@@ -1,5 +1,14 @@
 # VinusPanel changelog
 
+## 1.2.0 — Workspace refresh
+
+- introduced a Pyrodactyl-inspired workspace while preserving VinusPanel's own identity and assets;
+- added persistent grid and list layouts to the server dashboard;
+- redesigned server cards for both compact and detailed browsing;
+- rebuilt the server sidebar with stronger navigation, branding, and active-server context;
+- simplified page headers and surfaces for a cleaner, more focused interface;
+- improved responsive behavior and keyboard-visible controls.
+
 ## 1.1.0 — Complete interface redesign
 
 - introduced an immersive and responsive sign-in page;

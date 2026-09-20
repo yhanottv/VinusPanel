@@ -16,8 +16,8 @@ import { VINUS } from '@/theme';
 
 const Navigation = styled.header`
     ${tw`sticky top-0 z-50 w-full`};
-    background: rgba(7, 12, 18, 0.88);
-    border-bottom: 1px solid rgba(157, 176, 195, 0.14);
+    background: rgba(8, 8, 9, 0.9);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(22px) saturate(135%);
 
     &::after {
@@ -30,13 +30,13 @@ const Navigation = styled.header`
 
 const NavigationInner = styled.div`
     ${tw`mx-auto flex w-full items-center px-4`};
-    max-width: 1680px;
-    height: 4.75rem;
+    max-width: 1800px;
+    height: 4.5rem;
 `;
 
 const BrandMark = styled.span`
     ${tw`mr-3 flex h-10 w-10 flex-none items-center justify-center overflow-hidden rounded-xl border`};
-    background: linear-gradient(145deg, rgba(var(--vinus-accent-rgb), 0.18), rgba(8, 13, 20, 0.92));
+    background: linear-gradient(145deg, rgba(var(--vinus-accent-rgb), 0.18), rgba(10, 10, 11, 0.96));
     border-color: rgba(var(--vinus-accent-rgb), 0.32);
     box-shadow: 0 0 26px rgba(var(--vinus-accent-rgb), 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 
@@ -85,7 +85,7 @@ const RightNavigation = styled.div`
     & > button,
     & > .navigation-link {
         ${tw`flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border border-transparent p-0 text-neutral-400 no-underline transition-all duration-150`};
-        background: rgba(17, 29, 43, 0.58);
+        background: rgba(255, 255, 255, 0.045);
 
         &:active,
         &:hover {

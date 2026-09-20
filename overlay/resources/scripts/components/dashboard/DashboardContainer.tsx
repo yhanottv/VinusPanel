@@ -1,6 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle, faLayerGroup, faServer, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import {
+    faCheckCircle,
+    faLayerGroup,
+    faList,
+    faServer,
+    faThLarge,
+    faTimesCircle,
+} from '@fortawesome/free-solid-svg-icons';
 import { Server } from '@/api/server/getServer';
 import getServers from '@/api/getServers';
 import ServerRow, { ServerDisplayState } from '@/components/dashboard/ServerRow';
@@ -18,17 +25,14 @@ import { useLocation } from 'react-router-dom';
 import styled from 'styled-components/macro';
 
 const DashboardHero = styled.header`
-    ${tw`relative mb-5 overflow-hidden rounded-3xl border p-6 sm:p-8`};
-    background: radial-gradient(circle at 84% 24%, rgba(var(--vinus-accent-rgb), 0.2), transparent 20rem),
-        linear-gradient(120deg, rgba(20, 35, 52, 0.98), rgba(10, 18, 28, 0.98));
-    border-color: rgba(157, 176, 195, 0.18);
-    box-shadow: 0 24px 65px rgba(0, 0, 0, 0.22);
+    ${tw`relative mb-6 overflow-hidden border-b pb-7 pt-3`};
+    border-color: rgba(255, 255, 255, 0.08);
 
     &::after {
         content: '';
-        ${tw`pointer-events-none absolute -bottom-20 right-3 h-72 w-72`};
+        ${tw`pointer-events-none absolute -bottom-24 right-3 h-72 w-72`};
         background: url('/assets/images/vinus/eagle.png') center / contain no-repeat;
-        opacity: 0.08;
+        opacity: 0.045;
     }
 `;
 
@@ -36,19 +40,20 @@ const HeroContent = styled.div`
     ${tw`relative z-10 max-w-2xl`};
 
     h1 {
-        ${tw`text-3xl font-semibold text-neutral-50 sm:text-4xl`};
-        letter-spacing: -0.04em;
+        ${tw`text-4xl font-semibold text-neutral-50 sm:text-5xl`};
+        letter-spacing: -0.055em;
     }
 `;
 
 const SummaryGrid = styled.div`
     ${tw`relative z-10 mt-7 grid grid-cols-1 gap-3 sm:grid-cols-3`};
+    max-width: 46rem;
 `;
 
 const SummaryItem = styled.div<{ $tone?: 'success' | 'danger' }>`
     ${tw`flex items-center rounded-2xl border px-4 py-3`};
-    background: rgba(5, 10, 16, 0.42);
-    border-color: rgba(157, 176, 195, 0.14);
+    background: rgba(255, 255, 255, 0.035);
+    border-color: rgba(255, 255, 255, 0.07);
     backdrop-filter: blur(10px);
 
     & > svg {
@@ -59,8 +64,8 @@ const SummaryItem = styled.div<{ $tone?: 'success' | 'danger' }>`
 
 const DashboardToolbar = styled.div`
     ${tw`mb-5 flex flex-col gap-3 rounded-2xl border px-4 py-3 sm:flex-row sm:items-center sm:justify-between`};
-    background: rgba(14, 24, 36, 0.76);
-    border-color: rgba(157, 176, 195, 0.14);
+    background: rgba(255, 255, 255, 0.025);
+    border-color: rgba(255, 255, 255, 0.07);
 `;
 
 const AdminToggle = styled.div`
@@ -69,14 +74,43 @@ const AdminToggle = styled.div`
     border-color: rgba(157, 176, 195, 0.12);
 `;
 
+const ToolbarActions = styled.div`
+    ${tw`flex flex-wrap items-center gap-2`};
+`;
+
+const ViewSwitcher = styled.div`
+    ${tw`flex items-center rounded-xl border p-1`};
+    background: rgba(0, 0, 0, 0.24);
+    border-color: rgba(255, 255, 255, 0.08);
+
+    button {
+        ${tw`flex h-8 w-8 items-center justify-center rounded-lg text-neutral-500 transition-colors`};
+
+        &:hover {
+            ${tw`text-neutral-200`};
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        &.active {
+            color: #ff9b52;
+            background: rgba(var(--vinus-accent-rgb), 0.14);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--vinus-accent);
+        }
+    }
+`;
+
 const EmptyState = styled.div`
     ${tw`rounded-2xl border px-6 py-16 text-center`};
     background: rgba(16, 27, 39, 0.72);
     border-color: rgba(157, 176, 195, 0.16);
 `;
 
-const ServerGrid = styled.div`
-    ${tw`grid grid-cols-1 gap-4 xl:grid-cols-2`};
+const ServerGrid = styled.div<{ $view: 'grid' | 'list' }>`
+    ${tw`grid grid-cols-1 gap-3`};
+    ${({ $view }) => $view === 'grid' && tw`xl:grid-cols-2`};
 `;
 
 export default () => {
@@ -90,6 +124,7 @@ export default () => {
     const username = useStoreState((state) => state.user.data!.username);
     const rootAdmin = useStoreState((state) => state.user.data!.rootAdmin);
     const [showOnlyAdmin, setShowOnlyAdmin] = usePersistedState(`${uuid}:show_all_servers`, false);
+    const [displayMode, setDisplayMode] = usePersistedState<'grid' | 'list'>(`${uuid}:dashboard_display`, 'grid');
 
     const { data: servers, error } = useSWR<PaginatedResult<Server>>(
         ['/api/client/servers', showOnlyAdmin && rootAdmin, page],
@@ -193,18 +228,40 @@ export default () => {
                         </p>
                     </div>
                 </div>
-                {rootAdmin && (
-                    <AdminToggle>
-                        <p css={tw`mr-3 text-xs font-medium text-neutral-300`}>
-                            {showOnlyAdmin ? 'Vue administrateur' : 'Mes serveurs'}
-                        </p>
-                        <Switch
-                            name={'show_all_servers'}
-                            defaultChecked={showOnlyAdmin}
-                            onChange={() => setShowOnlyAdmin((current) => !current)}
-                        />
-                    </AdminToggle>
-                )}
+                <ToolbarActions>
+                    {rootAdmin && (
+                        <AdminToggle>
+                            <p css={tw`mr-3 text-xs font-medium text-neutral-300`}>
+                                {showOnlyAdmin ? 'Vue administrateur' : 'Mes serveurs'}
+                            </p>
+                            <Switch
+                                name={'show_all_servers'}
+                                defaultChecked={showOnlyAdmin}
+                                onChange={() => setShowOnlyAdmin((current) => !current)}
+                            />
+                        </AdminToggle>
+                    )}
+                    <ViewSwitcher aria-label={'Mode d’affichage'}>
+                        <button
+                            type={'button'}
+                            className={displayMode === 'list' ? 'active' : undefined}
+                            onClick={() => setDisplayMode('list')}
+                            aria-label={'Afficher les serveurs en liste'}
+                            aria-pressed={displayMode === 'list'}
+                        >
+                            <FontAwesomeIcon icon={faList} />
+                        </button>
+                        <button
+                            type={'button'}
+                            className={displayMode === 'grid' ? 'active' : undefined}
+                            onClick={() => setDisplayMode('grid')}
+                            aria-label={'Afficher les serveurs en grille'}
+                            aria-pressed={displayMode === 'grid'}
+                        >
+                            <FontAwesomeIcon icon={faThLarge} />
+                        </button>
+                    </ViewSwitcher>
+                </ToolbarActions>
             </DashboardToolbar>
             {!servers ? (
                 <Spinner centered size={'large'} />
@@ -212,11 +269,12 @@ export default () => {
                 <Pagination data={servers} onPageSelect={setPage}>
                     {({ items }) =>
                         items.length > 0 ? (
-                            <ServerGrid>
+                            <ServerGrid $view={displayMode}>
                                 {items.map((server) => (
                                     <ServerRow
                                         key={server.uuid}
                                         server={server}
+                                        view={displayMode}
                                         onStatusChange={onServerStatusChange}
                                     />
                                 ))}

@@ -1,7 +1,7 @@
 {
   "name": "VinusPanel",
-  "version": "1.1.0",
-  "description": "Thème sombre orange et accessible pour Pterodactyl Panel.",
+  "version": "1.2.0",
+  "description": "Dark, accessible, workspace-first theme for Pterodactyl Panel.",
   "author": "yhanottv",
   "license": "MIT",
   "compatibility": {

@@ -3,8 +3,8 @@ import tw from 'twin.macro';
 
 const SubNavigation = styled.div`
     ${tw`sticky z-40 w-full overflow-x-auto px-4 py-3`};
-    top: 4.75rem;
-    background: rgba(8, 13, 20, 0.78);
+    top: 4.5rem;
+    background: rgba(8, 9, 11, 0.86);
     border-bottom: 1px solid rgba(126, 144, 163, 0.12);
     backdrop-filter: blur(14px);
 
@@ -17,8 +17,8 @@ const SubNavigation = styled.div`
         width: max-content;
         min-width: min(100%, 1280px);
         max-width: 1280px;
-        background: #0e1622;
-        border: 1px solid rgba(126, 144, 163, 0.16);
+        background: #0d0e11;
+        border: 1px solid rgba(255, 255, 255, 0.08);
 
         & > a,
         & > div {
@@ -46,7 +46,17 @@ const SubNavigation = styled.div`
     &.server-sidebar {
         ${tw`z-30`};
 
-        & > div {
+        .server-sidebar-brand,
+        .server-sidebar-label,
+        .server-sidebar-current {
+            ${tw`hidden`};
+        }
+
+        .server-sidebar-links {
+            ${tw`flex items-center`};
+        }
+
+        .server-sidebar-links {
             & > a,
             & > div > a {
                 ${tw`inline-flex items-center gap-2`};
@@ -66,24 +76,18 @@ const SubNavigation = styled.div`
     @media (min-width: 1024px) {
         &.server-sidebar {
             ${tw`sticky overflow-y-auto overflow-x-hidden p-0`};
-            top: 6rem;
-            height: calc(100vh - 7rem);
+            top: 5.25rem;
+            height: calc(100vh - 6rem);
             background: transparent;
             border: 0;
             backdrop-filter: none;
 
             & > div {
-                ${tw`relative m-0 flex h-full min-w-0 flex-col items-stretch gap-1 overflow-hidden rounded-2xl p-2`};
+                ${tw`relative m-0 flex h-full min-w-0 flex-col items-stretch overflow-hidden rounded-2xl p-5`};
                 width: 100%;
-                background: linear-gradient(180deg, rgba(18, 31, 46, 0.98), rgba(9, 17, 26, 0.98));
-                border-color: rgba(157, 176, 195, 0.16);
-                box-shadow: 0 20px 48px rgba(0, 0, 0, 0.24);
-
-                &::before {
-                    content: 'ESPACE SERVEUR';
-                    ${tw`relative z-10 mb-2 block px-3 pb-3 pt-2 text-[0.68rem] font-semibold tracking-[0.18em] text-neutral-500`};
-                    border-bottom: 1px solid rgba(157, 176, 195, 0.12);
-                }
+                background: linear-gradient(180deg, rgba(12, 12, 13, 0.99), rgba(7, 8, 9, 0.99));
+                border-color: rgba(255, 255, 255, 0.08);
+                box-shadow: 0 20px 48px rgba(0, 0, 0, 0.3);
 
                 &::after {
                     content: '';
@@ -92,15 +96,51 @@ const SubNavigation = styled.div`
                     opacity: 0.035;
                 }
 
-                & > a,
-                & > div,
-                & > div > a {
+                .server-sidebar-brand {
+                    ${tw`relative z-10 mb-5 block border-b pb-5`};
+                    border-color: rgba(255, 255, 255, 0.08);
+
+                    a {
+                        ${tw`flex items-center no-underline`};
+                    }
+
+                    img {
+                        ${tw`mr-3 h-10 w-10 rounded-xl object-contain`};
+                        background: rgba(var(--vinus-accent-rgb), 0.1);
+                        border: 1px solid rgba(var(--vinus-accent-rgb), 0.22);
+                    }
+
+                    strong,
+                    span {
+                        ${tw`block`};
+                    }
+
+                    strong {
+                        ${tw`text-sm font-semibold text-neutral-100`};
+                    }
+
+                    span {
+                        ${tw`mt-0.5 text-[0.64rem] uppercase tracking-[0.16em] text-neutral-500`};
+                    }
+                }
+
+                .server-sidebar-label {
+                    ${tw`relative z-10 mb-2 block px-2 text-[0.64rem] font-semibold uppercase tracking-[0.18em] text-neutral-600`};
+                }
+
+                .server-sidebar-links {
+                    ${tw`relative z-10 flex min-h-0 flex-1 flex-col items-stretch gap-1 overflow-y-auto`};
+                }
+
+                .server-sidebar-links > a,
+                .server-sidebar-links > div,
+                .server-sidebar-links > div > a {
                     ${tw`w-full`};
                 }
 
-                & > a,
-                & > div > a {
-                    ${tw`relative z-10 flex items-center gap-3 rounded-xl px-3 py-2.5`};
+                .server-sidebar-links > a,
+                .server-sidebar-links > div > a {
+                    ${tw`relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium`};
                     border: 1px solid transparent;
 
                     & > svg {
@@ -109,9 +149,33 @@ const SubNavigation = styled.div`
 
                     &.active {
                         color: #f8fbff;
-                        background: linear-gradient(90deg, rgba(255, 122, 26, 0.2), rgba(255, 122, 26, 0.05));
-                        border-color: rgba(255, 122, 26, 0.22);
-                        box-shadow: inset 3px 0 0 #ff7a1a, 0 8px 20px rgba(0, 0, 0, 0.1);
+                        background: rgba(255, 255, 255, 0.07);
+                        border-color: rgba(255, 255, 255, 0.07);
+                        box-shadow: inset 3px 0 0 #ff7a1a;
+                    }
+                }
+
+                .server-sidebar-current {
+                    ${tw`relative z-10 mt-5 block rounded-xl border p-3`};
+                    background: rgba(255, 255, 255, 0.035);
+                    border-color: rgba(255, 255, 255, 0.08);
+
+                    span,
+                    strong,
+                    small {
+                        ${tw`block truncate`};
+                    }
+
+                    span {
+                        ${tw`text-[0.62rem] font-semibold uppercase tracking-[0.15em] text-neutral-500`};
+                    }
+
+                    strong {
+                        ${tw`mt-2 text-sm font-semibold text-neutral-100`};
+                    }
+
+                    small {
+                        ${tw`mt-1 font-mono text-[0.65rem] text-neutral-600`};
                     }
                 }
             }

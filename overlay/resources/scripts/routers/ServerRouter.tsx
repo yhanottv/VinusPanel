@@ -1,6 +1,6 @@
 import TransferListener from '@/components/server/TransferListener';
 import React, { useEffect, useState } from 'react';
-import { NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
+import { Link, NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
 import NavigationBar from '@/components/NavigationBar';
 import TransitionRouter from '@/TransitionRouter';
 import WebsocketHandler from '@/components/server/WebsocketHandler';
@@ -34,6 +34,7 @@ import ConflictStateRenderer from '@/components/server/ConflictStateRenderer';
 import PermissionRoute from '@/components/elements/PermissionRoute';
 import routes from '@/routers/routes';
 import ServerShellHeader from '@/components/server/ServerShellHeader';
+import { VINUS } from '@/theme';
 
 const navigationIcons: Record<string, IconDefinition> = {
     '/': faTerminal,
@@ -59,6 +60,7 @@ export default () => {
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const inConflictState = ServerContext.useStoreState((state) => state.server.inConflictState);
     const serverId = ServerContext.useStoreState((state) => state.server.data?.internalId);
+    const serverName = ServerContext.useStoreState((state) => state.server.data?.name);
     const getServer = ServerContext.useStoreActions((actions) => actions.server.getServer);
     const clearServerState = ServerContext.useStoreActions((actions) => actions.clearServerState);
 
@@ -103,40 +105,57 @@ export default () => {
                     <CSSTransition timeout={150} classNames={'fade'} appear in>
                         <SubNavigation className={'server-sidebar'}>
                             <div>
-                                {routes.server
-                                    .filter((route) => !!route.name)
-                                    .map((route) =>
-                                        route.permission ? (
-                                            <Can key={route.path} action={route.permission} matchAny>
-                                                <NavLink to={to(route.path, true)} exact={route.exact}>
+                                <div className={'server-sidebar-brand'}>
+                                    <Link to={'/'} aria-label={'Retour aux serveurs'}>
+                                        <img src={VINUS.logo} alt={''} aria-hidden={'true'} />
+                                        <div>
+                                            <strong>{VINUS.name}</strong>
+                                            <span>Control center</span>
+                                        </div>
+                                    </Link>
+                                </div>
+                                <p className={'server-sidebar-label'}>Navigation</p>
+                                <div className={'server-sidebar-links'}>
+                                    {routes.server
+                                        .filter((route) => !!route.name)
+                                        .map((route) =>
+                                            route.permission ? (
+                                                <Can key={route.path} action={route.permission} matchAny>
+                                                    <NavLink to={to(route.path, true)} exact={route.exact}>
+                                                        <FontAwesomeIcon
+                                                            icon={navigationIcons[route.path] || faTerminal}
+                                                            fixedWidth
+                                                        />
+                                                        <span>{route.name}</span>
+                                                    </NavLink>
+                                                </Can>
+                                            ) : (
+                                                <NavLink key={route.path} to={to(route.path, true)} exact={route.exact}>
                                                     <FontAwesomeIcon
                                                         icon={navigationIcons[route.path] || faTerminal}
                                                         fixedWidth
                                                     />
                                                     <span>{route.name}</span>
                                                 </NavLink>
-                                            </Can>
-                                        ) : (
-                                            <NavLink key={route.path} to={to(route.path, true)} exact={route.exact}>
-                                                <FontAwesomeIcon
-                                                    icon={navigationIcons[route.path] || faTerminal}
-                                                    fixedWidth
-                                                />
-                                                <span>{route.name}</span>
-                                            </NavLink>
-                                        )
+                                            )
+                                        )}
+                                    {rootAdmin && (
+                                        // eslint-disable-next-line react/jsx-no-target-blank
+                                        <a
+                                            href={`/admin/servers/view/${serverId}`}
+                                            target={'_blank'}
+                                            title={'Administration du serveur'}
+                                        >
+                                            <FontAwesomeIcon icon={faExternalLinkAlt} />
+                                            <span>Administration</span>
+                                        </a>
                                     )}
-                                {rootAdmin && (
-                                    // eslint-disable-next-line react/jsx-no-target-blank
-                                    <a
-                                        href={`/admin/servers/view/${serverId}`}
-                                        target={'_blank'}
-                                        title={'Administration du serveur'}
-                                    >
-                                        <FontAwesomeIcon icon={faExternalLinkAlt} />
-                                        <span>Administration</span>
-                                    </a>
-                                )}
+                                </div>
+                                <div className={'server-sidebar-current'}>
+                                    <span>Serveur actif</span>
+                                    <strong>{serverName}</strong>
+                                    <small>{id}</small>
+                                </div>
                             </div>
                         </SubNavigation>
                     </CSSTransition>

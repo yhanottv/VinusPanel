@@ -20,12 +20,15 @@ const statusColor = (status: ServerPowerState | 'loading' | 'suspended' | 'maint
     return '#fbbf24';
 };
 
-const ServerCard = styled(GreyRowBox)<{ $status: ReturnType<typeof getDisplayStatus>['key'] }>`
+const ServerCard = styled(GreyRowBox)<{
+    $status: ReturnType<typeof getDisplayStatus>['key'];
+    $view: 'grid' | 'list';
+}>`
     ${tw`relative grid min-h-[17rem] gap-5 overflow-hidden rounded-2xl border p-5 no-underline sm:p-6`};
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto 1fr;
-    background: linear-gradient(155deg, rgba(18, 31, 46, 0.98), rgba(11, 20, 30, 0.98));
-    border-color: rgba(157, 176, 195, 0.16);
+    background: linear-gradient(155deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.025));
+    border-color: rgba(255, 255, 255, 0.08);
     box-shadow: 0 16px 38px rgba(0, 0, 0, 0.18);
     transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 
@@ -75,6 +78,28 @@ const ServerCard = styled(GreyRowBox)<{ $status: ReturnType<typeof getDisplaySta
         }
     }
 
+    ${({ $view }) =>
+        $view === 'list' &&
+        `
+        min-height: 0;
+        grid-template-columns: minmax(13rem, 1.35fr) minmax(10rem, 0.8fr) minmax(22rem, 1.5fr);
+        grid-template-rows: auto;
+        align-items: center;
+        gap: 1.25rem;
+        padding: 1.15rem 1.35rem;
+
+        &::after {
+            background-size: 8rem auto;
+            background-position: 38% center;
+            opacity: 0.1;
+        }
+
+        @media (max-width: 1023px) {
+            grid-template-columns: minmax(0, 1fr);
+            grid-template-rows: auto auto auto;
+        }
+    `}
+
     @media (prefers-reduced-motion: reduce) {
         transition: none;
     }
@@ -119,9 +144,22 @@ const AddressBlock = styled.div`
     border-color: rgba(157, 176, 195, 0.11);
 `;
 
-const MetricGrid = styled.div`
+const MetricGrid = styled.div<{ $view: 'grid' | 'list' }>`
     ${tw`grid grid-cols-3 gap-3 self-end border-t pt-4`};
     border-color: rgba(157, 176, 195, 0.13);
+
+    ${({ $view }) =>
+        $view === 'list' &&
+        `
+        align-self: center;
+        border-top: 0;
+        padding-top: 0;
+
+        @media (max-width: 1023px) {
+            border-top: 1px solid rgba(157, 176, 195, 0.13);
+            padding-top: 1rem;
+        }
+    `}
 `;
 
 const MetricItem = styled.div<{ $alarm: boolean }>`
@@ -213,10 +251,12 @@ type Timer = ReturnType<typeof setInterval>;
 export default ({
     server,
     className,
+    view = 'grid',
     onStatusChange,
 }: {
     server: Server;
     className?: string;
+    view?: 'grid' | 'list';
     onStatusChange?: (uuid: string, status: ServerDisplayState) => void;
 }) => {
     const interval = useRef<Timer>(null) as React.MutableRefObject<Timer>;
@@ -268,7 +308,13 @@ export default ({
     }, [displayStatus.key, onStatusChange, server.uuid]);
 
     return (
-        <ServerCard as={Link} to={`/server/${server.id}`} className={className} $status={displayStatus.key}>
+        <ServerCard
+            as={Link}
+            to={`/server/${server.id}`}
+            className={className}
+            $status={displayStatus.key}
+            $view={view}
+        >
             <ServerIdentity>
                 <ServerIcon $status={displayStatus.key}>
                     <FontAwesomeIcon icon={faServer} />
@@ -294,7 +340,7 @@ export default ({
                     </p>
                 </div>
             </AddressBlock>
-            <MetricGrid>
+            <MetricGrid $view={view}>
                 <Metric
                     icon={faMicrochip}
                     label={'CPU'}

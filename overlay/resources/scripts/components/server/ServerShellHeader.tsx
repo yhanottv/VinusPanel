@@ -11,17 +11,14 @@ import PowerButtons from '@/components/server/console/PowerButtons';
 import routes from '@/routers/routes';
 
 const Header = styled.header`
-    ${tw`relative mb-5 overflow-hidden rounded-3xl border p-5 sm:p-6`};
-    background: radial-gradient(circle at 88% 20%, rgba(var(--vinus-accent-rgb), 0.2), transparent 18rem),
-        linear-gradient(125deg, rgba(19, 33, 49, 0.98), rgba(9, 17, 26, 0.98));
-    border-color: rgba(157, 176, 195, 0.17);
-    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.2);
+    ${tw`relative mb-6 overflow-hidden border-b pb-6`};
+    border-color: rgba(255, 255, 255, 0.08);
 
     &::after {
         content: '';
-        ${tw`pointer-events-none absolute -bottom-20 right-5 h-64 w-64`};
+        ${tw`pointer-events-none absolute -bottom-24 right-5 h-64 w-64`};
         background: url('/assets/images/vinus/eagle.png') center / contain no-repeat;
-        opacity: 0.07;
+        opacity: 0.04;
     }
 `;
 
@@ -126,7 +123,7 @@ export default () => {
                     </ServerMark>
                     <div css={tw`min-w-0`}>
                         <div css={tw`flex flex-wrap items-center gap-2`}>
-                            <h1 css={tw`truncate text-2xl font-semibold text-neutral-50 sm:text-3xl`}>{server.name}</h1>
+                            <h1 css={tw`truncate text-3xl font-semibold text-neutral-50 sm:text-5xl`}>{server.name}</h1>
                             <Status $color={currentStatus.color} aria-live={'polite'}>
                                 <FontAwesomeIcon icon={faCircle} />
                                 {currentStatus.label}

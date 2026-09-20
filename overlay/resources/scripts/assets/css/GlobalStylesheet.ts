@@ -15,6 +15,8 @@ export default createGlobalStyle`
         --vinus-surface-soft: #162536;
         --vinus-border: rgba(157, 176, 195, 0.16);
         --vinus-muted: #91a4b7;
+        --vinus-sidebar: #0a0a0b;
+        --vinus-panel: rgba(255, 255, 255, 0.045);
     }
 
     @font-face {
@@ -29,11 +31,11 @@ export default createGlobalStyle`
     body {
         ${tw`font-sans text-neutral-200`};
         min-height: 100vh;
-        background-color: #080d14;
+        background-color: #08090b;
         background-image:
-            radial-gradient(circle at 12% -14rem, rgba(var(--vinus-accent-rgb), 0.14), transparent 38rem),
-            radial-gradient(circle at 92% 22rem, rgba(47, 76, 105, 0.16), transparent 34rem),
-            linear-gradient(180deg, #070c12 0%, #0a121c 48%, #080d14 100%);
+            radial-gradient(circle at 16% -18rem, rgba(var(--vinus-accent-rgb), 0.12), transparent 40rem),
+            radial-gradient(circle at 96% 28rem, rgba(255, 255, 255, 0.035), transparent 34rem),
+            linear-gradient(180deg, #08090b 0%, #0b0d10 52%, #08090b 100%);
         background-attachment: fixed;
         letter-spacing: 0.006em;
         font-feature-settings: 'tnum' 1, 'cv02' 1, 'cv03' 1;
@@ -80,16 +82,21 @@ export default createGlobalStyle`
     @media (min-width: 1024px) {
         .server-layout {
             display: grid;
-            grid-template-columns: 15.5rem minmax(0, 1fr);
-            gap: 1.5rem;
+            grid-template-columns: 18rem minmax(0, 1fr);
+            gap: 0.75rem;
             width: 100%;
-            max-width: 1680px;
+            max-width: 1800px;
             margin: 0 auto;
-            padding: 0 1.25rem;
+            padding: 0 0.75rem 0.75rem;
         }
 
         .server-workspace {
-            padding-top: 1.25rem;
+            min-height: calc(100vh - 5.5rem);
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 1.25rem;
+            background: rgba(8, 9, 11, 0.62);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
         }
 
         .server-route-content > * {

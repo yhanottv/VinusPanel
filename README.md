@@ -11,8 +11,8 @@ VinusPanel ships only the theme overlay and its installation tools. It does **no
 ## ✨ Highlights
 
 - immersive, responsive, and accessible sign-in experience;
-- live server overview with clear status and resource cards;
-- unified server workspace with contextual information and quick power controls;
+- live server overview with clear status, resource cards, and persistent grid/list layouts;
+- workspace-first server interface with a dedicated sidebar and quick power controls;
 - redesigned sidebar, console, charts, network, and settings screens;
 - consistent dark surfaces with an orange visual identity;
 - automatic maintenance mode, backups, and rollback on installation failure;
@@ -147,7 +147,7 @@ Manual installation does not provide VinusPanel's automatic backup and rollback 
 
 ## 📦 Releases
 
-The current stable version is **1.1.0**. See the [latest release](https://github.com/yhanottv/VinusPanel/releases/latest) or read [CHANGELOG.md](CHANGELOG.md).
+The current stable version is **1.2.0**. See the [latest release](https://github.com/yhanottv/VinusPanel/releases/latest) or read [CHANGELOG.md](CHANGELOG.md).
 
 ## 📄 License
 
