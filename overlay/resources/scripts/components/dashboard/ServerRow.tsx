@@ -24,17 +24,17 @@ const ServerCard = styled(GreyRowBox)<{
     $status: ReturnType<typeof getDisplayStatus>['key'];
     $view: 'grid' | 'list';
 }>`
-    ${tw`relative grid min-h-[17rem] gap-5 overflow-hidden rounded-2xl border p-5 no-underline sm:p-6`};
+    ${tw`relative grid min-h-[15rem] gap-5 overflow-hidden rounded-xl border p-5 no-underline`};
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto 1fr;
-    background: linear-gradient(155deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.025));
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.022));
     border-color: rgba(255, 255, 255, 0.08);
     box-shadow: 0 16px 38px rgba(0, 0, 0, 0.18);
     transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 
     &::before {
         content: '';
-        ${tw`absolute bottom-4 left-0 top-4 w-1 rounded-r-full`};
+        ${tw`absolute bottom-3 left-0 top-3 w-[3px] rounded-r-full`};
         background: ${({ $status }) => statusColor($status)};
         z-index: 2;
     }
@@ -42,16 +42,7 @@ const ServerCard = styled(GreyRowBox)<{
     &::after {
         content: '';
         ${tw`pointer-events-none absolute inset-0`};
-        background: linear-gradient(
-                180deg,
-                #101b27 0%,
-                rgba(16, 27, 39, 0.2) 24%,
-                rgba(16, 27, 39, 0.2) 72%,
-                #101b27 100%
-            ),
-            linear-gradient(90deg, rgba(16, 27, 39, 0.94) 0%, rgba(16, 27, 39, 0.74) 58%, rgba(16, 27, 39, 0.88) 100%),
-            url('/assets/images/vinus/eagle.png') right -1.5rem top 0.5rem / 11rem auto no-repeat;
-        opacity: 0.18;
+        background: radial-gradient(circle at 92% 10%, rgba(var(--vinus-accent-rgb), 0.08), transparent 14rem);
     }
 
     & > * {
@@ -59,9 +50,10 @@ const ServerCard = styled(GreyRowBox)<{
     }
 
     &:hover {
-        border-color: rgba(var(--vinus-accent-rgb), 0.35);
-        box-shadow: 0 22px 50px rgba(0, 0, 0, 0.24), 0 0 30px rgba(var(--vinus-accent-rgb), 0.06);
-        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.15);
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.03));
+        box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
+        transform: translateY(-1px);
     }
 
     &:focus-visible {
@@ -72,26 +64,20 @@ const ServerCard = styled(GreyRowBox)<{
     @media (max-width: 639px) {
         ${tw`min-h-0 gap-4 p-5`};
 
-        &::after {
-            background-position: 62% center;
-            opacity: 0.22;
-        }
     }
 
     ${({ $view }) =>
         $view === 'list' &&
         `
         min-height: 0;
-        grid-template-columns: minmax(13rem, 1.35fr) minmax(10rem, 0.8fr) minmax(22rem, 1.5fr);
+        grid-template-columns: minmax(15rem, 1.4fr) minmax(11rem, 0.75fr) minmax(23rem, 1.35fr);
         grid-template-rows: auto;
         align-items: center;
         gap: 1.25rem;
-        padding: 1.15rem 1.35rem;
+        padding: 1.05rem 1.25rem;
 
         &::after {
-            background-size: 8rem auto;
-            background-position: 38% center;
-            opacity: 0.1;
+            background: linear-gradient(90deg, transparent, rgba(var(--vinus-accent-rgb), 0.025));
         }
 
         @media (max-width: 1023px) {
@@ -110,9 +96,9 @@ const ServerIdentity = styled.div`
 `;
 
 const ServerIcon = styled.div<{ $status: ReturnType<typeof getDisplayStatus>['key'] }>`
-    ${tw`mr-4 flex h-14 w-14 flex-none items-center justify-center rounded-2xl text-lg`};
+    ${tw`mr-4 flex h-12 w-12 flex-none items-center justify-center rounded-xl text-base`};
     color: ${({ $status }) => statusColor($status)};
-    background: rgba(5, 9, 15, 0.58);
+    background: rgba(0, 0, 0, 0.28);
     border: 1px solid ${({ $status }) => statusColor($status)}38;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 `;
@@ -132,21 +118,21 @@ const StatusBadge = styled.span<{ $status: ReturnType<typeof getDisplayStatus>['
 `;
 
 const ServerName = styled.p`
-    ${tw`text-xl font-semibold text-neutral-100`};
+    ${tw`text-lg font-semibold text-neutral-100`};
     letter-spacing: -0.025em;
 `;
 
 const AddressBlock = styled.div`
-    ${tw`self-start rounded-xl border px-3 py-2.5`};
+    ${tw`self-start rounded-lg border px-3 py-2.5`};
     width: fit-content;
     max-width: 100%;
-    background: rgba(5, 10, 16, 0.32);
-    border-color: rgba(157, 176, 195, 0.11);
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.07);
 `;
 
 const MetricGrid = styled.div<{ $view: 'grid' | 'list' }>`
     ${tw`grid grid-cols-3 gap-3 self-end border-t pt-4`};
-    border-color: rgba(157, 176, 195, 0.13);
+    border-color: rgba(255, 255, 255, 0.08);
 
     ${({ $view }) =>
         $view === 'list' &&
@@ -188,9 +174,9 @@ const MetricTrack = styled.div<{ $alarm: boolean }>`
 `;
 
 const CardChevron = styled(FontAwesomeIcon)`
-    ${tw`absolute right-5 top-5 hidden h-3 w-3 rounded-full border p-2 text-neutral-400 sm:block`};
-    background: rgba(5, 10, 16, 0.42);
-    border-color: rgba(157, 176, 195, 0.14);
+    ${tw`absolute right-4 top-4 hidden h-3 w-3 rounded-lg border p-2 text-neutral-500 sm:block`};
+    background: rgba(0, 0, 0, 0.22);
+    border-color: rgba(255, 255, 255, 0.08);
 `;
 
 export type ServerDisplayState = ServerPowerState | 'loading' | 'suspended' | 'maintenance' | 'unavailable';

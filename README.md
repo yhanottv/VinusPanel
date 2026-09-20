@@ -12,8 +12,11 @@ VinusPanel ships only the theme overlay and its installation tools. It does **no
 
 - immersive, responsive, and accessible sign-in experience;
 - live server overview with clear status, resource cards, and persistent grid/list layouts;
-- workspace-first server interface with a dedicated sidebar and quick power controls;
-- redesigned sidebar, console, charts, network, and settings screens;
+- workspace-first server interface with grouped navigation and quick power controls;
+- redesigned console with real-time KPIs, trends, and a full-width terminal;
+- custom file manager with a compact toolbar, readable rows, and empty states;
+- redesigned account and security workspace;
+- consistent component styling across databases, backups, schedules, network, startup, settings, and activity;
 - consistent dark surfaces with an orange visual identity;
 - automatic maintenance mode, backups, and rollback on installation failure;
 - safe uninstaller that restores the files from before the first installation;
@@ -102,7 +105,7 @@ These backups cover the files changed by the theme. They do not replace a comple
 2. confirms compatibility with Pterodactyl 1.15.1;
 3. backs up every file that will be changed;
 4. enables Pterodactyl maintenance mode;
-5. installs the 40-file VinusPanel overlay;
+5. installs the 51-file VinusPanel overlay;
 6. compiles production assets with Yarn;
 7. clears Laravel views and application caches;
 8. restores the expected web-server ownership;
@@ -147,7 +150,7 @@ Manual installation does not provide VinusPanel's automatic backup and rollback 
 
 ## 📦 Releases
 
-The current stable version is **1.2.0**. See the [latest release](https://github.com/yhanottv/VinusPanel/releases/latest) or read [CHANGELOG.md](CHANGELOG.md).
+The current stable version is **1.3.0**. See the [latest release](https://github.com/yhanottv/VinusPanel/releases/latest) or read [CHANGELOG.md](CHANGELOG.md).
 
 ## 📄 License
 

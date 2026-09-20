@@ -5,7 +5,7 @@ import tw from 'twin.macro';
 
 type Props = Readonly<
     React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
-        title?: string;
+        title?: React.ReactNode;
         borderColor?: string;
         showFlashes?: string | boolean;
         showLoadingOverlay?: boolean;
@@ -14,13 +14,13 @@ type Props = Readonly<
 
 const ContentBox = ({ title, borderColor, showFlashes, showLoadingOverlay, children, ...props }: Props) => (
     <div {...props}>
-        {title && <h2 css={tw`mb-3 px-1 text-lg font-semibold text-neutral-100`}>{title}</h2>}
+        {title && <h2 css={tw`mb-3 px-1 text-base font-semibold text-neutral-100`}>{title}</h2>}
         {showFlashes && (
             <FlashMessageRender byKey={typeof showFlashes === 'string' ? showFlashes : undefined} css={tw`mb-4`} />
         )}
         <div
             css={[
-                tw`relative rounded-2xl border border-neutral-600 bg-neutral-800 p-4 shadow-lg sm:p-5`,
+                tw`relative rounded-xl border border-neutral-600 bg-neutral-800 p-4 shadow-lg sm:p-5`,
                 !!borderColor && tw`border-t-4`,
             ]}
         >

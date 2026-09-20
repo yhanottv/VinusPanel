@@ -1,5 +1,16 @@
 # VinusPanel changelog
 
+## 1.3.0 — Full control workspace
+
+- replaced the legacy top navigation with a fixed application sidebar;
+- rebuilt the authenticated dashboard and account workspace around a consistent graphite design system;
+- reorganized every server route into grouped, permission-aware navigation;
+- redesigned the live console as a complete monitoring workspace with KPIs, trends, and a full-width terminal;
+- rebuilt the file manager with a dedicated toolbar, table header, richer file rows, and an empty state;
+- unified modern and legacy buttons, inputs, cards, rows, borders, spacing, and focus states;
+- improved French labels on account and security forms;
+- preserved responsive navigation and safe installer rollback behavior.
+
 ## 1.2.0 — Workspace refresh
 
 - introduced a Pyrodactyl-inspired workspace while preserving VinusPanel's own identity and assets;

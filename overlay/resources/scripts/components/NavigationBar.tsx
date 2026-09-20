@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCogs, faServer, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCogs, faServer, faSignOutAlt, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import SearchContainer from '@/components/dashboard/search/SearchContainer';
@@ -10,95 +10,92 @@ import tw from 'twin.macro';
 import styled from 'styled-components/macro';
 import http from '@/api/http';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
-import Tooltip from '@/components/elements/tooltip/Tooltip';
 import Avatar from '@/components/Avatar';
 import { VINUS } from '@/theme';
 
-const Navigation = styled.header`
-    ${tw`sticky top-0 z-50 w-full`};
-    background: rgba(8, 8, 9, 0.9);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(22px) saturate(135%);
-
-    &::after {
-        content: '';
-        ${tw`absolute bottom-0 left-0 h-px w-full`};
-        background: linear-gradient(90deg, transparent, rgba(var(--vinus-accent-rgb), 0.48), transparent);
-        opacity: 0.55;
-    }
+const Navigation = styled.aside`
+    ${tw`relative z-50 flex w-full flex-none border-b lg:sticky lg:top-3 lg:h-[calc(100vh-1.5rem)] lg:w-[17.5rem] lg:flex-col lg:overflow-hidden lg:rounded-2xl lg:border`};
+    background: rgba(15, 15, 19, 0.97);
+    border-color: rgba(255, 255, 255, 0.075);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.025);
 `;
 
 const NavigationInner = styled.div`
-    ${tw`mx-auto flex w-full items-center px-4`};
-    max-width: 1800px;
-    height: 4.5rem;
+    ${tw`flex h-[4.5rem] w-full items-center px-4 lg:h-full lg:flex-col lg:items-stretch lg:px-5 lg:py-5`};
+`;
+
+const Brand = styled(Link)`
+    ${tw`flex min-w-0 items-center no-underline lg:pb-5`};
+
+    @media (min-width: 1024px) {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.075);
+    }
 `;
 
 const BrandMark = styled.span`
     ${tw`mr-3 flex h-10 w-10 flex-none items-center justify-center overflow-hidden rounded-xl border`};
-    background: linear-gradient(145deg, rgba(var(--vinus-accent-rgb), 0.18), rgba(10, 10, 11, 0.96));
-    border-color: rgba(var(--vinus-accent-rgb), 0.32);
-    box-shadow: 0 0 26px rgba(var(--vinus-accent-rgb), 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    background: rgba(var(--vinus-accent-rgb), 0.1);
+    border-color: rgba(var(--vinus-accent-rgb), 0.22);
 
-    & > img {
+    img {
         ${tw`h-9 w-9 object-contain`};
-        filter: drop-shadow(0 0 6px rgba(var(--vinus-accent-rgb), 0.2));
     }
 `;
 
-const BrandName = styled.span`
-    ${tw`truncate text-lg font-semibold text-neutral-100`};
-    letter-spacing: -0.02em;
+const BrandCopy = styled.span`
+    ${tw`min-w-0`};
+
+    strong,
+    small {
+        ${tw`block truncate`};
+    }
+
+    strong {
+        ${tw`text-base font-semibold text-neutral-50`};
+    }
+
+    small {
+        ${tw`mt-0.5 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-neutral-500`};
+    }
 
     @media (max-width: 479px) {
         ${tw`hidden`};
     }
 `;
 
-const WorkspaceNavigation = styled.nav`
-    ${tw`hidden items-center md:flex`};
+const SectionLabel = styled.p`
+    ${tw`mb-2 mt-6 hidden px-3 text-[0.64rem] font-semibold uppercase tracking-[0.18em] text-neutral-600 lg:block`};
+`;
 
-    a {
-        ${tw`inline-flex items-center rounded-xl border border-transparent px-3.5 py-2 text-sm font-medium text-neutral-400 no-underline transition-all duration-150`};
+const MainNavigation = styled.nav`
+    ${tw`ml-auto flex items-center gap-1 lg:ml-0 lg:flex-col lg:items-stretch`};
+
+    a,
+    .search-entry > button,
+    .search-entry > div > button {
+        ${tw`flex h-10 items-center justify-center rounded-lg border border-transparent px-3 text-sm font-medium text-neutral-400 no-underline transition-all lg:w-full lg:justify-start`};
 
         svg {
-            ${tw`mr-2 text-neutral-500`};
+            ${tw`lg:mr-3`};
+        }
+
+        span {
+            ${tw`hidden lg:inline`};
         }
 
         &:hover,
         &.active {
             ${tw`text-neutral-100`};
-            background: rgba(var(--vinus-accent-rgb), 0.08);
-            border-color: rgba(var(--vinus-accent-rgb), 0.16);
-
-            svg {
-                color: var(--vinus-accent-soft);
-            }
-        }
-    }
-`;
-
-const RightNavigation = styled.div`
-    ${tw`ml-auto flex items-center gap-1.5`};
-
-    & > a,
-    & > button,
-    & > .navigation-link {
-        ${tw`flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border border-transparent p-0 text-neutral-400 no-underline transition-all duration-150`};
-        background: rgba(255, 255, 255, 0.045);
-
-        &:active,
-        &:hover {
-            ${tw`text-neutral-100`};
-            border-color: rgba(var(--vinus-accent-rgb), 0.26);
-            background: rgba(var(--vinus-accent-rgb), 0.09);
+            background: rgba(255, 255, 255, 0.055);
         }
 
         &.active {
-            color: var(--vinus-accent-soft);
-            border-color: rgba(var(--vinus-accent-rgb), 0.34);
-            background: rgba(var(--vinus-accent-rgb), 0.13);
-            box-shadow: 0 0 20px rgba(var(--vinus-accent-rgb), 0.09);
+            box-shadow: inset 3px 0 0 var(--vinus-accent);
+            background: rgba(var(--vinus-accent-rgb), 0.1);
+
+            svg {
+                color: #ff9b52;
+            }
         }
 
         &:focus-visible {
@@ -106,10 +103,61 @@ const RightNavigation = styled.div`
             outline-offset: 2px;
         }
     }
+
+    .search-entry {
+        ${tw`lg:w-full`};
+
+        & > div {
+            ${tw`lg:w-full`};
+        }
+    }
+`;
+
+const Footer = styled.div`
+    ${tw`ml-1 flex items-center gap-1 lg:mt-auto lg:ml-0 lg:block lg:border-t lg:pt-4`};
+    border-color: rgba(255, 255, 255, 0.075);
+`;
+
+const UserCard = styled(NavLink)`
+    ${tw`hidden min-w-0 items-center rounded-xl p-2 no-underline transition-colors lg:flex`};
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.045);
+    }
+
+    .avatar-wrap {
+        ${tw`mr-3 flex h-9 w-9 flex-none items-center justify-center overflow-hidden rounded-lg`};
+    }
+
+    strong,
+    small {
+        ${tw`block truncate`};
+    }
+
+    strong {
+        ${tw`text-sm font-medium text-neutral-100`};
+    }
+
+    small {
+        ${tw`mt-0.5 text-xs text-neutral-500`};
+    }
+`;
+
+const LogoutButton = styled.button`
+    ${tw`flex h-10 w-10 items-center justify-center rounded-lg text-neutral-500 transition-colors lg:mt-2 lg:w-full lg:justify-start lg:px-3`};
+
+    span {
+        ${tw`hidden lg:ml-3 lg:inline`};
+    }
+
+    &:hover {
+        ${tw`text-red-300`};
+        background: rgba(244, 63, 94, 0.08);
+    }
 `;
 
 export default () => {
-    const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data!.rootAdmin);
+    const user = useStoreState((state: ApplicationStore) => state.user.data!);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
     const onTriggerLogout = () => {
@@ -124,42 +172,50 @@ export default () => {
         <Navigation>
             <SpinnerOverlay visible={isLoggingOut} />
             <NavigationInner>
-                <div id={'logo'} className={'min-w-0 flex-1'}>
-                    <Link to={'/'} className={'inline-flex min-w-0 items-center no-underline'}>
-                        <BrandMark>
-                            <img src={VINUS.logo} alt={''} aria-hidden={'true'} />
-                        </BrandMark>
-                        <BrandName>{VINUS.name}</BrandName>
-                    </Link>
-                </div>
-                <WorkspaceNavigation aria-label={'Navigation principale'}>
+                <Brand to={'/'}>
+                    <BrandMark>
+                        <img src={VINUS.logo} alt={''} aria-hidden={'true'} />
+                    </BrandMark>
+                    <BrandCopy>
+                        <strong>{VINUS.name}</strong>
+                        <small>Game control</small>
+                    </BrandCopy>
+                </Brand>
+                <SectionLabel>Workspace</SectionLabel>
+                <MainNavigation aria-label={'Navigation principale'}>
                     <NavLink to={'/'} exact>
-                        <FontAwesomeIcon icon={faServer} />
-                        Serveurs
+                        <FontAwesomeIcon icon={faServer} fixedWidth />
+                        <span>Serveurs</span>
                     </NavLink>
-                </WorkspaceNavigation>
-                <RightNavigation>
-                    <SearchContainer />
-                    {rootAdmin && (
-                        <Tooltip placement={'bottom'} content={'Administration'}>
-                            <a href={'/admin'} rel={'noreferrer'}>
-                                <FontAwesomeIcon icon={faCogs} />
-                            </a>
-                        </Tooltip>
+                    <NavLink to={'/account'}>
+                        <FontAwesomeIcon icon={faUserCircle} fixedWidth />
+                        <span>Compte</span>
+                    </NavLink>
+                    {user.rootAdmin && (
+                        <a href={'/admin'}>
+                            <FontAwesomeIcon icon={faCogs} fixedWidth />
+                            <span>Administration</span>
+                        </a>
                     )}
-                    <Tooltip placement={'bottom'} content={'Compte'}>
-                        <NavLink to={'/account'}>
-                            <span className={'flex items-center w-5 h-5'}>
-                                <Avatar.User />
-                            </span>
-                        </NavLink>
-                    </Tooltip>
-                    <Tooltip placement={'bottom'} content={'Déconnexion'}>
-                        <button onClick={onTriggerLogout}>
-                            <FontAwesomeIcon icon={faSignOutAlt} />
-                        </button>
-                    </Tooltip>
-                </RightNavigation>
+                    <div className={'search-entry'} aria-label={'Rechercher'}>
+                        <SearchContainer />
+                    </div>
+                </MainNavigation>
+                <Footer>
+                    <UserCard to={'/account'}>
+                        <span className={'avatar-wrap'}>
+                            <Avatar.User />
+                        </span>
+                        <span className={'min-w-0'}>
+                            <strong>{user.username}</strong>
+                            <small>{user.email}</small>
+                        </span>
+                    </UserCard>
+                    <LogoutButton onClick={onTriggerLogout} aria-label={'Déconnexion'}>
+                        <FontAwesomeIcon icon={faSignOutAlt} fixedWidth />
+                        <span>Déconnexion</span>
+                    </LogoutButton>
+                </Footer>
             </NavigationInner>
         </Navigation>
     );

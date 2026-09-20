@@ -28,28 +28,30 @@ const ServerConsoleContainer = () => {
             )}
             <div className={styles.section_header}>
                 <div>
-                    <p className={styles.section_eyebrow}>TEMPS RÉEL</p>
-                    <h2>Console et ressources</h2>
+                    <p className={styles.section_eyebrow}>SUPERVISION EN TEMPS RÉEL</p>
+                    <h2>Vue d’ensemble</h2>
                 </div>
-                <p>Commandes, consommation et trafic de votre instance.</p>
+                <p>État, ressources et trafic de votre instance.</p>
             </div>
-            <div className={'grid grid-cols-12 gap-4 mb-5'}>
-                <div className={'flex col-span-12 xl:col-span-8'}>
-                    <Spinner.Suspense>
-                        <Console />
-                    </Spinner.Suspense>
-                </div>
-                <ServerDetailsBlock className={'col-span-12 xl:col-span-4'} />
+            <div className={'mb-6'}>
+                <ServerDetailsBlock />
             </div>
             <div className={styles.metrics_heading}>
-                <h2>Historique récent</h2>
-                <p>Mise à jour automatique depuis le flux WebSocket.</p>
+                <h2>Tendances</h2>
+                <p>Historique court mis à jour automatiquement.</p>
             </div>
-            <div className={'grid grid-cols-1 gap-4 md:grid-cols-3'}>
+            <div className={'mb-7 grid grid-cols-1 gap-4 md:grid-cols-3'}>
                 <Spinner.Suspense>
                     <StatGraphs />
                 </Spinner.Suspense>
             </div>
+            <div className={styles.metrics_heading}>
+                <h2>Console</h2>
+                <p>Sortie en direct et commandes administrateur.</p>
+            </div>
+            <Spinner.Suspense>
+                <Console />
+            </Spinner.Suspense>
             <Features enabled={eggFeatures} />
         </ServerContentBlock>
     );

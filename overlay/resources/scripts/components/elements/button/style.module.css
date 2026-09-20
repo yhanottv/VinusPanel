@@ -1,0 +1,85 @@
+.button {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-100;
+    @apply focus:ring-[3px] focus:ring-offset-2 focus:ring-offset-neutral-900 focus:ring-opacity-40;
+    min-height: 2.5rem;
+
+    &.small {
+        @apply h-8 px-3 py-0 text-xs font-medium focus:ring-2;
+        min-height: 2rem;
+    }
+
+    &.large {
+        @apply px-5 py-3;
+        min-height: 3rem;
+    }
+
+    &.secondary {
+        @apply bg-transparent text-neutral-100;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+
+        &:disabled {
+            background: transparent !important;
+        }
+    }
+
+    &:disabled {
+        @apply cursor-not-allowed opacity-50;
+    }
+
+    &.square {
+        @apply h-11 w-11 p-0;
+        min-height: 2.75rem;
+
+        &.small {
+            @apply h-8 w-8;
+            min-height: 2rem;
+        }
+    }
+}
+
+.primary {
+    @apply text-white;
+    background: #ff7a1a;
+    box-shadow: 0 8px 22px rgba(255, 122, 26, 0.16);
+
+    &:hover:not(:disabled),
+    &:active:not(:disabled) {
+        background: #ff8d3c;
+    }
+
+    &:focus {
+        --tw-ring-color: rgba(255, 122, 26, 0.72);
+    }
+
+    &.secondary:hover:not(:disabled) {
+        background: rgba(255, 122, 26, 0.14);
+        border-color: rgba(255, 122, 26, 0.28);
+    }
+}
+
+.text {
+    @apply text-neutral-100;
+    background: #2a2a31;
+
+    &:hover:not(:disabled),
+    &:active:not(:disabled) {
+        background: #36363f;
+    }
+
+    &:focus {
+        --tw-ring-color: rgba(255, 255, 255, 0.22);
+    }
+}
+
+.danger {
+    @apply bg-red-600 text-white;
+
+    &:hover:not(:disabled),
+    &:active:not(:disabled) {
+        @apply bg-red-500;
+    }
+
+    &:focus {
+        --tw-ring-color: rgba(244, 63, 94, 0.55);
+    }
+}

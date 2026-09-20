@@ -47,29 +47,12 @@ const pageDetails: Record<string, { label: string; description: string }> = {
     },
 };
 
-const PageIntro = styled.header`
-    ${tw`relative mb-6 overflow-hidden rounded-3xl border px-5 py-5 sm:px-6`};
-    background: linear-gradient(115deg, rgba(18, 31, 46, 0.96), rgba(10, 18, 28, 0.94));
-    border-color: rgba(157, 176, 195, 0.15);
-    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.15);
-
-    &::before {
-        content: '';
-        ${tw`absolute bottom-0 left-0 top-0 w-1`};
-        background: #ff7a1a;
-        box-shadow: 0 0 22px rgba(255, 122, 26, 0.45);
-    }
-
-    h1 {
-        ${tw`text-2xl font-semibold text-neutral-50`};
-    }
-
-    .page-eyebrow {
-        ${tw`mb-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-primary-300`};
-    }
+const PageIntro = styled.div`
+    ${tw`mb-5 flex items-center border-b pb-4`};
+    border-color: rgba(255, 255, 255, 0.06);
 
     p {
-        ${tw`mt-1 max-w-2xl text-sm text-neutral-400`};
+        ${tw`max-w-2xl text-sm text-neutral-400`};
     }
 `;
 
@@ -82,8 +65,6 @@ const ServerContentBlock: React.FC<Props> = ({ title, children, ...props }) => {
         <PageContentBlock title={`${name} | ${label}`} {...props}>
             {title !== 'Console' && (
                 <PageIntro>
-                    <p className={'page-eyebrow'}>{name}</p>
-                    <h1>{label}</h1>
                     <p>{details?.description || `Gérez les paramètres de ${name}.`}</p>
                 </PageIntro>
             )}

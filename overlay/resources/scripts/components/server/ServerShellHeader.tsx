@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useRouteMatch } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faCircle, faEthernet, faServer } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faCircle, faEthernet } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components/macro';
 import tw from 'twin.macro';
 import { ServerContext } from '@/state/server';
@@ -11,19 +11,12 @@ import PowerButtons from '@/components/server/console/PowerButtons';
 import routes from '@/routers/routes';
 
 const Header = styled.header`
-    ${tw`relative mb-6 overflow-hidden border-b pb-6`};
+    ${tw`relative mb-6 border-b pb-5`};
     border-color: rgba(255, 255, 255, 0.08);
-
-    &::after {
-        content: '';
-        ${tw`pointer-events-none absolute -bottom-24 right-5 h-64 w-64`};
-        background: url('/assets/images/vinus/eagle.png') center / contain no-repeat;
-        opacity: 0.04;
-    }
 `;
 
 const Breadcrumb = styled.div`
-    ${tw`relative z-10 mb-5 flex items-center text-xs text-neutral-500`};
+    ${tw`mb-4 flex items-center text-xs text-neutral-500`};
 
     a {
         ${tw`inline-flex items-center text-neutral-400 no-underline hover:text-primary-300`};
@@ -31,18 +24,11 @@ const Breadcrumb = styled.div`
 `;
 
 const HeaderLayout = styled.div`
-    ${tw`relative z-10 flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between`};
+    ${tw`flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between`};
 `;
 
 const Identity = styled.div`
-    ${tw`flex min-w-0 items-start`};
-`;
-
-const ServerMark = styled.div`
-    ${tw`mr-4 flex h-14 w-14 flex-none items-center justify-center rounded-2xl border text-primary-300`};
-    background: rgba(5, 10, 16, 0.46);
-    border-color: rgba(var(--vinus-accent-rgb), 0.24);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 28px rgba(var(--vinus-accent-rgb), 0.08);
+    ${tw`min-w-0`};
 `;
 
 const Status = styled.span<{ $color: string }>`
@@ -58,7 +44,7 @@ const Status = styled.span<{ $color: string }>`
 `;
 
 const Meta = styled.div`
-    ${tw`mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-neutral-400`};
+    ${tw`mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-neutral-400`};
 
     span {
         ${tw`inline-flex items-center`};
@@ -72,7 +58,7 @@ const HeaderActions = styled.div`
         ${tw`grid grid-cols-3 gap-2`};
 
         button {
-            ${tw`whitespace-nowrap`};
+            ${tw`min-h-[2.5rem] whitespace-nowrap rounded-lg border px-3 text-xs font-semibold`};
         }
     }
 
@@ -118,30 +104,27 @@ export default () => {
             </Breadcrumb>
             <HeaderLayout>
                 <Identity>
-                    <ServerMark>
-                        <FontAwesomeIcon icon={faServer} />
-                    </ServerMark>
-                    <div css={tw`min-w-0`}>
-                        <div css={tw`flex flex-wrap items-center gap-2`}>
-                            <h1 css={tw`truncate text-3xl font-semibold text-neutral-50 sm:text-5xl`}>{server.name}</h1>
-                            <Status $color={currentStatus.color} aria-live={'polite'}>
-                                <FontAwesomeIcon icon={faCircle} />
-                                {currentStatus.label}
-                            </Status>
-                        </div>
-                        <p css={tw`mt-1 line-clamp-1 max-w-2xl text-sm text-neutral-400`}>
-                            {server.description || 'Instance gérée depuis votre centre de contrôle VinusPanel.'}
-                        </p>
-                        <Meta>
-                            <span>
-                                <FontAwesomeIcon icon={faEthernet} css={tw`mr-2 text-primary-300`} />
-                                {allocation
-                                    ? `${allocation.alias || ip(allocation.ip)}:${allocation.port}`
-                                    : 'Aucune allocation principale'}
-                            </span>
-                            <span>ID&nbsp; {server.id}</span>
-                        </Meta>
+                    <p css={tw`mb-1 truncate text-xs font-semibold uppercase tracking-[0.16em] text-primary-300`}>
+                        {server.name}
+                    </p>
+                    <div css={tw`flex flex-wrap items-center gap-3`}>
+                        <h1 css={tw`text-2xl font-semibold text-neutral-50 sm:text-3xl`}>
+                            {route?.name || 'Serveur'}
+                        </h1>
+                        <Status $color={currentStatus.color} aria-live={'polite'}>
+                            <FontAwesomeIcon icon={faCircle} />
+                            {currentStatus.label}
+                        </Status>
                     </div>
+                    <Meta>
+                        <span>
+                            <FontAwesomeIcon icon={faEthernet} css={tw`mr-2 text-primary-300`} />
+                            {allocation
+                                ? `${allocation.alias || ip(allocation.ip)}:${allocation.port}`
+                                : 'Aucune allocation principale'}
+                        </span>
+                        <span>{server.description || `Identifiant ${server.id}`}</span>
+                    </Meta>
                 </Identity>
                 <HeaderActions>
                     <Can action={['control.start', 'control.stop', 'control.restart']} matchAny>

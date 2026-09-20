@@ -31,7 +31,7 @@ export default ({ title, copyOnClick, icon, color, className, progress, accent, 
                 <div className={styles.icon} style={ringStyle}>
                     <Icon icon={icon} />
                 </div>
-                <div className={'relative z-10 flex w-full min-w-0 flex-col justify-center overflow-hidden'}>
+                <div className={'relative z-10 flex w-full min-w-0 flex-col justify-end overflow-hidden'}>
                     <p className={'font-header text-xs font-medium leading-tight text-gray-400'}>{title}</p>
                     <div
                         ref={ref}

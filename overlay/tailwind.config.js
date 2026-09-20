@@ -1,16 +1,16 @@
 const colors = require('tailwindcss/colors');
 
 const gray = {
-    50: '#f8fbff',
-    100: '#edf4fb',
-    200: '#d6e1ec',
-    300: '#a7b8c9',
-    400: '#7e90a3',
-    500: '#516579',
-    600: '#293b4d',
-    700: '#1a2a3a',
-    800: '#101b27',
-    900: '#080f17',
+    50: '#fafafa',
+    100: '#f4f4f5',
+    200: '#e4e4e7',
+    300: '#d4d4d8',
+    400: '#a1a1aa',
+    500: '#71717a',
+    600: '#3f3f46',
+    700: '#27272a',
+    800: '#18181b',
+    900: '#09090b',
 };
 
 module.exports = {
@@ -23,7 +23,7 @@ module.exports = {
                 header: ['"IBM Plex Sans"', '"Roboto"', 'system-ui', 'sans-serif'],
             },
             colors: {
-                black: '#05090f',
+                black: '#050506',
                 // "primary" and "neutral" are deprecated, prefer the use of "blue" and "gray"
                 // in new code.
                 primary: colors.orange,

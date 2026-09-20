@@ -1,0 +1,126 @@
+.manager_toolbar {
+    @apply mb-5 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between;
+}
+
+.manager_path {
+    @apply min-w-0 flex-1 rounded-lg border px-3 py-2;
+    background: #111115;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.manager_actions {
+    @apply grid w-full grid-cols-2 gap-2 sm:grid-cols-4 xl:flex xl:w-auto xl:flex-none xl:justify-end;
+
+    & button,
+    & a {
+        @apply w-full;
+    }
+
+    & button {
+        @apply h-full whitespace-nowrap;
+    }
+}
+
+.manager_summary {
+    @apply mb-3 flex items-center justify-between px-1 text-xs text-neutral-500;
+
+    & div {
+        @apply flex min-w-0 items-center;
+    }
+
+    & svg {
+        @apply mr-2 text-primary-300;
+    }
+
+    & div span {
+        @apply truncate;
+    }
+}
+
+.file_table {
+    @apply overflow-hidden rounded-xl border;
+    background: #111115;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.file_table_header {
+    @apply hidden grid-cols-[minmax(0,1fr)_7rem_11rem_3rem] items-center border-b px-12 py-3 text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-neutral-500 md:grid;
+    border-color: rgba(255, 255, 255, 0.07);
+    background: #0d0d10;
+}
+
+.file_table_header span:nth-child(2),
+.file_table_header span:nth-child(3) {
+    @apply text-right;
+}
+
+.file_row {
+    @apply flex min-h-[4.25rem] cursor-pointer items-center border-b px-3 text-sm text-neutral-300 transition-colors duration-150 last:border-b-0 hover:text-neutral-100;
+    border-color: rgba(255, 255, 255, 0.06);
+    background: #151519;
+
+    &:hover {
+        background: #1a1a20;
+    }
+
+    & > .details {
+        @apply flex flex-1 items-center overflow-hidden px-3 py-2 text-neutral-300 no-underline;
+
+        &:not(a) {
+            @apply cursor-default;
+        }
+    }
+}
+
+.file_icon,
+.folder_icon {
+    @apply mr-3 flex h-9 w-9 flex-none items-center justify-center rounded-lg;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.file_icon {
+    @apply text-neutral-400;
+}
+
+.folder_icon {
+    @apply text-primary-300;
+    background: rgba(255, 122, 26, 0.09);
+}
+
+.file_name {
+    @apply min-w-0 flex-1;
+
+    & strong {
+        @apply block truncate text-sm font-medium text-neutral-100;
+    }
+
+    & span {
+        @apply mt-0.5 block truncate text-[0.7rem] text-neutral-500;
+    }
+}
+
+.file_size {
+    @apply hidden w-28 text-right text-xs text-neutral-400 md:block;
+}
+
+.file_date {
+    @apply hidden w-44 text-right text-xs text-neutral-500 md:block;
+}
+
+.empty_state {
+    @apply flex min-h-[18rem] flex-col items-center justify-center rounded-xl border px-6 text-center;
+    background: #111115;
+    border-color: rgba(255, 255, 255, 0.08);
+
+    & > svg {
+        @apply mb-4 text-3xl text-primary-300;
+    }
+
+    & h3 {
+        @apply text-base font-semibold text-neutral-100;
+    }
+
+    & p {
+        @apply mt-1 text-sm text-neutral-500;
+    }
+}

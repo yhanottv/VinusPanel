@@ -7,8 +7,13 @@ resources/scripts/components/auth/LoginContainer.tsx
 resources/scripts/components/auth/LoginFormContainer.tsx
 resources/scripts/components/auth/ResetPasswordContainer.tsx
 resources/scripts/components/dashboard/DashboardContainer.tsx
+resources/scripts/components/dashboard/AccountOverviewContainer.tsx
+resources/scripts/components/dashboard/forms/ConfigureTwoFactorForm.tsx
+resources/scripts/components/dashboard/forms/UpdateEmailAddressForm.tsx
+resources/scripts/components/dashboard/forms/UpdatePasswordForm.tsx
 resources/scripts/components/dashboard/ServerRow.tsx
 resources/scripts/components/elements/Button.tsx
+resources/scripts/components/elements/button/style.module.css
 resources/scripts/components/elements/ContentBox.tsx
 resources/scripts/components/elements/ContentContainer.tsx
 resources/scripts/components/elements/GreyRowBox.tsx
@@ -27,6 +32,11 @@ resources/scripts/components/server/console/StatBlock.tsx
 resources/scripts/components/server/console/StatGraphs.tsx
 resources/scripts/components/server/console/chart.ts
 resources/scripts/components/server/console/style.module.css
+resources/scripts/components/server/files/FileManagerContainer.tsx
+resources/scripts/components/server/files/FileObjectRow.tsx
+resources/scripts/components/server/files/NewDirectoryButton.tsx
+resources/scripts/components/server/files/UploadButton.tsx
+resources/scripts/components/server/files/style.module.css
 resources/scripts/components/server/ServerShellHeader.tsx
 resources/scripts/components/server/network/AllocationRow.tsx
 resources/scripts/components/server/network/NetworkContainer.tsx
@@ -34,6 +44,7 @@ resources/scripts/components/server/settings/ReinstallServerBox.tsx
 resources/scripts/components/server/settings/RenameServerBox.tsx
 resources/scripts/components/server/settings/SettingsContainer.tsx
 resources/scripts/routers/ServerRouter.tsx
+resources/scripts/routers/DashboardRouter.tsx
 resources/scripts/routers/routes.ts
 resources/scripts/theme.ts
 resources/views/templates/wrapper.blade.php

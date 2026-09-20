@@ -25,15 +25,8 @@ import { useLocation } from 'react-router-dom';
 import styled from 'styled-components/macro';
 
 const DashboardHero = styled.header`
-    ${tw`relative mb-6 overflow-hidden border-b pb-7 pt-3`};
+    ${tw`relative mb-6 overflow-hidden border-b pb-6 pt-1`};
     border-color: rgba(255, 255, 255, 0.08);
-
-    &::after {
-        content: '';
-        ${tw`pointer-events-none absolute -bottom-24 right-3 h-72 w-72`};
-        background: url('/assets/images/vinus/eagle.png') center / contain no-repeat;
-        opacity: 0.045;
-    }
 `;
 
 const HeroContent = styled.div`
@@ -41,18 +34,17 @@ const HeroContent = styled.div`
 
     h1 {
         ${tw`text-4xl font-semibold text-neutral-50 sm:text-5xl`};
-        letter-spacing: -0.055em;
+        letter-spacing: -0.05em;
     }
 `;
 
 const SummaryGrid = styled.div`
-    ${tw`relative z-10 mt-7 grid grid-cols-1 gap-3 sm:grid-cols-3`};
-    max-width: 46rem;
+    ${tw`relative z-10 mt-6 flex flex-wrap gap-2`};
 `;
 
 const SummaryItem = styled.div<{ $tone?: 'success' | 'danger' }>`
-    ${tw`flex items-center rounded-2xl border px-4 py-3`};
-    background: rgba(255, 255, 255, 0.035);
+    ${tw`flex min-w-[10rem] items-center rounded-xl border px-3.5 py-2.5`};
+    background: rgba(255, 255, 255, 0.028);
     border-color: rgba(255, 255, 255, 0.07);
     backdrop-filter: blur(10px);
 
@@ -63,7 +55,7 @@ const SummaryItem = styled.div<{ $tone?: 'success' | 'danger' }>`
 `;
 
 const DashboardToolbar = styled.div`
-    ${tw`mb-5 flex flex-col gap-3 rounded-2xl border px-4 py-3 sm:flex-row sm:items-center sm:justify-between`};
+    ${tw`mb-4 flex flex-col gap-3 rounded-xl border px-4 py-3 sm:flex-row sm:items-center sm:justify-between`};
     background: rgba(255, 255, 255, 0.025);
     border-color: rgba(255, 255, 255, 0.07);
 `;
@@ -124,7 +116,7 @@ export default () => {
     const username = useStoreState((state) => state.user.data!.username);
     const rootAdmin = useStoreState((state) => state.user.data!.rootAdmin);
     const [showOnlyAdmin, setShowOnlyAdmin] = usePersistedState(`${uuid}:show_all_servers`, false);
-    const [displayMode, setDisplayMode] = usePersistedState<'grid' | 'list'>(`${uuid}:dashboard_display`, 'grid');
+    const [displayMode, setDisplayMode] = usePersistedState<'grid' | 'list'>(`${uuid}:vinus_display_v3`, 'list');
 
     const { data: servers, error } = useSWR<PaginatedResult<Server>>(
         ['/api/client/servers', showOnlyAdmin && rootAdmin, page],
@@ -174,19 +166,18 @@ export default () => {
             <DashboardHero>
                 <HeroContent>
                     <p css={tw`mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary-300`}>
-                        Centre de contrôle
+                        Infrastructure
                     </p>
-                    <h1>Bonjour, {username}.</h1>
+                    <h1>Vos serveurs</h1>
                     <p css={tw`mt-3 max-w-xl text-sm leading-relaxed text-neutral-300`}>
-                        Retrouvez l&apos;état de votre infrastructure, les ressources utilisées et vos accès principaux
-                        dans une vue unique.
+                        Bonjour {username}. Surveillez vos instances et accédez rapidement à leur espace de gestion.
                     </p>
                 </HeroContent>
                 <SummaryGrid>
                     <SummaryItem>
                         <FontAwesomeIcon icon={faLayerGroup} />
                         <div>
-                            <p css={tw`text-xl font-semibold text-neutral-50`}>
+                            <p css={tw`text-lg font-semibold text-neutral-50`}>
                                 {servers ? servers.pagination.total : '—'}
                             </p>
                             <p css={tw`text-xs text-neutral-400`}>Instances au total</p>
@@ -195,7 +186,7 @@ export default () => {
                     <SummaryItem $tone={'success'}>
                         <FontAwesomeIcon icon={faCheckCircle} />
                         <div>
-                            <p css={tw`text-xl font-semibold text-neutral-50`}>
+                            <p css={tw`text-lg font-semibold text-neutral-50`}>
                                 {statusSummary.loaded ? statusSummary.online : '—'}
                             </p>
                             <p css={tw`text-xs text-neutral-400`}>En ligne sur cette page</p>
@@ -204,7 +195,7 @@ export default () => {
                     <SummaryItem $tone={'danger'}>
                         <FontAwesomeIcon icon={faTimesCircle} />
                         <div>
-                            <p css={tw`text-xl font-semibold text-neutral-50`}>
+                            <p css={tw`text-lg font-semibold text-neutral-50`}>
                                 {statusSummary.loaded ? statusSummary.offline : '—'}
                             </p>
                             <p css={tw`text-xs text-neutral-400`}>Hors ligne ou indisponibles</p>

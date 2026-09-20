@@ -1,7 +1,6 @@
 import TransferListener from '@/components/server/TransferListener';
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
-import NavigationBar from '@/components/NavigationBar';
 import TransitionRouter from '@/TransitionRouter';
 import WebsocketHandler from '@/components/server/WebsocketHandler';
 import { ServerContext } from '@/state/server';
@@ -10,6 +9,7 @@ import Can from '@/components/elements/Can';
 import Spinner from '@/components/elements/Spinner';
 import { NotFound, ServerError } from '@/components/elements/ScreenBlock';
 import { httpErrorToHuman } from '@/api/http';
+import http from '@/api/http';
 import { useStoreState } from 'easy-peasy';
 import SubNavigation from '@/components/elements/SubNavigation';
 import InstallListener from '@/components/server/InstallListener';
@@ -24,8 +24,11 @@ import {
     faFolderOpen,
     faHistory,
     faNetworkWired,
+    faServer,
+    faSignOutAlt,
     faSlidersH,
     faTerminal,
+    faUserCircle,
     faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
@@ -35,6 +38,7 @@ import PermissionRoute from '@/components/elements/PermissionRoute';
 import routes from '@/routers/routes';
 import ServerShellHeader from '@/components/server/ServerShellHeader';
 import { VINUS } from '@/theme';
+import { ip } from '@/lib/formatters';
 
 const navigationIcons: Record<string, IconDefinition> = {
     '/': faTerminal,
@@ -49,26 +53,45 @@ const navigationIcons: Record<string, IconDefinition> = {
     '/activity': faHistory,
 };
 
+const navigationSections = [
+    { label: 'Vue générale', paths: ['/'] },
+    { label: 'Gestion', paths: ['/files', '/databases', '/users', '/backups'] },
+    { label: 'Configuration', paths: ['/schedules', '/network', '/startup', '/settings'] },
+    { label: 'Historique', paths: ['/activity'] },
+];
+
+const statusLabel = (status: string | null) => {
+    if (status === 'running') return 'En ligne';
+    if (status === 'starting') return 'Démarrage';
+    if (status === 'stopping') return 'Arrêt en cours';
+    return 'Hors ligne';
+};
+
 export default () => {
     const match = useRouteMatch<{ id: string }>();
     const location = useLocation();
-
     const rootAdmin = useStoreState((state) => state.user.data!.rootAdmin);
     const [error, setError] = useState('');
 
     const id = ServerContext.useStoreState((state) => state.server.data?.id);
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
+    const server = ServerContext.useStoreState((state) => state.server.data);
+    const status = ServerContext.useStoreState((state) => state.status.value);
     const inConflictState = ServerContext.useStoreState((state) => state.server.inConflictState);
-    const serverId = ServerContext.useStoreState((state) => state.server.data?.internalId);
-    const serverName = ServerContext.useStoreState((state) => state.server.data?.name);
     const getServer = ServerContext.useStoreActions((actions) => actions.server.getServer);
     const clearServerState = ServerContext.useStoreActions((actions) => actions.clearServerState);
+    const allocation = server?.allocations.find((item) => item.isDefault);
 
     const to = (value: string, url = false) => {
-        if (value === '/') {
-            return url ? match.url : match.path;
-        }
+        if (value === '/') return url ? match.url : match.path;
         return `${(url ? match.url : match.path).replace(/\/*$/, '')}/${value.replace(/^\/+/, '')}`;
+    };
+
+    const logout = () => {
+        http.post('/auth/logout').finally(() => {
+            // @ts-expect-error this is valid
+            window.location = '/';
+        });
     };
 
     useEffect(
@@ -80,26 +103,35 @@ export default () => {
 
     useEffect(() => {
         setError('');
-
         getServer(match.params.id).catch((error) => {
             console.error(error);
             setError(httpErrorToHuman(error));
         });
 
-        return () => {
-            clearServerState();
-        };
+        return () => clearServerState();
     }, [match.params.id]);
+
+    const renderRoute = (route: (typeof routes.server)[number]) => {
+        const link = (
+            <NavLink to={to(route.path, true)} exact={route.exact}>
+                <FontAwesomeIcon icon={navigationIcons[route.path] || faTerminal} fixedWidth />
+                <span>{route.name}</span>
+            </NavLink>
+        );
+
+        return route.permission ? (
+            <Can key={route.path} action={route.permission} matchAny>
+                {link}
+            </Can>
+        ) : (
+            <React.Fragment key={route.path}>{link}</React.Fragment>
+        );
+    };
 
     return (
         <React.Fragment key={'server-router'}>
-            <NavigationBar />
-            {!uuid || !id ? (
-                error ? (
-                    <ServerError message={error} />
-                ) : (
-                    <Spinner size={'large'} centered />
-                )
+            {!uuid || !id || !server ? (
+                error ? <ServerError message={error} /> : <Spinner size={'large'} centered />
             ) : (
                 <div className={'server-layout'}>
                     <CSSTransition timeout={150} classNames={'fade'} appear in>
@@ -110,51 +142,58 @@ export default () => {
                                         <img src={VINUS.logo} alt={''} aria-hidden={'true'} />
                                         <div>
                                             <strong>{VINUS.name}</strong>
-                                            <span>Control center</span>
+                                            <span>Game control</span>
                                         </div>
                                     </Link>
                                 </div>
-                                <p className={'server-sidebar-label'}>Navigation</p>
+
+                                <div className={'server-sidebar-current'}>
+                                    <div className={'server-sidebar-server-icon'}>
+                                        <FontAwesomeIcon icon={faServer} />
+                                    </div>
+                                    <div className={'min-w-0'}>
+                                        <strong>{server.name}</strong>
+                                        <span className={`server-status server-status-${status || 'offline'}`}>
+                                            {statusLabel(status)}
+                                        </span>
+                                        <small>
+                                            {allocation
+                                                ? `${allocation.alias || ip(allocation.ip)}:${allocation.port}`
+                                                : id}
+                                        </small>
+                                    </div>
+                                </div>
+
                                 <div className={'server-sidebar-links'}>
-                                    {routes.server
-                                        .filter((route) => !!route.name)
-                                        .map((route) =>
-                                            route.permission ? (
-                                                <Can key={route.path} action={route.permission} matchAny>
-                                                    <NavLink to={to(route.path, true)} exact={route.exact}>
-                                                        <FontAwesomeIcon
-                                                            icon={navigationIcons[route.path] || faTerminal}
-                                                            fixedWidth
-                                                        />
-                                                        <span>{route.name}</span>
-                                                    </NavLink>
-                                                </Can>
-                                            ) : (
-                                                <NavLink key={route.path} to={to(route.path, true)} exact={route.exact}>
-                                                    <FontAwesomeIcon
-                                                        icon={navigationIcons[route.path] || faTerminal}
-                                                        fixedWidth
-                                                    />
-                                                    <span>{route.name}</span>
-                                                </NavLink>
-                                            )
-                                        )}
+                                    {navigationSections.map((section) => (
+                                        <div className={'server-sidebar-section'} key={section.label}>
+                                            <p>{section.label}</p>
+                                            {routes.server
+                                                .filter((route) => !!route.name && section.paths.includes(route.path))
+                                                .map(renderRoute)}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className={'server-sidebar-footer'}>
+                                    <Link to={'/'}>
+                                        <FontAwesomeIcon icon={faServer} fixedWidth />
+                                        <span>Tous les serveurs</span>
+                                    </Link>
+                                    <Link to={'/account'}>
+                                        <FontAwesomeIcon icon={faUserCircle} fixedWidth />
+                                        <span>Compte</span>
+                                    </Link>
                                     {rootAdmin && (
-                                        // eslint-disable-next-line react/jsx-no-target-blank
-                                        <a
-                                            href={`/admin/servers/view/${serverId}`}
-                                            target={'_blank'}
-                                            title={'Administration du serveur'}
-                                        >
-                                            <FontAwesomeIcon icon={faExternalLinkAlt} />
+                                        <a href={`/admin/servers/view/${server.internalId}`}>
+                                            <FontAwesomeIcon icon={faExternalLinkAlt} fixedWidth />
                                             <span>Administration</span>
                                         </a>
                                     )}
-                                </div>
-                                <div className={'server-sidebar-current'}>
-                                    <span>Serveur actif</span>
-                                    <strong>{serverName}</strong>
-                                    <small>{id}</small>
+                                    <button onClick={logout}>
+                                        <FontAwesomeIcon icon={faSignOutAlt} fixedWidth />
+                                        <span>Déconnexion</span>
+                                    </button>
                                 </div>
                             </div>
                         </SubNavigation>
@@ -173,12 +212,7 @@ export default () => {
                                     <TransitionRouter>
                                         <Switch location={location}>
                                             {routes.server.map(({ path, permission, component: Component }) => (
-                                                <PermissionRoute
-                                                    key={path}
-                                                    permission={permission}
-                                                    path={to(path)}
-                                                    exact
-                                                >
+                                                <PermissionRoute key={path} permission={permission} path={to(path)} exact>
                                                     <Spinner.Suspense>
                                                         <Component />
                                                     </Spinner.Suspense>
