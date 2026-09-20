@@ -48,9 +48,9 @@ const pageDetails: Record<string, { label: string; description: string }> = {
 };
 
 const PageIntro = styled.header`
-    ${tw`relative mb-6 overflow-hidden rounded-2xl border px-5 py-5 sm:px-6`};
-    background: linear-gradient(105deg, rgba(20, 33, 49, 0.96), rgba(12, 21, 32, 0.92));
-    border-color: rgba(126, 144, 163, 0.16);
+    ${tw`relative mb-6 overflow-hidden rounded-3xl border px-5 py-5 sm:px-6`};
+    background: linear-gradient(115deg, rgba(18, 31, 46, 0.96), rgba(10, 18, 28, 0.94));
+    border-color: rgba(157, 176, 195, 0.15);
     box-shadow: 0 18px 45px rgba(0, 0, 0, 0.15);
 
     &::before {
@@ -62,6 +62,10 @@ const PageIntro = styled.header`
 
     h1 {
         ${tw`text-2xl font-semibold text-neutral-50`};
+    }
+
+    .page-eyebrow {
+        ${tw`mb-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-primary-300`};
     }
 
     p {
@@ -78,6 +82,7 @@ const ServerContentBlock: React.FC<Props> = ({ title, children, ...props }) => {
         <PageContentBlock title={`${name} | ${label}`} {...props}>
             {title !== 'Console' && (
                 <PageIntro>
+                    <p className={'page-eyebrow'}>{name}</p>
                     <h1>{label}</h1>
                     <p>{details?.description || `Gérez les paramètres de ${name}.`}</p>
                 </PageIntro>

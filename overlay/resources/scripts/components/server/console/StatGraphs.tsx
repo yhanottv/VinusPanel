@@ -17,9 +17,9 @@ export default () => {
     const previous = useRef<Record<'tx' | 'rx', number>>({ tx: -1, rx: -1 });
     const [current, setCurrent] = useState({ cpu: 0, memory: 0, inbound: 0, outbound: 0 });
 
-    const cpu = useChartTickLabel('CPU', limits.cpu, '%', 2);
-    const memory = useChartTickLabel('Memory', limits.memory, 'MiB');
-    const network = useChart('Network', {
+    const cpu = useChartTickLabel('Processeur', limits.cpu, '%', 2);
+    const memory = useChartTickLabel('Mémoire', limits.memory, 'Mio');
+    const network = useChart('Réseau', {
         sets: 2,
         options: {
             scales: {
@@ -35,7 +35,7 @@ export default () => {
         callback(opts, index) {
             return {
                 ...opts,
-                label: !index ? 'Network In' : 'Network Out',
+                label: !index ? 'Trafic entrant' : 'Trafic sortant',
                 borderColor: !index ? '#43d6a3' : '#ff7a1a',
                 backgroundColor: hexToRgba(!index ? '#43d6a3' : '#ff7a1a', 0.12),
             };
@@ -95,10 +95,10 @@ export default () => {
                 icon={faExchangeAlt}
                 legend={
                     <>
-                        <Tooltip arrow content={'Inbound'}>
+                        <Tooltip arrow content={'Entrant'}>
                             <CloudDownloadIcon className={'mr-2 h-4 w-4 text-green-400'} />
                         </Tooltip>
-                        <Tooltip arrow content={'Outbound'}>
+                        <Tooltip arrow content={'Sortant'}>
                             <CloudUploadIcon className={'h-4 w-4 text-primary-300'} />
                         </Tooltip>
                     </>

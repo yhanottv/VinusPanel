@@ -46,23 +46,23 @@ export default {
     account: [
         {
             path: '/',
-            name: 'Account',
+            name: 'Compte',
             component: AccountOverviewContainer,
             exact: true,
         },
         {
             path: '/api',
-            name: 'API Credentials',
+            name: 'Clés API',
             component: AccountApiContainer,
         },
         {
             path: '/ssh',
-            name: 'SSH Keys',
+            name: 'Clés SSH',
             component: AccountSSHContainer,
         },
         {
             path: '/activity',
-            name: 'Activity',
+            name: 'Activité',
             component: ActivityLogContainer,
         },
     ],

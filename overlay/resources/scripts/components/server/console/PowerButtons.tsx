@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/elements/button/index';
 import Can from '@/components/elements/Can';
 import { ServerContext } from '@/state/server';
-import { PowerAction } from '@/components/server/console/ServerConsoleContainer';
 import { Dialog } from '@/components/elements/dialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faRedoAlt, faStop } from '@fortawesome/free-solid-svg-icons';
@@ -10,6 +9,8 @@ import { faPlay, faRedoAlt, faStop } from '@fortawesome/free-solid-svg-icons';
 interface PowerButtonProps {
     className?: string;
 }
+
+type PowerAction = 'start' | 'stop' | 'restart' | 'kill';
 
 export default ({ className }: PowerButtonProps) => {
     const [open, setOpen] = useState(false);

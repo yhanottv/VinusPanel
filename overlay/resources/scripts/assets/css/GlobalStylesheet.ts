@@ -10,9 +10,11 @@ export default createGlobalStyle`
         --vinus-accent-dark: ${VINUS.colors.accentDark};
         --vinus-accent-soft: ${VINUS.colors.accentSoft};
         --vinus-accent-rgb: 255, 122, 26;
-        --vinus-surface: #101b27;
-        --vinus-surface-strong: #0e1622;
-        --vinus-border: rgba(126, 144, 163, 0.16);
+        --vinus-surface: #111d2b;
+        --vinus-surface-strong: #0d1722;
+        --vinus-surface-soft: #162536;
+        --vinus-border: rgba(157, 176, 195, 0.16);
+        --vinus-muted: #91a4b7;
     }
 
     @font-face {
@@ -29,8 +31,9 @@ export default createGlobalStyle`
         min-height: 100vh;
         background-color: #080d14;
         background-image:
-            radial-gradient(circle at 50% -12rem, rgba(var(--vinus-accent-rgb), 0.13), transparent 34rem),
-            linear-gradient(180deg, #080d14 0%, #0b131d 52%, #080d14 100%);
+            radial-gradient(circle at 12% -14rem, rgba(var(--vinus-accent-rgb), 0.14), transparent 38rem),
+            radial-gradient(circle at 92% 22rem, rgba(47, 76, 105, 0.16), transparent 34rem),
+            linear-gradient(180deg, #070c12 0%, #0a121c 48%, #080d14 100%);
         background-attachment: fixed;
         letter-spacing: 0.006em;
         font-feature-settings: 'tnum' 1, 'cv02' 1, 'cv03' 1;
@@ -70,15 +73,23 @@ export default createGlobalStyle`
         min-width: 0;
     }
 
+    .server-workspace {
+        min-width: 0;
+    }
+
     @media (min-width: 1024px) {
         .server-layout {
             display: grid;
-            grid-template-columns: 14.5rem minmax(0, 1fr);
+            grid-template-columns: 15.5rem minmax(0, 1fr);
             gap: 1.5rem;
             width: 100%;
             max-width: 1680px;
             margin: 0 auto;
             padding: 0 1.25rem;
+        }
+
+        .server-workspace {
+            padding-top: 1.25rem;
         }
 
         .server-route-content > * {

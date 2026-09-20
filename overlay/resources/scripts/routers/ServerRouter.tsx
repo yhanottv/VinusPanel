@@ -33,6 +33,7 @@ import { useLocation } from 'react-router';
 import ConflictStateRenderer from '@/components/server/ConflictStateRenderer';
 import PermissionRoute from '@/components/elements/PermissionRoute';
 import routes from '@/routers/routes';
+import ServerShellHeader from '@/components/server/ServerShellHeader';
 
 const navigationIcons: Record<string, IconDefinition> = {
     '/': faTerminal,
@@ -139,30 +140,38 @@ export default () => {
                             </div>
                         </SubNavigation>
                     </CSSTransition>
-                    <main className={'server-route-content'}>
-                        <InstallListener />
-                        <TransferListener />
-                        <WebsocketHandler />
-                        {inConflictState &&
-                        (!rootAdmin || (rootAdmin && !location.pathname.endsWith(`/server/${id}`))) ? (
-                            <ConflictStateRenderer />
-                        ) : (
-                            <ErrorBoundary>
-                                <TransitionRouter>
-                                    <Switch location={location}>
-                                        {routes.server.map(({ path, permission, component: Component }) => (
-                                            <PermissionRoute key={path} permission={permission} path={to(path)} exact>
-                                                <Spinner.Suspense>
-                                                    <Component />
-                                                </Spinner.Suspense>
-                                            </PermissionRoute>
-                                        ))}
-                                        <Route path={'*'} component={NotFound} />
-                                    </Switch>
-                                </TransitionRouter>
-                            </ErrorBoundary>
-                        )}
-                    </main>
+                    <div className={'server-workspace'}>
+                        <ServerShellHeader />
+                        <main className={'server-route-content'}>
+                            <InstallListener />
+                            <TransferListener />
+                            <WebsocketHandler />
+                            {inConflictState &&
+                            (!rootAdmin || (rootAdmin && !location.pathname.endsWith(`/server/${id}`))) ? (
+                                <ConflictStateRenderer />
+                            ) : (
+                                <ErrorBoundary>
+                                    <TransitionRouter>
+                                        <Switch location={location}>
+                                            {routes.server.map(({ path, permission, component: Component }) => (
+                                                <PermissionRoute
+                                                    key={path}
+                                                    permission={permission}
+                                                    path={to(path)}
+                                                    exact
+                                                >
+                                                    <Spinner.Suspense>
+                                                        <Component />
+                                                    </Spinner.Suspense>
+                                                </PermissionRoute>
+                                            ))}
+                                            <Route path={'*'} component={NotFound} />
+                                        </Switch>
+                                    </TransitionRouter>
+                                </ErrorBoundary>
+                            )}
+                        </main>
+                    </div>
                 </div>
             )}
         </React.Fragment>

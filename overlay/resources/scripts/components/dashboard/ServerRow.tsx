@@ -1,14 +1,6 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-    faChevronRight,
-    faCube,
-    faEthernet,
-    faHdd,
-    faMemory,
-    faMicrochip,
-    faServer,
-} from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faEthernet, faHdd, faMemory, faMicrochip, faServer } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import { Server } from '@/api/server/getServer';
 import getServerResourceUsage, { ServerPowerState, ServerStats } from '@/api/server/getServerResourceUsage';
@@ -29,16 +21,17 @@ const statusColor = (status: ServerPowerState | 'loading' | 'suspended' | 'maint
 };
 
 const ServerCard = styled(GreyRowBox)<{ $status: ReturnType<typeof getDisplayStatus>['key'] }>`
-    ${tw`relative grid min-h-[19rem] gap-5 overflow-hidden rounded-2xl border border-neutral-600 p-6 no-underline`};
+    ${tw`relative grid min-h-[17rem] gap-5 overflow-hidden rounded-2xl border p-5 no-underline sm:p-6`};
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto 1fr;
-    background: #101b27;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.14);
-    transition: border-color 150ms ease;
+    background: linear-gradient(155deg, rgba(18, 31, 46, 0.98), rgba(11, 20, 30, 0.98));
+    border-color: rgba(157, 176, 195, 0.16);
+    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.18);
+    transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 
     &::before {
         content: '';
-        ${tw`absolute bottom-0 left-0 top-0 w-1`};
+        ${tw`absolute bottom-4 left-0 top-4 w-1 rounded-r-full`};
         background: ${({ $status }) => statusColor($status)};
         z-index: 2;
     }
@@ -53,9 +46,9 @@ const ServerCard = styled(GreyRowBox)<{ $status: ReturnType<typeof getDisplaySta
                 rgba(16, 27, 39, 0.2) 72%,
                 #101b27 100%
             ),
-            linear-gradient(90deg, rgba(16, 27, 39, 0.94) 0%, rgba(16, 27, 39, 0.68) 55%, rgba(16, 27, 39, 0.78) 100%),
-            url('/assets/images/vinus/eagle.png') right 1.5rem center / 12rem auto no-repeat;
-        opacity: 0.2;
+            linear-gradient(90deg, rgba(16, 27, 39, 0.94) 0%, rgba(16, 27, 39, 0.74) 58%, rgba(16, 27, 39, 0.88) 100%),
+            url('/assets/images/vinus/eagle.png') right -1.5rem top 0.5rem / 11rem auto no-repeat;
+        opacity: 0.18;
     }
 
     & > * {
@@ -63,7 +56,9 @@ const ServerCard = styled(GreyRowBox)<{ $status: ReturnType<typeof getDisplaySta
     }
 
     &:hover {
-        border-color: rgba(167, 184, 201, 0.38);
+        border-color: rgba(var(--vinus-accent-rgb), 0.35);
+        box-shadow: 0 22px 50px rgba(0, 0, 0, 0.24), 0 0 30px rgba(var(--vinus-accent-rgb), 0.06);
+        transform: translateY(-2px);
     }
 
     &:focus-visible {
@@ -90,10 +85,11 @@ const ServerIdentity = styled.div`
 `;
 
 const ServerIcon = styled.div<{ $status: ReturnType<typeof getDisplayStatus>['key'] }>`
-    ${tw`mr-4 flex h-12 w-12 flex-none items-center justify-center rounded-lg text-lg`};
+    ${tw`mr-4 flex h-14 w-14 flex-none items-center justify-center rounded-2xl text-lg`};
     color: ${({ $status }) => statusColor($status)};
-    background: rgba(5, 9, 15, 0.52);
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(5, 9, 15, 0.58);
+    border: 1px solid ${({ $status }) => statusColor($status)}38;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 `;
 
 const StatusBadge = styled.span<{ $status: ReturnType<typeof getDisplayStatus>['key'] }>`
@@ -106,25 +102,26 @@ const StatusBadge = styled.span<{ $status: ReturnType<typeof getDisplayStatus>['
         content: '';
         ${tw`mr-1.5 h-1.5 w-1.5 rounded-full`};
         background: ${({ $status }) => statusColor($status)};
+        box-shadow: 0 0 10px ${({ $status }) => statusColor($status)}88;
     }
 `;
 
-const GameBadge = styled.span`
-    ${tw`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium text-neutral-300`};
-    background: rgba(5, 9, 15, 0.48);
-    border: 1px solid rgba(214, 225, 236, 0.15);
-`;
-
 const ServerName = styled.p`
-    ${tw`text-lg font-medium text-neutral-100`};
+    ${tw`text-xl font-semibold text-neutral-100`};
+    letter-spacing: -0.025em;
 `;
 
 const AddressBlock = styled.div`
-    ${tw`self-start`};
+    ${tw`self-start rounded-xl border px-3 py-2.5`};
+    width: fit-content;
+    max-width: 100%;
+    background: rgba(5, 10, 16, 0.32);
+    border-color: rgba(157, 176, 195, 0.11);
 `;
 
 const MetricGrid = styled.div`
-    ${tw`grid grid-cols-3 gap-3 self-end border-t border-neutral-600 pt-4`};
+    ${tw`grid grid-cols-3 gap-3 self-end border-t pt-4`};
+    border-color: rgba(157, 176, 195, 0.13);
 `;
 
 const MetricItem = styled.div<{ $alarm: boolean }>`
@@ -141,7 +138,7 @@ const MetricTrack = styled.div<{ $alarm: boolean }>`
 
     & > span {
         ${tw`block h-full rounded-full`};
-        background: ${({ $alarm }) => ($alarm ? '#fb7185' : '#7e90a3')};
+        background: ${({ $alarm }) => ($alarm ? '#fb7185' : 'linear-gradient(90deg, #d84b00, #ff9b52)')};
         transition: width 250ms ease;
     }
 
@@ -153,11 +150,15 @@ const MetricTrack = styled.div<{ $alarm: boolean }>`
 `;
 
 const CardChevron = styled(FontAwesomeIcon)`
-    ${tw`absolute right-5 top-5 hidden text-neutral-500 sm:block`};
+    ${tw`absolute right-5 top-5 hidden h-3 w-3 rounded-full border p-2 text-neutral-400 sm:block`};
+    background: rgba(5, 10, 16, 0.42);
+    border-color: rgba(157, 176, 195, 0.14);
 `;
 
+export type ServerDisplayState = ServerPowerState | 'loading' | 'suspended' | 'maintenance' | 'unavailable';
+
 type DisplayStatus = {
-    key: ServerPowerState | 'loading' | 'suspended' | 'maintenance' | 'unavailable';
+    key: ServerDisplayState;
     label: string;
 };
 
@@ -209,7 +210,15 @@ const Metric = memo(({ icon, label, value, limit, usage, alarm }: MetricProps) =
 
 type Timer = ReturnType<typeof setInterval>;
 
-export default ({ server, className }: { server: Server; className?: string }) => {
+export default ({
+    server,
+    className,
+    onStatusChange,
+}: {
+    server: Server;
+    className?: string;
+    onStatusChange?: (uuid: string, status: ServerDisplayState) => void;
+}) => {
     const interval = useRef<Timer>(null) as React.MutableRefObject<Timer>;
     const [isSuspended, setIsSuspended] = useState(server.status === 'suspended');
     const [stats, setStats] = useState<ServerStats | null>(null);
@@ -244,15 +253,19 @@ export default ({ server, className }: { server: Server; className?: string }) =
         alarms.disk = server.limits.disk === 0 ? false : isAlarmState(stats.diskUsageInBytes, server.limits.disk);
     }
 
-    const diskLimit = server.limits.disk !== 0 ? bytesToString(mbToBytes(server.limits.disk)) : 'Unlimited';
-    const memoryLimit = server.limits.memory !== 0 ? bytesToString(mbToBytes(server.limits.memory)) : 'Unlimited';
-    const cpuLimit = server.limits.cpu !== 0 ? server.limits.cpu + ' %' : 'Unlimited';
+    const diskLimit = server.limits.disk !== 0 ? bytesToString(mbToBytes(server.limits.disk)) : 'Illimité';
+    const memoryLimit = server.limits.memory !== 0 ? bytesToString(mbToBytes(server.limits.memory)) : 'Illimité';
+    const cpuLimit = server.limits.cpu !== 0 ? server.limits.cpu + ' %' : 'Illimité';
 
     const displayStatus = getDisplayStatus(stats, server, isSuspended);
     const allocation = server.allocations.find((item) => item.isDefault);
     const cpuUsage = stats ? percent(stats.cpuUsagePercent, server.limits.cpu) : 0;
     const memoryUsage = stats ? percent(stats.memoryUsageInBytes, mbToBytes(server.limits.memory)) : 0;
     const diskUsage = stats ? percent(stats.diskUsageInBytes, mbToBytes(server.limits.disk)) : 0;
+
+    useEffect(() => {
+        onStatusChange?.(server.uuid, displayStatus.key);
+    }, [displayStatus.key, onStatusChange, server.uuid]);
 
     return (
         <ServerCard as={Link} to={`/server/${server.id}`} className={className} $status={displayStatus.key}>
@@ -261,13 +274,9 @@ export default ({ server, className }: { server: Server; className?: string }) =
                     <FontAwesomeIcon icon={faServer} />
                 </ServerIcon>
                 <div css={tw`min-w-0`}>
-                    <div css={tw`flex flex-col flex-wrap items-start gap-2 sm:flex-row sm:items-center`}>
+                    <div css={tw`flex flex-col flex-wrap items-start gap-2 pr-8 sm:flex-row sm:items-center`}>
                         <ServerName>{server.name}</ServerName>
                         <StatusBadge $status={displayStatus.key}>{displayStatus.label}</StatusBadge>
-                        <GameBadge>
-                            <FontAwesomeIcon icon={faCube} css={tw`mr-1.5 text-primary-300`} />
-                            Instance
-                        </GameBadge>
                     </div>
                     {!!server.description && (
                         <p css={tw`mt-1 line-clamp-2 text-sm text-neutral-300`}>{server.description}</p>
@@ -275,7 +284,9 @@ export default ({ server, className }: { server: Server; className?: string }) =
                 </div>
             </ServerIdentity>
             <AddressBlock>
-                <p css={tw`text-xs text-neutral-500`}>Adresse</p>
+                <p css={tw`text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-neutral-500`}>
+                    Point d&apos;accès
+                </p>
                 <div css={tw`mt-1 flex items-center`}>
                     <FontAwesomeIcon icon={faEthernet} css={tw`mr-2 text-neutral-500`} />
                     <p css={tw`truncate text-sm font-medium text-neutral-200`}>

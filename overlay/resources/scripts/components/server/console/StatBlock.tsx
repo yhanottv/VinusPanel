@@ -20,7 +20,7 @@ interface StatBlockProps {
 export default ({ title, copyOnClick, icon, color, className, progress, accent, children }: StatBlockProps) => {
     const { fontSize, ref } = useFitText({ minFontSize: 8, maxFontSize: 500 });
     const ringStyle = {
-        '--progress': Math.max(0, Math.min(100, progress ?? 0)),
+        '--progress': Math.max(0, Math.min(100, progress ?? 8)),
         '--accent': accent || '#ff7a1a',
     } as React.CSSProperties;
 

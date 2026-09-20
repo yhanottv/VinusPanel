@@ -7,9 +7,10 @@ VinusPanel contient uniquement la surcouche du thème et ses outils d'installati
 ## Aperçu
 
 - identité VinusPanel et aigle orange ;
-- interface sombre, contrastée et cohérente ;
-- écrans d'authentification francisés et accessibles ;
-- navigation, cartes, console, graphiques, réseau et réglages harmonisés ;
+- page de connexion immersive, responsive et accessible ;
+- tableau de bord avec synthèse d'état et cartes serveur en temps réel ;
+- espace serveur unifié avec en-tête contextuel, actions rapides et navigation latérale ;
+- console, métriques, graphiques, réseau et réglages harmonisés ;
 - suppression des visuels et textes Minecraft codés en dur ;
 - installation réversible avec sauvegarde automatique.
 
@@ -77,6 +78,10 @@ L'installateur automatisé est recommandé car il gère la maintenance, les perm
 - Yarn : 1.x
 
 Une autre version du panel peut modifier les composants React couverts par la surcouche. Exécutez d'abord `bash install.sh --check` et testez une sauvegarde avant toute migration.
+
+## Versions
+
+La version actuelle est **1.1.0**. Consultez [CHANGELOG.md](CHANGELOG.md) pour le détail des évolutions.
 
 ## Licence
 

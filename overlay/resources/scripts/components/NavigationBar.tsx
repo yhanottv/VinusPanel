@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCogs, faLayerGroup, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCogs, faServer, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import SearchContainer from '@/components/dashboard/search/SearchContainer';
@@ -16,15 +16,22 @@ import { VINUS } from '@/theme';
 
 const Navigation = styled.header`
     ${tw`sticky top-0 z-50 w-full`};
-    background: rgba(8, 13, 20, 0.9);
-    border-bottom: 1px solid rgba(126, 144, 163, 0.16);
-    backdrop-filter: blur(18px) saturate(130%);
+    background: rgba(7, 12, 18, 0.88);
+    border-bottom: 1px solid rgba(157, 176, 195, 0.14);
+    backdrop-filter: blur(22px) saturate(135%);
+
+    &::after {
+        content: '';
+        ${tw`absolute bottom-0 left-0 h-px w-full`};
+        background: linear-gradient(90deg, transparent, rgba(var(--vinus-accent-rgb), 0.48), transparent);
+        opacity: 0.55;
+    }
 `;
 
 const NavigationInner = styled.div`
     ${tw`mx-auto flex w-full items-center px-4`};
-    max-width: 1280px;
-    height: 4.5rem;
+    max-width: 1680px;
+    height: 4.75rem;
 `;
 
 const BrandMark = styled.span`
@@ -48,6 +55,29 @@ const BrandName = styled.span`
     }
 `;
 
+const WorkspaceNavigation = styled.nav`
+    ${tw`hidden items-center md:flex`};
+
+    a {
+        ${tw`inline-flex items-center rounded-xl border border-transparent px-3.5 py-2 text-sm font-medium text-neutral-400 no-underline transition-all duration-150`};
+
+        svg {
+            ${tw`mr-2 text-neutral-500`};
+        }
+
+        &:hover,
+        &.active {
+            ${tw`text-neutral-100`};
+            background: rgba(var(--vinus-accent-rgb), 0.08);
+            border-color: rgba(var(--vinus-accent-rgb), 0.16);
+
+            svg {
+                color: var(--vinus-accent-soft);
+            }
+        }
+    }
+`;
+
 const RightNavigation = styled.div`
     ${tw`ml-auto flex items-center gap-1.5`};
 
@@ -55,7 +85,7 @@ const RightNavigation = styled.div`
     & > button,
     & > .navigation-link {
         ${tw`flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border border-transparent p-0 text-neutral-400 no-underline transition-all duration-150`};
-        background: rgba(16, 27, 39, 0.52);
+        background: rgba(17, 29, 43, 0.58);
 
         &:active,
         &:hover {
@@ -102,13 +132,14 @@ export default () => {
                         <BrandName>{VINUS.name}</BrandName>
                     </Link>
                 </div>
+                <WorkspaceNavigation aria-label={'Navigation principale'}>
+                    <NavLink to={'/'} exact>
+                        <FontAwesomeIcon icon={faServer} />
+                        Serveurs
+                    </NavLink>
+                </WorkspaceNavigation>
                 <RightNavigation>
                     <SearchContainer />
-                    <Tooltip placement={'bottom'} content={'Tableau de bord'}>
-                        <NavLink to={'/'} exact>
-                            <FontAwesomeIcon icon={faLayerGroup} />
-                        </NavLink>
-                    </Tooltip>
                     {rootAdmin && (
                         <Tooltip placement={'bottom'} content={'Administration'}>
                             <a href={'/admin'} rel={'noreferrer'}>
