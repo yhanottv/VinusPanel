@@ -19,7 +19,7 @@ VinusPanel contient uniquement la surcouche du thème et ses outils d'installati
 Pré-requis : une installation fonctionnelle de Pterodactyl **1.15.1**, `git`, PHP, Node.js et Yarn. Par défaut, le panel est attendu dans `/var/www/pterodactyl`.
 
 ```bash
-git clone --depth 1 https://github.com/AyhanTHE/VinusPanel.git
+git clone --depth 1 https://github.com/yhanottv/VinusPanel.git
 cd VinusPanel
 sudo bash install.sh
 ```
