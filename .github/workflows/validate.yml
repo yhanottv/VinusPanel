@@ -18,4 +18,8 @@ jobs:
         run: bash scripts/check-package.sh
       - name: Scan for accidental secrets
         run: |
-          ! grep -RInE --exclude-dir=.git '(BEGIN (RSA |OPENSSH )?PRIVATE KEY|APP_KEY=|DB_PASSWORD=)' .
+          private_key_pattern='BEGIN (RSA |OPENSSH )?PRIVATE ''KEY'
+          app_key_pattern='APP_''KEY='
+          db_password_pattern='DB_''PASSWORD='
+          secret_pattern="${private_key_pattern}|${app_key_pattern}|${db_password_pattern}"
+          ! grep -RInE --exclude-dir=.git "$secret_pattern" .
