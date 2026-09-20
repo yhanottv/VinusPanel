@@ -1,0 +1,21 @@
+name: Validate theme package
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate shell syntax
+        run: bash -n install.sh uninstall.sh scripts/check-package.sh
+      - name: Validate package manifest
+        run: bash scripts/check-package.sh
+      - name: Scan for accidental secrets
+        run: |
+          ! grep -RInE --exclude-dir=.git '(BEGIN (RSA |OPENSSH )?PRIVATE KEY|APP_KEY=|DB_PASSWORD=)' .

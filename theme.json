@@ -1,0 +1,19 @@
+{
+  "name": "VinusPanel",
+  "version": "1.0.0",
+  "description": "Thème sombre orange et accessible pour Pterodactyl Panel.",
+  "author": "AyhanTHE",
+  "license": "MIT",
+  "compatibility": {
+    "pterodactyl": ["1.15.1"],
+    "node": ">=18",
+    "yarn": "1.x"
+  },
+  "panelRoot": "/var/www/pterodactyl",
+  "overlay": "overlay",
+  "brand": {
+    "name": "VinusPanel",
+    "accent": "#ff7a1a",
+    "accentDark": "#d84b00"
+  }
+}

@@ -1,0 +1,224 @@
+.server_hero {
+    @apply relative mb-5 flex min-h-[9rem] items-end justify-between overflow-hidden rounded-2xl border px-5 py-5;
+    background-color: #0b1621;
+    background-position: right 2rem center;
+    background-repeat: no-repeat;
+    background-size: 20rem auto;
+    background-clip: padding-box;
+    border-color: rgba(126, 144, 163, 0.16);
+    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.22);
+
+    &::after {
+        content: '';
+        @apply pointer-events-none absolute inset-0;
+        background: linear-gradient(
+            180deg,
+            #0b1621 0%,
+            rgba(11, 22, 33, 0.2) 22%,
+            rgba(11, 22, 33, 0.18) 72%,
+            #0b1621 100%
+        );
+    }
+
+    & > * {
+        @apply relative z-10;
+    }
+}
+
+.hero_content {
+    @apply min-w-0 pr-4;
+
+    & h1 {
+        @apply line-clamp-1 text-2xl font-semibold text-gray-50;
+    }
+
+    & p {
+        @apply mt-1 line-clamp-2 max-w-2xl text-sm text-gray-300;
+    }
+}
+
+.hero_status {
+    @apply mb-3 inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium text-gray-100;
+    background: rgba(5, 9, 15, 0.58);
+    border-color: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+}
+
+.hero_status_dot {
+    @apply mr-2 h-2 w-2 rounded-full bg-green-400;
+}
+
+.hero_actions {
+    @apply flex flex-none items-center gap-2;
+}
+
+.terminal {
+    @apply flex w-full flex-col overflow-hidden rounded-2xl border;
+    min-height: 34rem;
+    background: #05090f;
+    border-color: rgba(255, 122, 26, 0.18);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.025);
+
+    & .overflows_container {
+        @apply w-full;
+    }
+
+    & > .container {
+        @apply flex flex-1 bg-black px-3 py-2 font-mono text-sm;
+        min-height: 29rem;
+
+        & #terminal {
+            @apply h-full w-full;
+
+            &::-webkit-scrollbar-track {
+                @apply w-2;
+                background: #05090f;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: #293b4d;
+            }
+        }
+    }
+
+    & .command_icon {
+        @apply absolute left-0 top-0 z-10 flex h-full select-none items-center px-4 text-primary-300 transition-colors duration-100;
+    }
+
+    & .command_input {
+        @apply relative w-full border-0 px-4 py-3 pl-11 pr-4 font-mono text-sm text-gray-100 outline-none transition-colors duration-100;
+        background: #0b131d;
+        border-top: 1px solid rgba(126, 144, 163, 0.14);
+
+        &:focus {
+            background: #101b27;
+            box-shadow: inset 3px 0 0 #ff7a1a;
+        }
+    }
+}
+
+.console_header {
+    @apply flex h-12 items-center justify-between border-b px-4;
+    background: linear-gradient(90deg, #101b27, #0b131d);
+    border-color: rgba(126, 144, 163, 0.14);
+
+    & > div {
+        @apply flex items-center gap-2.5;
+    }
+
+    & svg {
+        @apply text-primary-300;
+    }
+}
+
+.console_title {
+    @apply text-sm font-semibold text-gray-100;
+}
+
+.console_live {
+    @apply flex items-center text-xs text-gray-400;
+
+    &::before {
+        content: '';
+        @apply mr-2 h-1.5 w-1.5 rounded-full bg-green-400;
+    }
+}
+
+.details_grid {
+    @apply grid grid-cols-6 gap-3;
+}
+
+.stat_block {
+    @apply relative col-span-3 flex min-h-[5.75rem] items-start overflow-hidden rounded-xl border p-3;
+    background: #101b27;
+    border-color: rgba(126, 144, 163, 0.16);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+
+    & > .status_bar {
+        @apply hidden;
+    }
+
+    & > .icon {
+        @apply relative mr-3 flex h-10 w-10 flex-none items-center justify-center rounded-lg border;
+        color: #9aafc2;
+        background: #162535;
+        border-color: rgba(126, 144, 163, 0.16);
+
+        & > svg {
+            @apply h-4 w-4;
+        }
+    }
+}
+
+.stat_block_wide {
+    grid-column: span 6 / span 6;
+}
+
+.chart_container {
+    @apply relative overflow-hidden rounded-2xl border;
+    min-height: 14rem;
+    background: linear-gradient(165deg, rgba(20, 33, 49, 0.98), rgba(10, 18, 28, 0.98));
+    border-color: rgba(126, 144, 163, 0.16);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.18);
+
+    &::after {
+        content: '';
+        @apply pointer-events-none absolute inset-0;
+        background-image: linear-gradient(rgba(126, 144, 163, 0.035) 1px, transparent 1px);
+        background-size: 100% 3rem;
+    }
+}
+
+.chart_header {
+    @apply relative z-10 flex items-start justify-between px-4 pb-1 pt-4;
+}
+
+.chart_label {
+    @apply flex items-center gap-2 text-sm font-medium text-gray-300;
+
+    & svg {
+        @apply text-primary-300;
+    }
+}
+
+.chart_value {
+    @apply mt-1 text-xl font-semibold text-gray-50;
+}
+
+.chart_meta {
+    @apply text-right text-xs text-gray-500;
+}
+
+.chart_canvas {
+    @apply relative z-10 -ml-1 mt-1;
+}
+
+@media (max-width: 767px) {
+    .server_hero {
+        @apply min-h-[12rem] flex-col items-stretch justify-end gap-4;
+        background-position: right 1rem top 1rem;
+        background-size: 13rem auto;
+    }
+
+    .hero_actions {
+        @apply grid grid-cols-3;
+
+        & > button {
+            @apply w-full;
+        }
+    }
+
+    .terminal {
+        min-height: 30rem;
+
+        & > .container {
+            min-height: 25rem;
+        }
+    }
+}
+
+@media (max-width: 420px) {
+    .stat_block {
+        @apply col-span-6 min-h-[5.5rem];
+    }
+}
