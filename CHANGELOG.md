@@ -1,5 +1,16 @@
 # VinusPanel changelog
 
+## 1.4.0 — Identity and activity
+
+- rebuilt the sign-in experience around a responsive animated control-room scene;
+- added reduced-motion support for decorative login animations;
+- introduced a dedicated profile page with browser-local display names and avatars;
+- propagated profile appearance to the dashboard, sidebar, and account header;
+- redesigned account and server activity logs as compact security timelines;
+- added event summaries, filter states, localized labels, and clearer metadata;
+- refreshed the legacy administration interface through isolated, reversible CSS only;
+- kept all authentication, authorization, administrative workflows, and server APIs unchanged.
+
 ## 1.3.0 — Full control workspace
 
 - replaced the legacy top navigation with a fixed application sidebar;

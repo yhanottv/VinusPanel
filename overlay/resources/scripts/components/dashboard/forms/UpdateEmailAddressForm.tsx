@@ -47,7 +47,12 @@ export default () => {
                     <Form css={tw`m-0`}>
                         <Field id={'current_email'} type={'email'} name={'email'} label={'Adresse e-mail'} />
                         <div css={tw`mt-5`}>
-                            <Field id={'confirm_password'} type={'password'} name={'password'} label={'Mot de passe actuel'} />
+                            <Field
+                                id={'confirm_password'}
+                                type={'password'}
+                                name={'password'}
+                                label={'Mot de passe actuel'}
+                            />
                         </div>
                         <div css={tw`mt-6`}>
                             <Button disabled={isSubmitting || !isValid}>Mettre à jour</Button>

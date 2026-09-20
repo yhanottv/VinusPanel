@@ -10,11 +10,14 @@ VinusPanel ships only the theme overlay and its installation tools. It does **no
 
 ## ✨ Highlights
 
-- immersive, responsive, and accessible sign-in experience;
+- fully rebuilt, animated sign-in experience with reduced-motion support;
 - live server overview with clear status, resource cards, and persistent grid/list layouts;
 - workspace-first server interface with grouped navigation and quick power controls;
 - redesigned console with real-time KPIs, trends, and a full-width terminal;
 - custom file manager with a compact toolbar, readable rows, and empty states;
+- dedicated profile page with a local display name and custom avatar;
+- redesigned account and server activity timelines;
+- visually refreshed administration area without changing its controllers or workflows;
 - redesigned account and security workspace;
 - consistent component styling across databases, backups, schedules, network, startup, settings, and activity;
 - consistent dark surfaces with an orange visual identity;
@@ -34,6 +37,9 @@ VinusPanel ships only the theme overlay and its installation tools. It does **no
 
 > [!IMPORTANT]
 > Other Pterodactyl versions may use different React components. Run the pre-flight check and keep a complete VPS backup before attempting an unsupported version.
+
+> [!NOTE]
+> Profile appearance is stored locally in the current browser for the signed-in account. It does not alter the Pterodactyl username, authentication data, database, or permissions.
 
 ## 🚀 Quick installation
 
@@ -105,7 +111,7 @@ These backups cover the files changed by the theme. They do not replace a comple
 2. confirms compatibility with Pterodactyl 1.15.1;
 3. backs up every file that will be changed;
 4. enables Pterodactyl maintenance mode;
-5. installs the 51-file VinusPanel overlay;
+5. installs the 61-file VinusPanel overlay;
 6. compiles production assets with Yarn;
 7. clears Laravel views and application caches;
 8. restores the expected web-server ownership;
@@ -150,7 +156,7 @@ Manual installation does not provide VinusPanel's automatic backup and rollback 
 
 ## 📦 Releases
 
-The current stable version is **1.3.0**. See the [latest release](https://github.com/yhanottv/VinusPanel/releases/latest) or read [CHANGELOG.md](CHANGELOG.md).
+The current stable version is **1.4.0**. See the [latest release](https://github.com/yhanottv/VinusPanel/releases/latest) or read [CHANGELOG.md](CHANGELOG.md).
 
 ## 📄 License
 

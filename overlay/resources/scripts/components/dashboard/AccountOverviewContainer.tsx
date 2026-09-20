@@ -10,8 +10,10 @@ import MessageBox from '@/components/MessageBox';
 import { useLocation } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faKey, faShieldAlt, faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faKey, faShieldAlt } from '@fortawesome/free-solid-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import Avatar from '@/components/Avatar';
+import useProfileAppearance from '@/components/dashboard/profile/useProfileAppearance';
 
 const AccountHeader = styled.header`
     ${tw`mb-7 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between`};
@@ -62,16 +64,17 @@ const SectionTitle = ({ icon, children }: { icon: IconProp; children: React.Reac
 export default () => {
     const { state } = useLocation<undefined | { twoFactorRedirect?: boolean }>();
     const user = useStoreState((state: any) => state.user.data);
+    const { appearance } = useProfileAppearance(user?.uuid);
 
     return (
         <PageContentBlock title={'Compte | VinusPanel'}>
             <AccountHeader>
                 <div className={'identity'}>
                     <div className={'avatar'}>
-                        <FontAwesomeIcon icon={faUserCircle} size={'lg'} />
+                        <Avatar.User />
                     </div>
                     <div className={'min-w-0'}>
-                        <h1>Votre compte</h1>
+                        <h1>{appearance.displayName || 'Votre compte'}</h1>
                         <p>{user?.email || 'Gérez vos informations et la sécurité de votre compte.'}</p>
                     </div>
                 </div>

@@ -1,7 +1,14 @@
 import React from 'react';
 import { NavLink, Route, Switch, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faKey, faShieldAlt, faTerminal, faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import {
+    faFingerprint,
+    faKey,
+    faPalette,
+    faShieldAlt,
+    faTerminal,
+    faUserCircle,
+} from '@fortawesome/free-solid-svg-icons';
 import NavigationBar from '@/components/NavigationBar';
 import DashboardContainer from '@/components/dashboard/DashboardContainer';
 import { NotFound } from '@/components/elements/ScreenBlock';
@@ -48,7 +55,13 @@ const AccountNavigation = styled.nav`
     }
 `;
 
-const accountIcons = [faUserCircle, faKey, faTerminal, faShieldAlt];
+const accountIcons: Record<string, any> = {
+    '/': faUserCircle,
+    '/profile': faPalette,
+    '/api': faKey,
+    '/ssh': faTerminal,
+    '/activity': faFingerprint,
+};
 
 export default () => {
     const location = useLocation();
@@ -61,9 +74,9 @@ export default () => {
                     <AccountNavigation aria-label={'Navigation du compte'}>
                         {routes.account
                             .filter((route) => !!route.name)
-                            .map(({ path, name, exact = false }, index) => (
+                            .map(({ path, name, exact = false }) => (
                                 <NavLink key={path} to={`/account/${path}`.replace('//', '/')} exact={exact}>
-                                    <FontAwesomeIcon icon={accountIcons[index] || faUserCircle} />
+                                    <FontAwesomeIcon icon={accountIcons[path] || faShieldAlt} />
                                     {name}
                                 </NavLink>
                             ))}

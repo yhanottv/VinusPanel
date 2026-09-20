@@ -9,6 +9,7 @@ import StartupContainer from '@/components/server/startup/StartupContainer';
 import FileManagerContainer from '@/components/server/files/FileManagerContainer';
 import SettingsContainer from '@/components/server/settings/SettingsContainer';
 import AccountOverviewContainer from '@/components/dashboard/AccountOverviewContainer';
+import ProfileContainer from '@/components/dashboard/profile/ProfileContainer';
 import AccountApiContainer from '@/components/dashboard/AccountApiContainer';
 import AccountSSHContainer from '@/components/dashboard/ssh/AccountSSHContainer';
 import ActivityLogContainer from '@/components/dashboard/activity/ActivityLogContainer';
@@ -49,6 +50,11 @@ export default {
             name: 'Compte',
             component: AccountOverviewContainer,
             exact: true,
+        },
+        {
+            path: '/profile',
+            name: 'Profil',
+            component: ProfileContainer,
         },
         {
             path: '/api',

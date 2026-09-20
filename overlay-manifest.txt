@@ -1,6 +1,8 @@
 public/assets/images/vinus/eagle.png
+public/assets/css/vinus-admin.css
 resources/scripts/assets/css/GlobalStylesheet.ts
 resources/scripts/components/NavigationBar.tsx
+resources/scripts/components/Avatar.tsx
 resources/scripts/components/auth/ForgotPasswordContainer.tsx
 resources/scripts/components/auth/LoginCheckpointContainer.tsx
 resources/scripts/components/auth/LoginContainer.tsx
@@ -8,9 +10,12 @@ resources/scripts/components/auth/LoginFormContainer.tsx
 resources/scripts/components/auth/ResetPasswordContainer.tsx
 resources/scripts/components/dashboard/DashboardContainer.tsx
 resources/scripts/components/dashboard/AccountOverviewContainer.tsx
+resources/scripts/components/dashboard/activity/ActivityLogContainer.tsx
 resources/scripts/components/dashboard/forms/ConfigureTwoFactorForm.tsx
 resources/scripts/components/dashboard/forms/UpdateEmailAddressForm.tsx
 resources/scripts/components/dashboard/forms/UpdatePasswordForm.tsx
+resources/scripts/components/dashboard/profile/ProfileContainer.tsx
+resources/scripts/components/dashboard/profile/useProfileAppearance.ts
 resources/scripts/components/dashboard/ServerRow.tsx
 resources/scripts/components/elements/Button.tsx
 resources/scripts/components/elements/button/style.module.css
@@ -23,6 +28,9 @@ resources/scripts/components/elements/PageContentBlock.tsx
 resources/scripts/components/elements/ServerContentBlock.tsx
 resources/scripts/components/elements/SubNavigation.tsx
 resources/scripts/components/elements/TitledGreyBox.tsx
+resources/scripts/components/elements/activity/ActivityLogEntry.tsx
+resources/scripts/components/elements/activity/ActivityLogMetaButton.tsx
+resources/scripts/components/elements/activity/style.module.css
 resources/scripts/components/server/console/ChartBlock.tsx
 resources/scripts/components/server/console/Console.tsx
 resources/scripts/components/server/console/PowerButtons.tsx
@@ -38,6 +46,7 @@ resources/scripts/components/server/files/NewDirectoryButton.tsx
 resources/scripts/components/server/files/UploadButton.tsx
 resources/scripts/components/server/files/style.module.css
 resources/scripts/components/server/ServerShellHeader.tsx
+resources/scripts/components/server/ServerActivityLogContainer.tsx
 resources/scripts/components/server/network/AllocationRow.tsx
 resources/scripts/components/server/network/NetworkContainer.tsx
 resources/scripts/components/server/settings/ReinstallServerBox.tsx
@@ -48,4 +57,5 @@ resources/scripts/routers/DashboardRouter.tsx
 resources/scripts/routers/routes.ts
 resources/scripts/theme.ts
 resources/views/templates/wrapper.blade.php
+resources/views/layouts/scripts.blade.php
 tailwind.config.js

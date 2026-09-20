@@ -1,0 +1,103 @@
+.activity_page_header {
+    @apply mb-6 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-end sm:justify-between;
+    border-color: rgba(255, 255, 255, 0.07);
+
+    & h1 { @apply text-3xl font-semibold text-neutral-50; }
+    & > div > p:last-child { @apply mt-2 max-w-2xl text-sm text-neutral-400; }
+}
+
+.eyebrow { @apply mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary-300; }
+
+.activity_summary {
+    @apply flex items-center gap-3 self-start rounded-xl border px-4 py-3;
+    background: rgba(255, 255, 255, 0.025);
+    border-color: rgba(255, 255, 255, 0.08);
+
+    & svg { @apply text-primary-300; }
+    & strong, & span { @apply block; }
+    & strong { @apply text-sm text-neutral-100; }
+    & span { @apply mt-0.5 text-xs text-neutral-500; }
+}
+
+.list {
+    @apply overflow-hidden rounded-2xl border;
+    background: #121216;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.entry {
+    @apply relative grid grid-cols-[3.25rem_minmax(0,1fr)] gap-3 border-b px-4 py-4 last:border-b-0 sm:grid-cols-[3.75rem_minmax(0,1fr)] sm:px-5;
+    border-color: rgba(255, 255, 255, 0.06);
+    transition: background 140ms ease, border-color 140ms ease;
+
+    &:hover { background: rgba(255, 255, 255, 0.025); }
+}
+
+.timeline {
+    @apply relative flex justify-center;
+
+    &::after {
+        content: '';
+        @apply absolute top-11 w-px;
+        bottom: -1.05rem;
+        background: rgba(255, 255, 255, 0.08);
+    }
+}
+
+.entry:last-child .timeline::after { display: none; }
+
+.avatar {
+    @apply relative z-10 flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border;
+    background: #1b1b21;
+    border-color: rgba(255, 255, 255, 0.09);
+}
+
+.content { @apply min-w-0; }
+.event_row { @apply flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between; }
+
+.event_identity {
+    @apply flex min-w-0 flex-wrap items-center gap-2;
+    & > strong { @apply truncate text-sm font-semibold text-neutral-100; }
+}
+
+.event_badge {
+    @apply inline-flex items-center rounded-md border px-2 py-1 text-[0.68rem] font-semibold text-primary-200 no-underline;
+    background: rgba(255, 122, 26, 0.08);
+    border-color: rgba(255, 122, 26, 0.18);
+    &:hover { color: #fff; border-color: rgba(255, 122, 26, 0.35); }
+}
+
+.event_time { @apply flex-none text-xs text-neutral-500; }
+
+.description {
+    @apply mt-2 break-words text-sm leading-relaxed text-neutral-300;
+    & strong { @apply break-all font-semibold text-neutral-50; }
+}
+
+.meta_row { @apply mt-2 flex flex-wrap items-center gap-2 text-xs text-neutral-500; }
+
+.meta_chip {
+    @apply inline-flex items-center rounded-md border px-2 py-1 font-mono text-[0.68rem] text-neutral-400 no-underline;
+    background: rgba(255, 255, 255, 0.025);
+    border-color: rgba(255, 255, 255, 0.07);
+    &:hover { @apply text-neutral-200; }
+}
+
+.icons {
+    @apply flex items-center gap-1 text-neutral-500;
+    & svg { @apply h-4 w-4; }
+}
+
+.meta_button {
+    @apply ml-auto flex h-8 w-8 items-center justify-center rounded-lg text-neutral-500 transition-colors;
+    &:hover { @apply text-primary-300; background: rgba(255, 122, 26, 0.08); }
+}
+
+.empty_state {
+    @apply flex min-h-[20rem] flex-col items-center justify-center rounded-2xl border px-6 text-center;
+    background: #121216;
+    border-color: rgba(255, 255, 255, 0.08);
+    & svg { @apply mb-4 h-9 w-9 text-primary-300; }
+    & h3 { @apply text-base font-semibold text-neutral-100; }
+    & p { @apply mt-1 text-sm text-neutral-500; }
+}

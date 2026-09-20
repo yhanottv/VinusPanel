@@ -63,7 +63,6 @@ const ServerCard = styled(GreyRowBox)<{
 
     @media (max-width: 639px) {
         ${tw`min-h-0 gap-4 p-5`};
-
     }
 
     ${({ $view }) =>

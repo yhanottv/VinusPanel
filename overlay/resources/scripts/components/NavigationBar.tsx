@@ -12,6 +12,7 @@ import http from '@/api/http';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import Avatar from '@/components/Avatar';
 import { VINUS } from '@/theme';
+import useProfileAppearance from '@/components/dashboard/profile/useProfileAppearance';
 
 const Navigation = styled.aside`
     ${tw`relative z-50 flex w-full flex-none border-b lg:sticky lg:top-3 lg:h-[calc(100vh-1.5rem)] lg:w-[17.5rem] lg:flex-col lg:overflow-hidden lg:rounded-2xl lg:border`};
@@ -158,6 +159,7 @@ const LogoutButton = styled.button`
 
 export default () => {
     const user = useStoreState((state: ApplicationStore) => state.user.data!);
+    const { appearance } = useProfileAppearance(user.uuid);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
     const onTriggerLogout = () => {
@@ -202,12 +204,12 @@ export default () => {
                     </div>
                 </MainNavigation>
                 <Footer>
-                    <UserCard to={'/account'}>
+                    <UserCard to={'/account/profile'}>
                         <span className={'avatar-wrap'}>
                             <Avatar.User />
                         </span>
                         <span className={'min-w-0'}>
-                            <strong>{user.username}</strong>
+                            <strong>{appearance.displayName || user.username}</strong>
                             <small>{user.email}</small>
                         </span>
                     </UserCard>

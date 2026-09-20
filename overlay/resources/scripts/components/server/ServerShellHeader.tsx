@@ -108,9 +108,7 @@ export default () => {
                         {server.name}
                     </p>
                     <div css={tw`flex flex-wrap items-center gap-3`}>
-                        <h1 css={tw`text-2xl font-semibold text-neutral-50 sm:text-3xl`}>
-                            {route?.name || 'Serveur'}
-                        </h1>
+                        <h1 css={tw`text-2xl font-semibold text-neutral-50 sm:text-3xl`}>{route?.name || 'Serveur'}</h1>
                         <Status $color={currentStatus.color} aria-live={'polite'}>
                             <FontAwesomeIcon icon={faCircle} />
                             {currentStatus.label}

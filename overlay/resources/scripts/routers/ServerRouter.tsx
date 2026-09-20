@@ -111,7 +111,7 @@ export default () => {
         return () => clearServerState();
     }, [match.params.id]);
 
-    const renderRoute = (route: (typeof routes.server)[number]) => {
+    const renderRoute = (route: typeof routes.server[number]) => {
         const link = (
             <NavLink to={to(route.path, true)} exact={route.exact}>
                 <FontAwesomeIcon icon={navigationIcons[route.path] || faTerminal} fixedWidth />
@@ -131,7 +131,11 @@ export default () => {
     return (
         <React.Fragment key={'server-router'}>
             {!uuid || !id || !server ? (
-                error ? <ServerError message={error} /> : <Spinner size={'large'} centered />
+                error ? (
+                    <ServerError message={error} />
+                ) : (
+                    <Spinner size={'large'} centered />
+                )
             ) : (
                 <div className={'server-layout'}>
                     <CSSTransition timeout={150} classNames={'fade'} appear in>
@@ -212,7 +216,12 @@ export default () => {
                                     <TransitionRouter>
                                         <Switch location={location}>
                                             {routes.server.map(({ path, permission, component: Component }) => (
-                                                <PermissionRoute key={path} permission={permission} path={to(path)} exact>
+                                                <PermissionRoute
+                                                    key={path}
+                                                    permission={permission}
+                                                    path={to(path)}
+                                                    exact
+                                                >
                                                     <Spinner.Suspense>
                                                         <Component />
                                                     </Spinner.Suspense>

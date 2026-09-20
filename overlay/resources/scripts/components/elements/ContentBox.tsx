@@ -4,7 +4,7 @@ import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import tw from 'twin.macro';
 
 type Props = Readonly<
-    React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
+    Omit<React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>, 'title'> & {
         title?: React.ReactNode;
         borderColor?: string;
         showFlashes?: string | boolean;

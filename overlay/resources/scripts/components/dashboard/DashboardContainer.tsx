@@ -23,6 +23,7 @@ import { PaginatedResult } from '@/api/http';
 import Pagination from '@/components/elements/Pagination';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components/macro';
+import useProfileAppearance from '@/components/dashboard/profile/useProfileAppearance';
 
 const DashboardHero = styled.header`
     ${tw`relative mb-6 overflow-hidden border-b pb-6 pt-1`};
@@ -114,9 +115,11 @@ export default () => {
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const uuid = useStoreState((state) => state.user.data!.uuid);
     const username = useStoreState((state) => state.user.data!.username);
+    const { appearance } = useProfileAppearance(uuid);
     const rootAdmin = useStoreState((state) => state.user.data!.rootAdmin);
     const [showOnlyAdmin, setShowOnlyAdmin] = usePersistedState(`${uuid}:show_all_servers`, false);
     const [displayMode, setDisplayMode] = usePersistedState<'grid' | 'list'>(`${uuid}:vinus_display_v3`, 'list');
+    const currentDisplayMode = displayMode || 'list';
 
     const { data: servers, error } = useSWR<PaginatedResult<Server>>(
         ['/api/client/servers', showOnlyAdmin && rootAdmin, page],
@@ -170,7 +173,8 @@ export default () => {
                     </p>
                     <h1>Vos serveurs</h1>
                     <p css={tw`mt-3 max-w-xl text-sm leading-relaxed text-neutral-300`}>
-                        Bonjour {username}. Surveillez vos instances et accédez rapidement à leur espace de gestion.
+                        Bonjour {appearance.displayName || username}. Surveillez vos instances et accédez rapidement à
+                        leur espace de gestion.
                     </p>
                 </HeroContent>
                 <SummaryGrid>
@@ -235,19 +239,19 @@ export default () => {
                     <ViewSwitcher aria-label={'Mode d’affichage'}>
                         <button
                             type={'button'}
-                            className={displayMode === 'list' ? 'active' : undefined}
+                            className={currentDisplayMode === 'list' ? 'active' : undefined}
                             onClick={() => setDisplayMode('list')}
                             aria-label={'Afficher les serveurs en liste'}
-                            aria-pressed={displayMode === 'list'}
+                            aria-pressed={currentDisplayMode === 'list'}
                         >
                             <FontAwesomeIcon icon={faList} />
                         </button>
                         <button
                             type={'button'}
-                            className={displayMode === 'grid' ? 'active' : undefined}
+                            className={currentDisplayMode === 'grid' ? 'active' : undefined}
                             onClick={() => setDisplayMode('grid')}
                             aria-label={'Afficher les serveurs en grille'}
-                            aria-pressed={displayMode === 'grid'}
+                            aria-pressed={currentDisplayMode === 'grid'}
                         >
                             <FontAwesomeIcon icon={faThLarge} />
                         </button>
@@ -260,12 +264,12 @@ export default () => {
                 <Pagination data={servers} onPageSelect={setPage}>
                     {({ items }) =>
                         items.length > 0 ? (
-                            <ServerGrid $view={displayMode}>
+                            <ServerGrid $view={currentDisplayMode}>
                                 {items.map((server) => (
                                     <ServerRow
                                         key={server.uuid}
                                         server={server}
-                                        view={displayMode}
+                                        view={currentDisplayMode}
                                         onStatusChange={onServerStatusChange}
                                     />
                                 ))}
