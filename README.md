@@ -1,188 +1,311 @@
-# 🦅 VinusPanel
+<div align="center">
 
-[![Validate theme package](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml/badge.svg)](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml)
-[![Latest release](https://img.shields.io/github/v/release/yhanottv/VinusPanel?color=ff7a1a)](https://github.com/yhanottv/VinusPanel/releases/latest)
-[![License](https://img.shields.io/github/license/yhanottv/VinusPanel)](LICENSE)
+<img src="overlay/public/assets/images/vinus/eagle.png" alt="Logo VinusPanel — aigle orange" width="120" />
 
-A black workspace with Liquid Glass navigation for **Pterodactyl Panel 1.15.1**, designed for clarity, comfort, and a consistent experience on desktop and mobile.
+# VinusPanel
 
-VinusPanel ships only the theme overlay and its installation tools. It does **not** redistribute the complete Pterodactyl source code.
+**Un thème open source pour Pterodactyl : interface noire, navigation Liquid Glass et console repensée.**
 
-## ✨ Highlights
+[![Validation du paquet](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml/badge.svg)](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml)
+[![Version des sources](https://img.shields.io/badge/sources-2.3.6-ff7a1a)](CHANGELOG.md)
+[![Pterodactyl](https://img.shields.io/badge/Pterodactyl-1.15.1-242429)](#compatibilité-du-panel)
+[![Licence MIT](https://img.shields.io/badge/licence-MIT-242429)](LICENSE)
+[![Discord](https://img.shields.io/badge/Discord-Rejoindre-5865F2?logo=discord&logoColor=white)](https://discord.gg/vinuspanel)
 
-- Discord logo button and help announcement, sharing the invitation configured through `VINUS.discordInvite` in `resources/scripts/theme.ts` (clear it to hide the announcement);
-- explicit connection diagnostics, an ASCII console signature and command history kept only in memory while the console is open;
+[Installation](#installation) · [Appareils](#appareils-et-navigateurs) · [Catalogue](#catalogue-minecraft-optionnel) · [Support](#aide-et-signalement-de-bugs)
 
-- restrained sign-in screen and black content surfaces;
-- live server overview with clear status, resource cards, and persistent grid/list layouts;
-- workspace-first server interface with grouped navigation and quick power controls;
-- dedicated console workspace with state-aware controls, compact telemetry and resource graphs always visible at the top of the page;
-- custom file manager with a compact toolbar, readable rows, and empty states;
-- dedicated profile page with a local display name and custom avatar;
-- redesigned account and server activity timelines;
-- visually refreshed administration area without changing its controllers or workflows;
-- redesigned account and security workspace;
-- consistent component styling across databases, backups, schedules, network, startup, settings, and activity;
-- translucent navigation, graphite reading surfaces, and restrained orange accents;
-- keyboard-operable search, skip links, and reduced-motion/transparency support;
-- automatic maintenance mode, backups, and rollback on installation failure;
-- safe uninstaller that restores the files from before the first installation;
-- no `.env`, credentials, database content, or other panel secrets included.
+</div>
 
-## ✅ Compatibility
+VinusPanel retravaille le tableau de bord, la navigation, la console et les principaux écrans de gestion de Pterodactyl. Il conserve les actions et les permissions du panel, avec une identité noire et orange et des libellés principalement en français.
 
-| Component | Supported version |
+Le dépôt contient une **surcouche de fichiers et ses outils d’installation**, pas une distribution complète de Pterodactyl. Un panel fonctionnel doit déjà être installé. Le thème peut servir à gérer d’autres jeux ; seul le catalogue optionnel de mods et plugins est réservé à Minecraft.
+
+## Ce qui a changé
+
+La version **2.3.6** réunit les évolutions suivantes. Le [changelog](CHANGELOG.md) conserve le détail par version, y compris les anciens designs remplacés depuis.
+
+| Espace | Fonctionnement actuel |
 | --- | --- |
-| Pterodactyl Panel | **1.15.1** |
-| PHP | 8.2 or 8.3 |
-| Node.js | 22 or newer (validated on 22) |
-| Yarn | 1.x |
-| Recommended OS | Ubuntu or Debian |
+| Interface | Fonds noirs, surfaces de lecture sobres, boutons compacts et accents orange. |
+| Navigation | Effet **Liquid Glass limité à la navigation** : transparence sombre, flou et reflets discrets. |
+| Tableau de bord | Liste des serveurs, états en direct, recherche et choix entre grille et liste. |
+| Console | Terminal avec commandes, journaux en direct et commandes d’alimentation regroupées dans un espace dédié. |
+| Ressources | **Processeur, mémoire et réseau directement en haut**, sans menu à dérouler ni répétition des mêmes mesures dans le bloc de pilotage. |
+| Graphiques | Séries conservées pendant les mises à jour, transitions progressives, unités compactes et distinction du trafic entrant/sortant. |
+| Signature | Aigle orange détaillé, centré et adapté aux dimensions du terminal. |
+| Catalogue | Recherche Modrinth, icônes des projets, catégories selon le logiciel serveur, aperçu d’installation et suivi des mises à jour. |
+| Erreurs | Messages plus explicites pour les problèmes de connexion, de session et de permissions ; références de diagnostic pour le catalogue. |
+| Communauté | Bouton avec le logo Discord et annonce d’aide en haut des pages client. |
 
-> [!IMPORTANT]
-> Other Pterodactyl versions may use different React components. Run the pre-flight check and keep a complete VPS backup before attempting an unsupported version.
+### Console et pilotage
 
-> [!NOTE]
-> Profile appearance is stored locally in the current browser for the signed-in account. It does not alter the Pterodactyl username, authentication data, database, or permissions.
+Les boutons de démarrage, redémarrage et arrêt tiennent compte de l’état du serveur, de la connexion et des permissions de l’utilisateur. L’arrêt forcé conserve sa confirmation. La console affiche l’état de sa connexion et propose une reconnexion en cas d’interruption.
 
-## Console signature
+Les trois graphiques restent visibles au-dessus du terminal. Les mises à jour de télémétrie ne recréent plus les séries à chaque seconde. Les débits réseau sont calculés à partir du temps réellement écoulé entre les mesures. Le stockage et la durée de session restent dans un bloc séparé.
 
-The centered orange eagle ASCII is written directly after the initial server status and each transition to startup. It remains in normal terminal scrollback, with no expiry or log buffering. The supplied eagle logo is sampled into detailed Unicode terminal characters, scaled proportionally to fit the console and centered as one shape. This visual signature is local to the panel and is never sent as a server command or written to server log files.
+La signature souvent appelée « ASCII » utilise des **caractères Unicode** pour restituer plus finement le logo. Elle apparaît dans le terminal, après le premier état connu du serveur à l’ouverture de la page, puis lors d’une transition vers le démarrage. Elle reste dans l’historique normal : aucun effacement après 1,8 seconde. Les nouveaux journaux peuvent naturellement la faire défiler hors de la zone visible.
 
-## Blueprint catalogue
+Cette signature est uniquement visuelle : elle n’est jamais envoyée comme commande ni ajoutée aux fichiers de logs du serveur. L’historique des commandes saisies reste en mémoire pendant l’ouverture de la console ; il n’est pas conservé dans le stockage persistant du navigateur.
 
-Version 2.2 includes an optional native Blueprint extension with separate compatible Mods/Plugins tabs, installation previews, required dependencies and tracked updates. See [Vinus Catalog](extensions/vinuscatalog/README.md) for installation and limits. Blueprint beta-2026-06 and Pterodactyl 1.15.1 are the tested combination. Install Blueprint before applying the theme; the installer automatically selects its integration hooks.
+### Autres écrans retravaillés
 
-## 🚀 Quick installation
+- Connexion, récupération de compte et espaces de gestion du compte.
+- Gestionnaire de fichiers, bases de données, accès utilisateurs et sauvegardes.
+- Planifications, réseau, paramètres de démarrage et paramètres du serveur.
+- Journaux d’activité du compte et des serveurs, avec une lecture plus claire des événements.
+- Profil avec nom d’affichage et avatar locaux au navigateur.
+- Apparence de l’administration historique, via une feuille de style dédiée.
 
-Clone the repository on the machine hosting your Pterodactyl panel:
+Les personnalisations du profil ne changent ni l’identité de connexion, ni les permissions, ni les données du compte dans Pterodactyl. Elles ne se synchronisent pas entre appareils.
+
+## Appareils et navigateurs
+
+VinusPanel s’utilise dans un navigateur ; aucune application native n’est fournie. La mise en page s’adapte à la **largeur disponible**, pas au modèle de l’appareil.
+
+| Appareil | Adaptation de l’interface | État de validation |
+| --- | --- | --- |
+| Ordinateur de bureau ou portable | Navigation latérale à partir de 1 024 px, espace de console élargi et blocs répartis en colonnes. | Rendu contrôlé dans un navigateur Chromium intégré, notamment à 1 440 px. |
+| Tablette ou fenêtre intermédiaire | Navigation horizontale sous 1 024 px, contenu réorganisé selon l’espace. | Rendu intermédiaire contrôlé à 742 px ; pas de certification sur chaque tablette physique. |
+| Smartphone | Cartes empilées sur les petites largeurs, terminal redimensionné et navigation horizontale défilable. | Aperçu responsive contrôlé à 390 px ; tests sur appareils iOS/Android physiques encore à compléter. |
+
+**Navigateurs visés :** versions récentes de Chrome, Edge, Firefox et Safari, sur Windows, macOS, Linux, Android et iOS. La validation réalisée ne constitue pas une matrice de tests complète de tous ces navigateurs et systèmes. Les navigateurs anciens, Internet Explorer et les WebViews embarquées particulières ne sont pas validés.
+
+Le rendu du flou dépend du navigateur et de ses capacités graphiques. La navigation conserve un fond sombre lorsque le flou n’est pas disponible ; un fond opaque est prévu quand la préférence de transparence réduite est prise en charge. JavaScript et la connexion WebSocket à Wings sont nécessaires au fonctionnement de la console en direct.
+
+### Accessibilité
+
+La navigation inclut des indications de focus, un lien d’accès direct au contenu, une recherche utilisable au clavier et des libellés accessibles pour les boutons à icône. Les préférences de réduction des animations et de la transparence sont prises en compte. Ces adaptations ne constituent pas une certification WCAG ni un audit complet avec lecteurs d’écran.
+
+## Compatibilité du panel
+
+| Composant | Version ou condition |
+| --- | --- |
+| VinusPanel | Sources **2.3.6**. |
+| Pterodactyl Panel | **1.15.1**, version validée pour cette surcouche. |
+| Blueprint | Optionnel pour le thème ; intégration validée pour **beta-2026-06** uniquement. Requis pour Vinus Catalog. |
+| Vinus Catalog | Extension **1.1.0**, incluse dans ce dépôt. |
+| Node.js | L’installateur exige **22 minimum** ; compilation validée avec Node 22. Les versions majeures suivantes ne sont pas automatiquement certifiées. |
+| Yarn | **1.x** pour la chaîne de compilation utilisée. |
+| PHP | Environnement validé avec **8.3** ; conserver les prérequis PHP du panel et de Blueprint. |
+| Serveur hôte | Déploiement validé sur Ubuntu 24.04. Scripts Bash prévus pour un environnement Linux de type Ubuntu/Debian avec l’utilisateur web `www-data`. |
+| Wings | Instance déjà fonctionnelle et joignable par le panel ; aucune modification de Wings fournie par le thème. |
+
+Les autres versions de Pterodactyl, les forks et les combinaisons avec d’autres thèmes ne sont pas validés. L’installateur refuse une version différente lorsqu’il peut lire celle du panel, ainsi qu’une version Blueprint installée différente de celle attendue. Le contrôle préalable n’est pas une preuve de compatibilité de toutes les extensions tierces.
+
+## Installation
+
+Prévoir un accès SSH à la machine qui héberge **le panel**, les droits `sudo`, ses sources frontend et ses dépendances. Installer VinusPanel sur le panel, pas uniquement sur un nœud Wings distant.
+
+Sauvegarder le panel, sa base de données et sa configuration avant installation. L’opération compile les fichiers frontend et place temporairement le panel en maintenance. L’installateur du thème ne lance aucune commande d’arrêt ou de redémarrage des serveurs de jeu.
+
+### 1. Récupérer les sources
 
 ```bash
 git clone --depth 1 https://github.com/yhanottv/VinusPanel.git
 cd VinusPanel
 ```
 
-Run the non-destructive pre-flight check:
+### 2. Vérifier l’environnement
 
 ```bash
 bash install.sh --check
 ```
 
-Install the theme:
+Le contrôle vérifie les fichiers du paquet et les prérequis détectables sans modifier le panel. Le chemin par défaut est `/var/www/pterodactyl`.
+
+### 3. Installer
 
 ```bash
 sudo bash install.sh
 ```
 
-The default panel directory is `/var/www/pterodactyl`.
-
-### Custom panel directory
+Pour un emplacement personnalisé, utiliser le même chemin au contrôle et à l’installation :
 
 ```bash
-sudo bash install.sh --panel-dir /path/to/pterodactyl
+bash install.sh --panel-dir /chemin/du/panel --check
+sudo bash install.sh --panel-dir /chemin/du/panel
 ```
 
-## 🔄 Updating
+**Avec Blueprint :** installer d’abord Blueprint, puis VinusPanel. L’installateur détecte sa présence et sélectionne les variantes qui conservent ses points d’extension. Il n’installe pas automatiquement Vinus Catalog.
+
+### Ce que fait l’installateur
+
+1. Contrôle le paquet, les commandes requises et les versions détectables.
+2. Sauvegarde les fichiers concernés, puis active la maintenance du panel.
+3. Copie les **75 fichiers de la surcouche de base**, avec les variantes et fichiers supplémentaires nécessaires si Blueprint est détecté.
+4. Installe les dépendances frontend si elles sont absentes, puis ajoute la police IBM Plex Sans et l’environnement de test requis.
+5. Compile les assets, nettoie les caches Laravel et rétablit les propriétaires attendus.
+6. Enregistre la version installée et désactive la maintenance.
+
+En cas d’échec, le script tente de restaurer les fichiers sauvegardés, de recompiler et de sortir du mode maintenance. Les sauvegardes de fichiers ne couvrent pas toute la machine ni toutes les modifications des dépendances : elles ne remplacent pas une sauvegarde complète.
+
+## Catalogue Minecraft optionnel
+
+**Blueprint est le framework d’extensions ; Modrinth fournit le catalogue.** Vinus Catalog fonctionne indépendamment du thème. VinusPanel lui ajoute une entrée dans la navigation lorsqu’il est installé.
+
+### Catégories selon le serveur
+
+| Logiciel détecté | Catégories proposées |
+| --- | --- |
+| Forge, NeoForge, Fabric, Quilt | **Mods** filtrés pour le chargeur correspondant. |
+| Paper, Purpur, Spigot, Bukkit, Folia, Sponge | **Plugins** uniquement, filtrés pour le profil détecté. |
+| Velocity, Bungeecord, Waterfall | **Plugins** compatibles avec le proxy. |
+| Youer, Mohist | Deux onglets séparés : **Mods** et **Plugins**. |
+| Arclight | Deux onglets après identification du chargeur Forge, Fabric ou NeoForge. |
+| Vanilla ou logiciel inconnu | Aucun téléchargement automatique proposé. |
+
+La recherche affiche les icônes disponibles, avec un remplacement par une initiale si nécessaire. L’aperçu sélectionne une version stable déclarée compatible et inclut ses dépendances requises. L’installation se fait **serveur arrêté**, avec les permissions Pterodactyl nécessaires sur les fichiers ; le catalogue n’arrête pas le serveur à votre place.
+
+Les éléments installés par le catalogue sont suivis dans l’onglet **« Installés avec ce catalogue »**, qui permet de rechercher et d’appliquer leurs mises à jour compatibles. Les mises à jour ne sont pas appliquées automatiquement et les JAR déjà présents ne sont pas importés automatiquement dans ce suivi.
+
+### Installer l’extension
+
+Après installation de la version Blueprint compatible, puis du thème, créer le paquet depuis la racine de ce dépôt (`zip` doit être disponible) :
 
 ```bash
-cd VinusPanel
+cd extensions/vinuscatalog
+zip -r vinuscatalog.blueprint conf.yml admin app components routes config tests README.md
+sudo cp vinuscatalog.blueprint /var/www/pterodactyl/
+cd /var/www/pterodactyl
+sudo blueprint -install vinuscatalog
+```
+
+Adapter le chemin si le panel est installé ailleurs. La [documentation de Vinus Catalog](extensions/vinuscatalog/README.md) détaille l’installation, la configuration et les limites.
+
+### Fonctionnement chez d’autres hébergeurs
+
+La détection ne dépend d’aucun numéro d’egg propre à une installation. Elle utilise le logiciel déclaré, le nom du JAR puis le nom de l’egg. La version Minecraft provient des variables de l’egg ; si elle manque ou vaut `latest`, l’utilisateur doit sélectionner la version réellement installée.
+
+Les eggs personnalisés ou renommés peuvent nécessiter une correspondance administrative par **UUID d’egg ou de serveur**. Le [fichier d’exemple](extensions/vinuscatalog/config/vinuscatalog.php.example) est volontairement vide ; ces correspondances locales ne doivent pas être publiées. Le panel doit pouvoir contacter Modrinth et Wings.
+
+### Limites du catalogue
+
+- **Modrinth uniquement** : les projets exclusifs à d’autres plateformes, privés ou payants ne sont pas couverts. Il ne s’agit pas d’un accès à tous les mods et plugins existants.
+- Un JAR principal de **25 Mio maximum**, jusqu’à **20 projets et 100 Mio par lot**, avec au maximum **12 niveaux de dépendances**.
+- Les dépendances optionnelles et les conflits avec des JAR installés hors catalogue ne sont pas résolus automatiquement.
+- Le filtrage utilise les compatibilités déclarées par les auteurs ; il ne garantit pas l’absence de conflits, notamment sur les serveurs hybrides.
+- Les anciennes versions gérées sont conservées dans des dossiers `/vinus-*`. Un fichier inconnu ou modifié manuellement n’est pas écrasé.
+
+## Personnalisation
+
+Les réglages de marque se trouvent dans [`overlay/resources/scripts/theme.ts`](overlay/resources/scripts/theme.ts). Le fichier devient `resources/scripts/theme.ts` dans le panel installé.
+
+| Réglage | Rôle |
+| --- | --- |
+| `VINUS.name` | Nom utilisé par les composants qui consomment ce réglage. |
+| `VINUS.logo` | Chemin du logo graphique ; ne régénère pas la signature Unicode du terminal. |
+| `VINUS.colors` | Couleurs des composants qui utilisent ces variables ; certains styles restent définis dans leurs propres fichiers. |
+| `VINUS.discordInvite` | Invitation partagée par le logo Discord et le bandeau d’aide. |
+
+L’invitation par défaut est **https://discord.gg/vinuspanel**. Pour votre propre communauté, utiliser une URL HTTPS `discord.gg/...` ou `discord.com/invite/...`. Une valeur vide masque l’annonce et désactive le bouton. Le texte du bandeau se trouve dans [`DiscordButton.tsx`](overlay/resources/scripts/components/elements/DiscordButton.tsx).
+
+Les réglages frontend nécessitent une recompilation. Pour une installation gérée par ce dépôt, modifier les sources de la surcouche puis relancer l’installateur. Conserver vos personnalisations dans une branche ou un fork : une réinstallation recopie les fichiers et peut remplacer les modifications faites directement dans le panel.
+
+## Mise à jour et désinstallation
+
+### Mettre à jour le thème
+
+Depuis votre clone, après sauvegarde et lecture du changelog :
+
+```bash
 git pull --ff-only
+bash install.sh --check
 sudo bash install.sh
 ```
 
-The installer can be run multiple times. The original pre-theme files remain preserved for a future uninstall.
+Ajouter `--panel-dir /chemin/du/panel` si nécessaire. Si Git signale des modifications locales, les conserver et résoudre le conflit avant de poursuivre. La version des sources sur `main` peut être plus récente qu’une archive publiée dans [Releases](https://github.com/yhanottv/VinusPanel/releases).
 
-## 🧹 Uninstalling
+Une mise à jour de Pterodactyl ou de Blueprint peut remplacer des fichiers du thème. Vérifier la compatibilité avant de réappliquer VinusPanel. L’extension Vinus Catalog se met à jour séparément avec son paquet Blueprint.
 
-From the cloned repository, run:
+### Retirer le thème
 
 ```bash
 sudo bash uninstall.sh
+# Ou pour un autre emplacement :
+sudo bash uninstall.sh --panel-dir /chemin/du/panel
 ```
 
-For a custom panel location:
+Le script restaure les fichiers sauvegardés avant leur prise en charge par le thème, retire les fichiers introduits par celui-ci, recompile les assets et nettoie les caches. Il ne désinstalle pas automatiquement Blueprint ou Vinus Catalog. Après une mise à jour du panel, vérifier que la sauvegarde d’origine correspond encore à la version à restaurer.
+
+### Emplacement des sauvegardes
+
+| Chemin | Contenu |
+| --- | --- |
+| `/var/lib/vinuspanel/original` | Fichiers d’origine suivis par le thème. |
+| `/var/backups/vinuspanel/install-*` | Sauvegardes par transaction d’installation. |
+| `/var/lib/vinuspanel/last-transaction` | Chemin de la dernière transaction. |
+| `/var/backups/vinuspanel/uninstalled-*` | État du thème archivé après désinstallation. |
+
+## Permissions, sécurité et diagnostics
+
+VinusPanel conserve les contrôles de permissions de Pterodactyl. Le catalogue vérifie les autorisations, l’état arrêté du serveur et l’aperçu d’installation avant d’écrire des fichiers. Ses jetons d’aperçu sont liés au compte et au serveur, revalidés sous verrou puis consommés avant les téléchargements.
+
+Les téléchargements du catalogue sont limités au CDN HTTPS de Modrinth, sans redirection, avec limites de taille et vérification SHA-512. Les erreurs inattendues du catalogue sont journalisées côté panel et renvoyées avec une référence de diagnostic. Les messages d’erreur serveur présentés à l’utilisateur évitent d’exposer les traces internes.
+
+Ces protections ne remplacent pas la maintenance de Pterodactyl et de Wings ni l’évaluation des extensions installées. Une empreinte valide confirme l’intégrité d’un téléchargement, pas l’innocuité du code qu’il contient. Aucun audit de sécurité exhaustif ni garantie d’absence de vulnérabilité n’est annoncé.
+
+## Aide et signalement de bugs
+
+Rejoindre **[le Discord VinusPanel](https://discord.gg/vinuspanel)** ou ouvrir une [issue GitHub](https://github.com/yhanottv/VinusPanel/issues).
+
+| Symptôme | Vérification utile |
+| --- | --- |
+| Ancien design encore visible | Vérifier la réussite de la compilation et la version installée, puis recharger la page sans cache. |
+| Console déconnectée ou ressources indisponibles | Vérifier la liaison WebSocket, Wings et le proxy HTTPS ; relever le message affiché. |
+| Session expirée ou accès refusé | Se reconnecter ou vérifier les permissions du compte et du serveur. |
+| Catalogue absent | Vérifier que Blueprint et Vinus Catalog sont installés, puis les permissions de l’utilisateur. |
+| Mauvaise catégorie ou aucun résultat | Vérifier le logiciel/JAR déclaré, la version Minecraft et les éventuelles correspondances d’eggs personnalisés. |
+| Installation du catalogue refusée | Vérifier l’arrêt du serveur, les permissions, les tailles autorisées et le message de conflit de fichier. |
+| Échec d’installation du thème | Conserver la sortie de commande et le chemin de sauvegarde indiqué ; vérifier l’état du panel après la tentative de restauration. |
+
+Pour un signalement exploitable, indiquer les versions de VinusPanel, Pterodactyl et Blueprint, le navigateur, l’appareil, la largeur d’écran approximative, les étapes de reproduction et le résultat attendu. Ajouter l’heure et la référence d’erreur lorsqu’elle est disponible. Masquer les jetons, mots de passe, données personnelles et fichiers de configuration privés dans les captures et les logs.
+
+## Validation et contribution
+
+Pour la publication **2.3.6**, les contrôles suivants ont été exécutés dans l’environnement de panel utilisé pour le développement :
+
+- Vérification TypeScript et compilation frontend de production.
+- **85 tests frontend** dans 8 suites.
+- **52 vérifications** de détection et d’artefacts du catalogue.
+- **21 vérifications isolées** d’installation du catalogue, sans base de données ni serveur de jeu réel.
+- Syntaxe PHP et shell, correspondance du manifeste et contrôle des identifiants privés avant publication.
+
+Le [workflow GitHub Actions](.github/workflows/validate.yml) vérifie la syntaxe shell, le manifeste, la syntaxe PHP du catalogue et certains motifs de secrets accidentels. **Il ne lance pas toute la compilation du panel ni les 85 tests frontend.** Les contrôles visuels responsive sont décrits dans la section appareils ; ils ne remplacent pas une validation exhaustive sur appareils physiques.
+
+Pour vérifier le paquet depuis ce dépôt :
 
 ```bash
-sudo bash uninstall.sh --panel-dir /path/to/pterodactyl
+bash -n install.sh uninstall.sh scripts/check-package.sh
+bash scripts/check-package.sh
 ```
 
-The uninstaller restores the original files, removes only files introduced by VinusPanel, rebuilds the frontend assets, and clears the panel caches.
+Pour les tests du catalogue, utiliser l’autoload Composer d’un panel compatible :
 
-## 🛡️ Backups and rollback
+```bash
+php extensions/vinuscatalog/tests/run.php /chemin/du/panel
+php extensions/vinuscatalog/tests/install.php /chemin/du/panel
+```
 
-- original files are stored in `/var/lib/vinuspanel/original`;
-- every installation creates a transaction backup in `/var/backups/vinuspanel`;
-- if compilation or installation fails, the current transaction is rolled back automatically;
-- the panel is returned from maintenance mode even when an error occurs.
+Les tests frontend et la compilation demandent les sources et les dépendances de Pterodactyl avec la surcouche appliquée. Utiliser un environnement de développement ou de test pour contribuer. Les contributions via pull request sont bienvenues ; préciser les versions testées et joindre une capture pour les changements visuels.
 
-These backups cover the files changed by the theme. They do not replace a complete system, database, and application backup.
-
-## 🧰 What the installer does
-
-1. validates the package manifest and required commands;
-2. confirms compatibility with Pterodactyl 1.15.1;
-3. backs up every file that will be changed;
-4. enables Pterodactyl maintenance mode;
-5. installs the 61-file VinusPanel overlay;
-6. compiles production assets with Yarn;
-7. clears Laravel views and application caches;
-8. restores the expected web-server ownership;
-9. disables maintenance mode.
-
-## 📁 Repository layout
+## Structure du dépôt
 
 ```text
 VinusPanel/
-├── overlay/                  # Theme files copied over Pterodactyl
-├── scripts/check-package.sh  # Package and secret-safety validation
-├── install.sh                # Backup, install, build, and rollback
-├── uninstall.sh              # Restore the original panel files
-├── overlay-manifest.txt      # Exact list of installed theme files
-└── theme.json                # Theme metadata and compatibility
+├── overlay/                  # Surcouche principale du thème
+├── blueprint-overlay/        # Variantes et intégration Blueprint
+├── extensions/vinuscatalog/  # Catalogue Minecraft optionnel et tests
+├── scripts/check-package.sh # Validation du paquet
+├── licenses/                 # Licences tierces conservées
+├── install.sh                # Installation, sauvegarde et restauration
+├── uninstall.sh              # Restauration des fichiers d’origine
+├── overlay-manifest.txt      # Liste des fichiers de la surcouche de base
+├── theme.json                # Version et métadonnées
+└── CHANGELOG.md               # Historique des évolutions
 ```
 
-## 🧪 Validation
+## Licence et crédits
 
-The public package is checked with GitHub Actions on every push and pull request. The production theme has also passed:
+VinusPanel est distribué sous [licence MIT](LICENSE). Les licences des fichiers dérivés de Pterodactyl et de Blueprint sont conservées dans [`licenses/`](licenses/).
 
-- TypeScript type checking;
-- ESLint validation;
-- all 46 upstream frontend tests;
-- the Pterodactyl production Webpack build;
-- package-manifest and accidental-secret checks.
-
-## 🧩 Manual installation
-
-The automated installer is strongly recommended. If you need to inspect or reproduce the process manually:
-
-```bash
-sudo cp -a overlay/. /var/www/pterodactyl/
-cd /var/www/pterodactyl
-sudo yarn install --frozen-lockfile
-sudo yarn build:production
-sudo php artisan view:clear
-sudo php artisan cache:clear
-```
-
-Manual installation does not provide VinusPanel's automatic backup and rollback protections.
-
-## 📦 Releases
-
-The current source version is **2.3.6**. See the [latest release](https://github.com/yhanottv/VinusPanel/releases/latest) or read [CHANGELOG.md](CHANGELOG.md).
-
-## 📄 License
-
-VinusPanel is released under the [MIT License](LICENSE).
-
-Pterodactyl is a third-party open-source project distributed under its own MIT license. Visit [pterodactyl/panel](https://github.com/pterodactyl/panel) for the upstream project.
-
-## Liquid Glass design
-
-Glass is limited to navigation surfaces, with opaque fallbacks. Resource
-tables and the terminal keep stable backgrounds for long reading sessions. No
-animation loop, external imagery, additional font service, or new dependency is used.
-The existing orange identity and bundled IBM Plex Sans are retained.
-
-The visual research used [BuiltByBit's Pterodactyl category](https://builtbybit.com/resources/websites/pterodactyl/themes/)
-and [this server-dashboard reference on Pinterest](https://www.pinterest.com/pin/702983823073939887/)
-for layout context. No third-party theme code or artwork is included.
+[Pterodactyl](https://github.com/pterodactyl/panel), [Blueprint](https://blueprint.zip/) et [Modrinth](https://modrinth.com/) sont des projets tiers distincts. VinusPanel n’est pas une version officielle de ces projets.
