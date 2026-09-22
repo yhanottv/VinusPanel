@@ -19,10 +19,8 @@ const ContentBox = ({ title, borderColor, showFlashes, showLoadingOverlay, child
             <FlashMessageRender byKey={typeof showFlashes === 'string' ? showFlashes : undefined} css={tw`mb-4`} />
         )}
         <div
-            css={[
-                tw`relative rounded-xl border border-neutral-600 bg-neutral-800 p-4 shadow-lg sm:p-5`,
-                !!borderColor && tw`border-t-4`,
-            ]}
+            className={'vinus-surface'}
+            css={[tw`relative rounded-xl border border-neutral-600 p-4 sm:p-5`, !!borderColor && tw`border-t-4`]}
         >
             <SpinnerOverlay visible={showLoadingOverlay || false} />
             {children}

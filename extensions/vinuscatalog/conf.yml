@@ -1,0 +1,17 @@
+info:
+  name: 'Vinus Catalog'
+  identifier: 'vinuscatalog'
+  description: 'Compatible Minecraft mods and plugins from Modrinth.'
+  version: '1.1.0'
+  target: 'beta-2026-06'
+  flags: 'ignorePlaceholders'
+  author: 'yhanottv'
+  website: 'https://github.com/yhanottv/VinusPanel'
+admin:
+  view: 'admin/view.blade.php'
+dashboard:
+  components: 'components'
+requests:
+  app: 'app'
+  routers:
+    client: 'routes/client.php'

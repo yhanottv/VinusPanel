@@ -3,6 +3,7 @@ import ContentContainer from '@/components/elements/ContentContainer';
 import { CSSTransition } from 'react-transition-group';
 import tw from 'twin.macro';
 import FlashMessageRender from '@/components/FlashMessageRender';
+import { DiscordAnnouncement } from '@/components/elements/DiscordButton';
 
 export interface PageContentBlockProps {
     title?: string;
@@ -21,6 +22,7 @@ const PageContentBlock: React.FC<PageContentBlockProps> = ({ title, showFlashKey
         <CSSTransition timeout={150} classNames={'fade'} appear in>
             <>
                 <ContentContainer css={tw`my-5 sm:my-8`} className={className}>
+                    <DiscordAnnouncement />
                     {showFlashKey && <FlashMessageRender byKey={showFlashKey} css={tw`mb-4`} />}
                     {children}
                 </ContentContainer>

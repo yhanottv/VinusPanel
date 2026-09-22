@@ -1,12 +1,14 @@
 {
   "name": "VinusPanel",
-  "version": "1.4.0",
-  "description": "Dark, accessible, workspace-first theme for Pterodactyl Panel.",
+  "version": "2.3.6",
+  "description": "Satin Pterodactyl workspace with Liquid Glass navigation and an optional Blueprint Minecraft catalogue.",
   "author": "yhanottv",
   "license": "MIT",
   "compatibility": {
-    "pterodactyl": ["1.15.1"],
-    "node": ">=18",
+    "pterodactyl": [
+      "1.15.1"
+    ],
+    "node": ">=22",
     "yarn": "1.x"
   },
   "panelRoot": "/var/www/pterodactyl",

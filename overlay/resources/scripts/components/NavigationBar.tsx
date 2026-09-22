@@ -1,3 +1,4 @@
+import DiscordButton from '@/components/elements/DiscordButton';
 import * as React from 'react';
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
@@ -15,21 +16,28 @@ import { VINUS } from '@/theme';
 import useProfileAppearance from '@/components/dashboard/profile/useProfileAppearance';
 
 const Navigation = styled.aside`
-    ${tw`relative z-50 flex w-full flex-none border-b lg:sticky lg:top-3 lg:h-[calc(100vh-1.5rem)] lg:w-[17.5rem] lg:flex-col lg:overflow-hidden lg:rounded-2xl lg:border`};
-    background: rgba(15, 15, 19, 0.97);
-    border-color: rgba(255, 255, 255, 0.075);
-    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.025);
+    ${tw`relative z-50 flex w-full flex-none border-b lg:sticky lg:top-3 lg:h-[calc(100vh-1.5rem)] lg:w-[15rem] lg:flex-col lg:overflow-y-auto lg:rounded-xl lg:border`};
+
+    @media (min-width: 1024px) {
+        height: calc(100vh - 1.5rem);
+        align-self: start;
+    }
+    background: var(--vinus-glass-navigation);
+    backdrop-filter: blur(28px) saturate(115%);
+    -webkit-backdrop-filter: blur(28px) saturate(115%);
+    border-color: rgba(255, 255, 255, 0.065);
+    box-shadow: var(--vinus-navigation-shadow);
 `;
 
 const NavigationInner = styled.div`
-    ${tw`flex h-[4.5rem] w-full items-center px-4 lg:h-full lg:flex-col lg:items-stretch lg:px-5 lg:py-5`};
+    ${tw`flex h-[4.5rem] w-full items-center px-4 lg:h-full lg:flex-col lg:items-stretch lg:px-3 lg:py-5`};
 `;
 
 const Brand = styled(Link)`
     ${tw`flex min-w-0 items-center no-underline lg:pb-5`};
 
     @media (min-width: 1024px) {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.075);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.065);
     }
 `;
 
@@ -87,12 +95,13 @@ const MainNavigation = styled.nav`
         &:hover,
         &.active {
             ${tw`text-neutral-100`};
-            background: rgba(255, 255, 255, 0.055);
+            background: rgba(255, 255, 255, 0.035);
         }
 
         &.active {
-            box-shadow: inset 3px 0 0 var(--vinus-accent);
-            background: rgba(var(--vinus-accent-rgb), 0.1);
+            border-color: rgba(var(--vinus-accent-rgb), 0.16);
+                box-shadow: inset 2px 0 0 #ff7a1a;
+            background: rgba(var(--vinus-accent-rgb), 0.065);
 
             svg {
                 color: #ff9b52;
@@ -116,14 +125,14 @@ const MainNavigation = styled.nav`
 
 const Footer = styled.div`
     ${tw`ml-1 flex items-center gap-1 lg:mt-auto lg:ml-0 lg:block lg:border-t lg:pt-4`};
-    border-color: rgba(255, 255, 255, 0.075);
+    border-color: rgba(255, 255, 255, 0.065);
 `;
 
 const UserCard = styled(NavLink)`
     ${tw`hidden min-w-0 items-center rounded-xl p-2 no-underline transition-colors lg:flex`};
 
     &:hover {
-        background: rgba(255, 255, 255, 0.045);
+        background: rgba(255, 255, 255, 0.035);
     }
 
     .avatar-wrap {
@@ -180,21 +189,21 @@ export default () => {
                     </BrandMark>
                     <BrandCopy>
                         <strong>{VINUS.name}</strong>
-                        <small>Game control</small>
+                        <small>Panel de gestion</small>
                     </BrandCopy>
                 </Brand>
-                <SectionLabel>Workspace</SectionLabel>
+                <SectionLabel>Espace de travail</SectionLabel>
                 <MainNavigation aria-label={'Navigation principale'}>
-                    <NavLink to={'/'} exact>
+                    <NavLink to={'/'} exact aria-label={'Serveurs'}>
                         <FontAwesomeIcon icon={faServer} fixedWidth />
                         <span>Serveurs</span>
                     </NavLink>
-                    <NavLink to={'/account'}>
+                    <NavLink to={'/account'} aria-label={'Compte'}>
                         <FontAwesomeIcon icon={faUserCircle} fixedWidth />
                         <span>Compte</span>
                     </NavLink>
                     {user.rootAdmin && (
-                        <a href={'/admin'}>
+                        <a href={'/admin'} aria-label={'Administration'}>
                             <FontAwesomeIcon icon={faCogs} fixedWidth />
                             <span>Administration</span>
                         </a>
@@ -204,6 +213,7 @@ export default () => {
                     </div>
                 </MainNavigation>
                 <Footer>
+                    <DiscordButton />
                     <UserCard to={'/account/profile'}>
                         <span className={'avatar-wrap'}>
                             <Avatar.User />

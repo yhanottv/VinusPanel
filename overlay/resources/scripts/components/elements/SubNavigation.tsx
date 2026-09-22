@@ -2,22 +2,29 @@ import styled from 'styled-components/macro';
 import tw from 'twin.macro';
 
 const SubNavigation = styled.nav`
-    ${tw`sticky top-0 z-40 w-full overflow-x-auto border-b p-2 lg:h-[calc(100vh-1.5rem)] lg:overflow-hidden lg:rounded-2xl lg:border lg:p-0`};
-    background: rgba(15, 15, 19, 0.97);
-    border-color: rgba(255, 255, 255, 0.075);
-    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.025);
+    ${tw`sticky top-0 lg:top-3 z-40 w-full overflow-x-auto border-b p-2 lg:h-[calc(100vh-1.5rem)] lg:overflow-hidden lg:rounded-xl lg:border lg:p-0`};
+
+    @media (min-width: 1024px) {
+        height: calc(100vh - 1.5rem);
+        align-self: start;
+    }
+    background: var(--vinus-glass-navigation);
+    backdrop-filter: blur(28px) saturate(115%);
+    -webkit-backdrop-filter: blur(28px) saturate(115%);
+    border-color: rgba(255, 255, 255, 0.065);
+    box-shadow: var(--vinus-navigation-shadow);
 
     &::-webkit-scrollbar {
         display: none;
     }
 
     & > div {
-        ${tw`flex items-center gap-1 lg:h-full lg:flex-col lg:items-stretch lg:gap-0 lg:p-5`};
+        ${tw`flex items-center gap-1 lg:h-full lg:flex-col lg:items-stretch lg:gap-0 lg:px-3 lg:py-5`};
     }
 
     .server-sidebar-brand {
         ${tw`hidden lg:block lg:border-b lg:pb-5`};
-        border-color: rgba(255, 255, 255, 0.075);
+        border-color: rgba(255, 255, 255, 0.065);
 
         a {
             ${tw`flex items-center no-underline`};
@@ -44,12 +51,19 @@ const SubNavigation = styled.nav`
     }
 
     .server-sidebar-current {
-        ${tw`hidden lg:my-5 lg:grid lg:grid-cols-[2.75rem_minmax(0,1fr)] lg:gap-3 lg:rounded-xl lg:border lg:p-3`};
-        background: linear-gradient(135deg, rgba(var(--vinus-accent-rgb), 0.1), rgba(255, 255, 255, 0.025));
-        border-color: rgba(var(--vinus-accent-rgb), 0.17);
+        ${tw`hidden lg:my-4 lg:grid lg:grid-cols-[2.75rem_minmax(0,1fr)] lg:gap-3 lg:rounded-xl lg:border lg:p-3`};
+        background: rgba(255, 255, 255, 0.018);
+        border-color: var(--vinus-border);
+
+        @media (min-width: 1024px) {
+            grid-template-columns: 2rem minmax(0, 1fr);
+            flex-shrink: 0;
+            gap: 0.6rem;
+            padding: 0.75rem 0.5rem;
+        }
 
         .server-sidebar-server-icon {
-            ${tw`flex h-11 w-11 items-center justify-center rounded-lg text-primary-300`};
+            ${tw`flex h-8 w-8 items-center justify-center rounded-lg text-primary-300`};
             background: rgba(0, 0, 0, 0.24);
         }
 
@@ -96,14 +110,14 @@ const SubNavigation = styled.nav`
     }
 
     .server-sidebar-links {
-        ${tw`flex items-center gap-1 lg:min-h-0 lg:flex-1 lg:flex-col lg:items-stretch lg:gap-4 lg:overflow-y-auto`};
+        ${tw`flex items-center gap-1 lg:min-h-0 lg:flex-1 lg:flex-col lg:items-stretch lg:gap-3 lg:overflow-y-auto`};
     }
 
     .server-sidebar-section {
-        ${tw`flex items-center gap-1 lg:block`};
+        ${tw`flex flex-none items-center gap-1 lg:block`};
 
         & > p {
-            ${tw`hidden lg:mb-1.5 lg:block lg:px-3 lg:text-[0.61rem] lg:font-semibold lg:uppercase lg:tracking-[0.17em] lg:text-neutral-600`};
+            ${tw`hidden lg:mb-1.5 lg:block lg:px-3 lg:text-[0.61rem] lg:font-semibold lg:uppercase lg:tracking-[0.17em] lg:text-neutral-500`};
         }
 
         & > a,
@@ -116,13 +130,14 @@ const SubNavigation = styled.nav`
 
             &:hover {
                 ${tw`text-neutral-100`};
-                background: rgba(255, 255, 255, 0.045);
+                background: rgba(255, 255, 255, 0.035);
             }
 
             &.active {
                 ${tw`text-neutral-50`};
-                background: rgba(var(--vinus-accent-rgb), 0.11);
-                box-shadow: inset 3px 0 0 var(--vinus-accent);
+                background: rgba(var(--vinus-accent-rgb), 0.065);
+                border-color: rgba(var(--vinus-accent-rgb), 0.16);
+                box-shadow: inset 2px 0 0 #ff7a1a;
 
                 svg {
                     color: #ff9b52;
@@ -133,7 +148,7 @@ const SubNavigation = styled.nav`
 
     .server-sidebar-footer {
         ${tw`hidden lg:block lg:border-t lg:pt-4`};
-        border-color: rgba(255, 255, 255, 0.075);
+        border-color: rgba(255, 255, 255, 0.065);
 
         a,
         button {

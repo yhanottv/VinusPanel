@@ -15,6 +15,8 @@ export const breakpoint: BreakpointFunction<Breakpoints> = createBreakpoint<Brea
  */
 export const VINUS = {
     name: 'VinusPanel',
+    // Configure your community invitation here; an empty value hides the announcement.
+    discordInvite: 'https://discord.gg/vinuspanel' as string,
     logo: '/assets/images/vinus/eagle.png',
     colors: {
         accent: '#ff7a1a',

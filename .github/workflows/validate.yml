@@ -16,6 +16,8 @@ jobs:
         run: bash -n install.sh uninstall.sh scripts/check-package.sh
       - name: Validate package manifest
         run: bash scripts/check-package.sh
+      - name: Validate catalogue PHP syntax
+        run: find extensions/vinuscatalog -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Scan for accidental secrets
         run: |
           private_key_pattern='BEGIN (RSA |OPENSSH )?PRIVATE ''KEY'

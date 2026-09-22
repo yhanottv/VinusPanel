@@ -28,7 +28,7 @@ const Label = styled.label`
 const AllocationCard = styled(GreyRowBox)`
     ${tw`mt-3 grid items-center gap-4 rounded-2xl border-neutral-600 bg-neutral-800 p-4`};
     grid-template-columns: 3rem minmax(8rem, 0.8fr) 5rem minmax(12rem, 1.4fr) auto;
-    background: linear-gradient(120deg, rgba(20, 33, 49, 0.98), rgba(14, 24, 36, 0.98));
+    background: var(--vinus-surface);
 
     @media (max-width: 767px) {
         ${tw`gap-3`};

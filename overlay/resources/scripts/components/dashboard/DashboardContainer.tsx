@@ -26,7 +26,7 @@ import styled from 'styled-components/macro';
 import useProfileAppearance from '@/components/dashboard/profile/useProfileAppearance';
 
 const DashboardHero = styled.header`
-    ${tw`relative mb-6 overflow-hidden border-b pb-6 pt-1`};
+    ${tw`relative mb-7 pt-1`};
     border-color: rgba(255, 255, 255, 0.08);
 `;
 
@@ -34,30 +34,30 @@ const HeroContent = styled.div`
     ${tw`relative z-10 max-w-2xl`};
 
     h1 {
-        ${tw`text-4xl font-semibold text-neutral-50 sm:text-5xl`};
+        ${tw`text-3xl font-semibold text-neutral-50 sm:text-4xl`};
         letter-spacing: -0.05em;
     }
 `;
 
 const SummaryGrid = styled.div`
-    ${tw`relative z-10 mt-6 flex flex-wrap gap-2`};
+    ${tw`relative z-10 mt-7 grid grid-cols-3 gap-2 sm:gap-3`};
 `;
 
 const SummaryItem = styled.div<{ $tone?: 'success' | 'danger' }>`
-    ${tw`flex min-w-[10rem] items-center rounded-xl border px-3.5 py-2.5`};
-    background: rgba(255, 255, 255, 0.028);
+    ${tw`flex min-w-0 flex-col items-start rounded-xl border px-3 py-3 sm:flex-row sm:items-center sm:px-5 sm:py-4`};
+    background: var(--vinus-glass);
+    box-shadow: var(--vinus-glass-shadow);
     border-color: rgba(255, 255, 255, 0.07);
-    backdrop-filter: blur(10px);
 
     & > svg {
-        ${tw`mr-3`};
+        ${tw`mb-2 sm:mb-0 sm:mr-3`};
         color: ${({ $tone }) => ($tone === 'success' ? '#43d6a3' : $tone === 'danger' ? '#fb7185' : '#ff9b52')};
     }
 `;
 
 const DashboardToolbar = styled.div`
-    ${tw`mb-4 flex flex-col gap-3 rounded-xl border px-4 py-3 sm:flex-row sm:items-center sm:justify-between`};
-    background: rgba(255, 255, 255, 0.025);
+    ${tw`mb-3 flex flex-col gap-3 border-b px-0 pb-4 pt-1 sm:flex-row sm:items-center sm:justify-between`};
+    background: transparent;
     border-color: rgba(255, 255, 255, 0.07);
 `;
 
@@ -97,7 +97,7 @@ const ViewSwitcher = styled.div`
 
 const EmptyState = styled.div`
     ${tw`rounded-2xl border px-6 py-16 text-center`};
-    background: rgba(16, 27, 39, 0.72);
+    background: var(--vinus-glass);
     border-color: rgba(157, 176, 195, 0.16);
 `;
 
@@ -168,41 +168,41 @@ export default () => {
         <PageContentBlock title={'VinusPanel — Serveurs'} showFlashKey={'dashboard'}>
             <DashboardHero>
                 <HeroContent>
-                    <p css={tw`mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary-300`}>
-                        Infrastructure
+                    <p css={tw`mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-400`}>
+                        Vue d’ensemble
                     </p>
                     <h1>Vos serveurs</h1>
                     <p css={tw`mt-3 max-w-xl text-sm leading-relaxed text-neutral-300`}>
-                        Bonjour {appearance.displayName || username}. Surveillez vos instances et accédez rapidement à
-                        leur espace de gestion.
+                        Bonjour {appearance.displayName || username}. Retrouvez vos serveurs et leur activité en un coup
+                        d’œil.
                     </p>
                 </HeroContent>
                 <SummaryGrid>
                     <SummaryItem>
                         <FontAwesomeIcon icon={faLayerGroup} />
                         <div>
-                            <p css={tw`text-lg font-semibold text-neutral-50`}>
+                            <p css={tw`text-3xl font-semibold text-neutral-50`}>
                                 {servers ? servers.pagination.total : '—'}
                             </p>
-                            <p css={tw`text-xs text-neutral-400`}>Instances au total</p>
+                            <p css={tw`text-xs text-neutral-400`}>Serveurs au total</p>
                         </div>
                     </SummaryItem>
                     <SummaryItem $tone={'success'}>
                         <FontAwesomeIcon icon={faCheckCircle} />
                         <div>
-                            <p css={tw`text-lg font-semibold text-neutral-50`}>
+                            <p css={tw`text-3xl font-semibold text-neutral-50`}>
                                 {statusSummary.loaded ? statusSummary.online : '—'}
                             </p>
-                            <p css={tw`text-xs text-neutral-400`}>En ligne sur cette page</p>
+                            <p css={tw`text-xs text-neutral-400`}>En ligne · cette page</p>
                         </div>
                     </SummaryItem>
                     <SummaryItem $tone={'danger'}>
                         <FontAwesomeIcon icon={faTimesCircle} />
                         <div>
-                            <p css={tw`text-lg font-semibold text-neutral-50`}>
+                            <p css={tw`text-3xl font-semibold text-neutral-50`}>
                                 {statusSummary.loaded ? statusSummary.offline : '—'}
                             </p>
-                            <p css={tw`text-xs text-neutral-400`}>Hors ligne ou indisponibles</p>
+                            <p css={tw`text-xs text-neutral-400`}>Hors ligne · cette page</p>
                         </div>
                     </SummaryItem>
                 </SummaryGrid>

@@ -1,0 +1,9 @@
+<?php
+
+return [
+    // Map the egg UUID (not the server UUID) to a Detection::PROFILES key.
+    // 'egg_profiles' => ['your-egg-uuid' => 'fabric'],
+    'egg_profiles' => [],
+    // Optional per-server override, useful when a generic egg launches a different JAR.
+    'server_profiles' => [],
+];

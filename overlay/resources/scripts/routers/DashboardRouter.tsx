@@ -19,7 +19,7 @@ import styled from 'styled-components/macro';
 import tw from 'twin.macro';
 
 const Shell = styled.div`
-    ${tw`min-h-screen lg:flex lg:gap-3 lg:p-3`};
+    ${tw`min-h-screen lg:flex lg:gap-0 lg:p-3`};
 `;
 
 const Workspace = styled.main`
@@ -27,10 +27,8 @@ const Workspace = styled.main`
 
     @media (min-width: 1024px) {
         min-height: calc(100vh - 1.5rem);
-        border: 1px solid rgba(255, 255, 255, 0.07);
-        border-radius: 1.25rem;
-        background: rgba(10, 10, 13, 0.72);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+        padding: 0 0.5rem;
+        background: transparent;
     }
 `;
 
@@ -68,8 +66,11 @@ export default () => {
 
     return (
         <Shell className={'app-shell'}>
+            <a className={'skip-navigation'} href={'#main-content'}>
+                Aller au contenu
+            </a>
             <NavigationBar />
-            <Workspace className={'app-workspace'}>
+            <Workspace className={'app-workspace'} id={'main-content'} tabIndex={-1}>
                 {location.pathname.startsWith('/account') && (
                     <AccountNavigation aria-label={'Navigation du compte'}>
                         {routes.account

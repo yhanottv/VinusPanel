@@ -29,7 +29,7 @@ const ProfileLayout = styled.div`
 const Preview = styled.section`
     ${tw`relative overflow-hidden rounded-2xl border p-6`};
     min-height: 25rem;
-    background: radial-gradient(circle at 50% 15%, rgba(var(--vinus-accent-rgb), 0.18), transparent 13rem), #131317;
+    background: var(--vinus-glass);
     border-color: rgba(255, 255, 255, 0.08);
 
     &::after {
@@ -43,12 +43,12 @@ const AvatarFrame = styled.div`
     ${tw`relative mx-auto mt-8 h-36 w-36 overflow-hidden rounded-[2rem] border`};
     background: rgba(0, 0, 0, 0.28);
     border-color: rgba(var(--vinus-accent-rgb), 0.26);
-    box-shadow: 0 22px 70px rgba(0, 0, 0, 0.38), 0 0 50px rgba(var(--vinus-accent-rgb), 0.12);
+    box-shadow: var(--vinus-glass-shadow);
 `;
 
 const Editor = styled.section`
     ${tw`rounded-2xl border p-5 sm:p-7`};
-    background: #151519;
+    background: var(--vinus-glass);
     border-color: rgba(255, 255, 255, 0.08);
 
     .upload-zone {

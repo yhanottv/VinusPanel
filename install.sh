@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-THEME_VERSION="1.4.0"
+THEME_VERSION="2.3.6"
 DEFAULT_PANEL_DIR="/var/www/pterodactyl"
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PANEL_DIR="$DEFAULT_PANEL_DIR"
@@ -55,6 +55,17 @@ done
 
 [[ "$PANEL_DIR" = /* ]] || fail "le chemin du panel doit être absolu"
 
+USE_BLUEPRINT=0
+MANIFEST="$(mktemp)"
+trap 'rm -f "$MANIFEST"' EXIT
+cat "$REPO_DIR/overlay-manifest.txt" > "$MANIFEST"
+if [[ -f "$PANEL_DIR/.blueprint/extensions/blueprint/private/db/is_installed" ]]; then
+    grep -q '^VERSION="beta-2026-06"' "$PANEL_DIR/blueprint.sh" || fail "intégration Blueprint validée pour beta-2026-06 uniquement"
+    USE_BLUEPRINT=1
+    find "$REPO_DIR/blueprint-overlay" -type f -printf '%P\n' >> "$MANIFEST"
+fi
+LC_ALL=C sort -u -o "$MANIFEST" "$MANIFEST"
+
 require_command() {
     command -v "$1" >/dev/null 2>&1 || fail "commande requise absente : $1"
 }
@@ -77,7 +88,7 @@ validate_environment() {
     local node_major
     node_major="$(node --version | sed -E 's/^v([0-9]+).*/\1/')"
     [[ "$node_major" =~ ^[0-9]+$ ]] || fail "version Node.js illisible"
-    ((node_major >= 18)) || fail "Node.js 18 ou supérieur est requis"
+    ((node_major >= 22)) || fail "Node.js 22 ou supérieur est requis"
 
     local detected_version=""
     if [[ -f "$PANEL_DIR/config/app.php" ]]; then
@@ -105,7 +116,7 @@ backup_into() {
         else
             printf '%s\n' "$relative_path" >> "$destination/new-files.list"
         fi
-    done < "$REPO_DIR/overlay-manifest.txt"
+    done < "$MANIFEST"
 }
 
 extend_original_backup() {
@@ -120,7 +131,7 @@ extend_original_backup() {
                 printf '%s\n' "$relative_path" >> "$ORIGINAL_BACKUP/new-files.list"
             fi
         fi
-    done < "$REPO_DIR/overlay-manifest.txt"
+    done < "$MANIFEST"
 }
 
 restore_from() {
@@ -191,16 +202,22 @@ MAINTENANCE_ENABLED=1
 log "Installation de la surcouche VinusPanel $THEME_VERSION…"
 while IFS= read -r relative_path; do
     [[ -n "$relative_path" ]] || continue
+    source_file="$REPO_DIR/overlay/$relative_path"
+    if ((USE_BLUEPRINT)) && [[ -f "$REPO_DIR/blueprint-overlay/$relative_path" ]]; then
+        source_file="$REPO_DIR/blueprint-overlay/$relative_path"
+    fi
     install -D -m 0644 -o www-data -g www-data \
-        "$REPO_DIR/overlay/$relative_path" \
+        "$source_file" \
         "$PANEL_DIR/$relative_path"
-done < "$REPO_DIR/overlay-manifest.txt"
+done < "$MANIFEST"
 
 cd "$PANEL_DIR"
 if [[ ! -d node_modules ]]; then
     log "Installation des dépendances frontend…"
     yarn install --frozen-lockfile
 fi
+# The typeface is part of VinusPanel, not a default Pterodactyl dependency.
+yarn add -D @fontsource-variable/ibm-plex-sans@^5.2.8 jest-environment-jsdom@28.1.3 --ignore-scripts
 
 log "Compilation des assets de production…"
 yarn build:production

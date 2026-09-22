@@ -14,6 +14,13 @@ const ContentContainer = styled.div`
     ${breakpoint('xl')`
         ${tw`mx-8`};
     `};
+
+    @media (min-width: 1024px) {
+        .server-route-content & {
+            margin-left: 0;
+            margin-right: 0;
+        }
+    }
 `;
 ContentContainer.displayName = 'ContentContainer';
 

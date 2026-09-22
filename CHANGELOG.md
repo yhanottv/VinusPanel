@@ -1,5 +1,92 @@
 # VinusPanel changelog
 
+## 2.3.6 — Discord community link
+
+- replaced the chat button with an accessible Discord logo link;
+- added a compact help and bug-report announcement at the top of client pages;
+- configured the community invitation, shared by both links and customizable per installation.
+
+## 2.3.5 — Black glass navigation
+
+- replaced the gray navigation tint with translucent black, subtle reflections and finer borders;
+- retained blur and accessible focus indicators, with a restrained orange active-tab marker;
+- matched desktop sidebars, mobile navigation and the reduced-transparency fallback.
+
+## 2.3.4 — Black surfaces and direct resource graphs
+
+- restored black backgrounds and removed metallic gradients and raised card/button edges, retaining navigation glass;
+- replaced the resource accordion with three always-visible charts;
+- clarified metric hierarchy and network directions, with compact localized axis labels and stable chart heights.
+
+## 2.3.3 — Centered eagle signature
+
+- replaced the wordmark with a detailed Unicode rendering sampled from the supplied eagle logo, proportionally fitted and horizontally centered within the terminal;
+- retained orange coloring and persistent normal scrollback.
+
+## 2.3.2 — Persistent console artwork
+
+- replaced the temporary introduction with the supplied orange block artwork in normal terminal scrollback, immediately after the initial server status and startup transitions;
+- removed the 1.8-second timeout, alternate screen and log buffering;
+- preserved the drawing on idle consoles and adapted it to narrow viewports;
+- prevented duplicate signatures from repeated status events and preserved history on reconnection.
+
+## 2.3.1 — Temporary terminal introduction
+
+- replaced the fixed ASCII banner with a brief introduction rendered inside xterm on page entry and server startup;
+- restored the log screen after 1.8 seconds, preserving buffered output in order;
+- simplified the console to a single flat toolbar and command line;
+- added regression checks for intro expiry, output preservation, cleanup and narrow terminals.
+
+## 2.3.0 — Clear diagnostics and catalogue artwork
+
+- removed duplicate CPU, memory and network metrics from the control column;
+- added validated Modrinth icons with fallbacks and a configurable Discord button;
+- added an ASCII console signature and localized connection guidance;
+- removed persistent command history and added safe HTTP error messages;
+- consumed catalogue installation tokens before downloads and capped batches at 100 MiB;
+- added catalogue error references and regression coverage.
+
+## 2.2.1 — Satin surfaces and resource overview
+
+- added directional highlights and shadows to content surfaces, keeping navigation glass separate;
+- moved resource graphs above the console workspace and expanded them by default;
+- preserved mounted charts when collapsed, retaining their live history.
+
+## 2.2.0 — Matte workspace and Blueprint catalogue
+
+- limited Liquid Glass to navigation and simplified the server status;
+- retained chart datasets across telemetry updates, animated new points and preserved history when charts are collapsed;
+- calculated network rates from actual elapsed time;
+- added a portable Modrinth catalogue as a native Blueprint extension, with separate hybrid-server categories;
+- validated downloads and required dependencies, tracked compatible updates and preserved previous JARs;
+- added automatic recovery for failed installation batches and isolated installation tests;
+- preserved Blueprint hooks and Pterodactyl 1.15.1 security middleware in the optional integration.
+
+
+## 2.1.0 — Console workspace
+
+- rebuilt the console with its own page header, a large terminal and a separate control column;
+- added server-state-aware controls, retaining permission checks and forced-stop confirmation;
+- grouped CPU, memory, storage, uptime and traffic in a responsive telemetry panel;
+- made detailed resource charts expandable;
+- disabled power actions while disconnected, before status is known, and during conflict states;
+- retained terminal command history, search, live logs and responsive resizing;
+- added 15 state-transition and availability tests for power controls.
+
+## 2.0.0 — Liquid Glass
+
+- introduced a smoked-glass design system with warm orange accents and restrained surface reflections;
+- rebuilt the sign-in page with a static glass illustration and removed the unverified system-status claim;
+- simplified both workspaces with narrower translucent navigation and more room for content;
+- redesigned server summaries and adaptive list cards without fixed-width overflow;
+- moved the live terminal above resource charts and compacted file-manager rows;
+- aligned account, profile, shared forms, and legacy administration with the new surfaces;
+- made server search a labelled keyboard-operable button and added skip-to-content links;
+- added global visible focus, reduced-motion and reduced-transparency support;
+- corrected terminal resizing, sticky navigation height, and the legacy authentication top gap;
+- kept existing server actions, permission checks, authentication, and data storage intact.
+
+
 ## 1.4.0 — Identity and activity
 
 - rebuilt the sign-in experience around a responsive animated control-room scene;

@@ -11,16 +11,16 @@ interface Props {
 }
 
 const ButtonStyle = styled.button<Omit<Props, 'isLoading'>>`
-    ${tw`relative inline-block rounded-lg border p-2 text-sm font-medium normal-case tracking-normal transition-all duration-150`};
+    ${tw`relative inline-block rounded-md border p-2 text-sm font-medium normal-case tracking-normal transition-all duration-150`};
 
     ${(props) =>
         ((!props.isSecondary && !props.color) || props.color === 'primary') &&
         css<Props>`
-            ${(props) => !props.isSecondary && tw`bg-primary-500 border-primary-600 border text-primary-50`};
-            box-shadow: 0 8px 24px rgba(255, 122, 26, 0.15);
+            ${(props) => !props.isSecondary && tw`bg-primary-400 border-primary-300 border text-neutral-900`};
+            box-shadow: none;
 
             &:hover:not(:disabled) {
-                ${tw`bg-primary-600 border-primary-700`};
+                ${tw`bg-primary-300 border-primary-200`};
             }
         `};
 

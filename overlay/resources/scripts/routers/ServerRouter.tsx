@@ -1,3 +1,4 @@
+import DiscordButton from '@/components/elements/DiscordButton';
 import TransferListener from '@/components/server/TransferListener';
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
@@ -138,6 +139,9 @@ export default () => {
                 )
             ) : (
                 <div className={'server-layout'}>
+                    <a className={'skip-navigation'} href={'#main-content'}>
+                        Aller au contenu
+                    </a>
                     <CSSTransition timeout={150} classNames={'fade'} appear in>
                         <SubNavigation className={'server-sidebar'}>
                             <div>
@@ -146,7 +150,7 @@ export default () => {
                                         <img src={VINUS.logo} alt={''} aria-hidden={'true'} />
                                         <div>
                                             <strong>{VINUS.name}</strong>
-                                            <span>Game control</span>
+                                            <span>Panel de gestion</span>
                                         </div>
                                     </Link>
                                 </div>
@@ -180,6 +184,7 @@ export default () => {
                                 </div>
 
                                 <div className={'server-sidebar-footer'}>
+                  <DiscordButton />
                                     <Link to={'/'}>
                                         <FontAwesomeIcon icon={faServer} fixedWidth />
                                         <span>Tous les serveurs</span>
@@ -203,8 +208,8 @@ export default () => {
                         </SubNavigation>
                     </CSSTransition>
                     <div className={'server-workspace'}>
-                        <ServerShellHeader />
-                        <main className={'server-route-content'}>
+                        {location.pathname.replace(/\/$/, '') !== match.url.replace(/\/$/, '') && <ServerShellHeader />}
+                        <main className={'server-route-content'} id={'main-content'} tabIndex={-1}>
                             <InstallListener />
                             <TransferListener />
                             <WebsocketHandler />

@@ -24,16 +24,16 @@ const ServerCard = styled(GreyRowBox)<{
     $status: ReturnType<typeof getDisplayStatus>['key'];
     $view: 'grid' | 'list';
 }>`
-    ${tw`relative grid min-h-[15rem] gap-5 overflow-hidden rounded-xl border p-5 no-underline`};
+    ${tw`relative grid min-h-[14rem] gap-4 overflow-hidden rounded-xl border p-5 no-underline`};
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto 1fr;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.022));
+    background: var(--vinus-glass);
     border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.18);
+    box-shadow: var(--vinus-glass-shadow);
     transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 
     &::before {
-        content: '';
+        content: none;
         ${tw`absolute bottom-3 left-0 top-3 w-[3px] rounded-r-full`};
         background: ${({ $status }) => statusColor($status)};
         z-index: 2;
@@ -42,7 +42,7 @@ const ServerCard = styled(GreyRowBox)<{
     &::after {
         content: '';
         ${tw`pointer-events-none absolute inset-0`};
-        background: radial-gradient(circle at 92% 10%, rgba(var(--vinus-accent-rgb), 0.08), transparent 14rem);
+        background: none;
     }
 
     & > * {
@@ -51,9 +51,9 @@ const ServerCard = styled(GreyRowBox)<{
 
     &:hover {
         border-color: rgba(255, 255, 255, 0.15);
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.03));
-        box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
-        transform: translateY(-1px);
+        background: #151518;
+        box-shadow: none;
+        transform: none;
     }
 
     &:focus-visible {
@@ -69,19 +69,22 @@ const ServerCard = styled(GreyRowBox)<{
         $view === 'list' &&
         `
         min-height: 0;
-        grid-template-columns: minmax(15rem, 1.4fr) minmax(11rem, 0.75fr) minmax(23rem, 1.35fr);
-        grid-template-rows: auto;
+        grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+        grid-template-rows: auto auto;
         align-items: center;
-        gap: 1.25rem;
-        padding: 1.05rem 1.25rem;
+        & > :nth-child(2) { grid-column: 1; padding: 0; border: 0; background: none; }
+        & > :nth-child(3) { grid-column: 2; grid-row: 1 / span 2; }
+        gap: .75rem 2rem;
+        padding: 1.25rem;
 
         &::after {
-            background: linear-gradient(90deg, transparent, rgba(var(--vinus-accent-rgb), 0.025));
+            background: none;
         }
 
-        @media (max-width: 1023px) {
+        @media (max-width: 767px) {
             grid-template-columns: minmax(0, 1fr);
             grid-template-rows: auto auto auto;
+            & > :nth-child(3) { grid-column: 1; grid-row: auto; }
         }
     `}
 
@@ -95,11 +98,11 @@ const ServerIdentity = styled.div`
 `;
 
 const ServerIcon = styled.div<{ $status: ReturnType<typeof getDisplayStatus>['key'] }>`
-    ${tw`mr-4 flex h-12 w-12 flex-none items-center justify-center rounded-xl text-base`};
+    ${tw`mr-3 flex h-10 w-10 flex-none items-center justify-center rounded-xl text-base`};
     color: ${({ $status }) => statusColor($status)};
     background: rgba(0, 0, 0, 0.28);
     border: 1px solid ${({ $status }) => statusColor($status)}38;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    box-shadow: none;
 `;
 
 const StatusBadge = styled.span<{ $status: ReturnType<typeof getDisplayStatus>['key'] }>`
@@ -112,17 +115,17 @@ const StatusBadge = styled.span<{ $status: ReturnType<typeof getDisplayStatus>['
         content: '';
         ${tw`mr-1.5 h-1.5 w-1.5 rounded-full`};
         background: ${({ $status }) => statusColor($status)};
-        box-shadow: 0 0 10px ${({ $status }) => statusColor($status)}88;
+        box-shadow: none;
     }
 `;
 
 const ServerName = styled.p`
-    ${tw`text-lg font-semibold text-neutral-100`};
+    ${tw`text-base font-semibold text-neutral-100`};
     letter-spacing: -0.025em;
 `;
 
 const AddressBlock = styled.div`
-    ${tw`self-start rounded-lg border px-3 py-2.5`};
+    ${tw`self-start rounded-lg border px-3 py-2`};
     width: fit-content;
     max-width: 100%;
     background: rgba(0, 0, 0, 0.2);
@@ -140,7 +143,7 @@ const MetricGrid = styled.div<{ $view: 'grid' | 'list' }>`
         border-top: 0;
         padding-top: 0;
 
-        @media (max-width: 1023px) {
+        @media (max-width: 767px) {
             border-top: 1px solid rgba(157, 176, 195, 0.13);
             padding-top: 1rem;
         }
@@ -157,11 +160,11 @@ const MetricItem = styled.div<{ $alarm: boolean }>`
 
 const MetricTrack = styled.div<{ $alarm: boolean }>`
     ${tw`mt-2 h-1 overflow-hidden rounded-full`};
-    background: rgba(15, 23, 32, 0.5);
+    background: rgba(255, 255, 255, 0.07);
 
     & > span {
         ${tw`block h-full rounded-full`};
-        background: ${({ $alarm }) => ($alarm ? '#fb7185' : 'linear-gradient(90deg, #d84b00, #ff9b52)')};
+        background: ${({ $alarm }) => ($alarm ? '#fb7185' : '#cda37e')};
         transition: width 250ms ease;
     }
 
@@ -173,9 +176,7 @@ const MetricTrack = styled.div<{ $alarm: boolean }>`
 `;
 
 const CardChevron = styled(FontAwesomeIcon)`
-    ${tw`absolute right-4 top-4 hidden h-3 w-3 rounded-lg border p-2 text-neutral-500 sm:block`};
-    background: rgba(0, 0, 0, 0.22);
-    border-color: rgba(255, 255, 255, 0.08);
+    ${tw`absolute right-3 top-3 hidden h-3 w-3 text-neutral-500 sm:block`};
 `;
 
 export type ServerDisplayState = ServerPowerState | 'loading' | 'suspended' | 'maintenance' | 'unavailable';
@@ -305,19 +306,17 @@ export default ({
                     <FontAwesomeIcon icon={faServer} />
                 </ServerIcon>
                 <div css={tw`min-w-0`}>
-                    <div css={tw`flex flex-col flex-wrap items-start gap-2 pr-8 sm:flex-row sm:items-center`}>
+                    <div css={tw`flex flex-col flex-wrap items-start gap-2 sm:flex-row sm:items-center`}>
                         <ServerName>{server.name}</ServerName>
                         <StatusBadge $status={displayStatus.key}>{displayStatus.label}</StatusBadge>
                     </div>
                     {!!server.description && (
-                        <p css={tw`mt-1 line-clamp-2 text-sm text-neutral-300`}>{server.description}</p>
+                        <p css={tw`mt-1 line-clamp-1 text-xs text-neutral-400`}>{server.description}</p>
                     )}
                 </div>
             </ServerIdentity>
             <AddressBlock>
-                <p css={tw`text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-neutral-500`}>
-                    Point d&apos;accès
-                </p>
+                <p css={tw`text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-neutral-500`}>Adresse</p>
                 <div css={tw`mt-1 flex items-center`}>
                     <FontAwesomeIcon icon={faEthernet} css={tw`mr-2 text-neutral-500`} />
                     <p css={tw`truncate text-sm font-medium text-neutral-200`}>

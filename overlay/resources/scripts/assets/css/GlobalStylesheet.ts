@@ -11,10 +11,15 @@ export default createGlobalStyle`
         --vinus-accent-soft: ${VINUS.colors.accentSoft};
         --vinus-accent-rgb: 255, 122, 26;
         --vinus-bg: #08080a;
+        color-scheme: dark;
+        --vinus-glass: #101012;
+        --vinus-glass-navigation: linear-gradient(135deg, rgba(255,255,255,.025), transparent 42%, rgba(255,255,255,.008)), rgba(4,4,6,.88);
+        --vinus-glass-shadow: none;
+        --vinus-navigation-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 8px 24px rgba(0,0,0,.24);
         --vinus-sidebar: #0f0f13;
-        --vinus-surface: #151519;
-        --vinus-surface-raised: #1b1b21;
-        --vinus-border: rgba(255, 255, 255, 0.08);
+        --vinus-surface: #101012;
+        --vinus-surface-raised: #19191d;
+        --vinus-border: rgba(255, 255, 255, 0.09);
         --vinus-border-strong: rgba(255, 255, 255, 0.13);
         --vinus-muted: #8b8b98;
     }
@@ -39,11 +44,11 @@ export default createGlobalStyle`
     body {
         ${tw`font-sans text-neutral-200`};
         min-height: 100vh;
-        background:
-            radial-gradient(circle at 12% -14rem, rgba(var(--vinus-accent-rgb), 0.1), transparent 34rem),
-            linear-gradient(180deg, #09090b 0%, #070709 100%);
+        background: var(--vinus-bg);
         background-attachment: fixed;
-        letter-spacing: 0.003em;
+        font-family: 'IBM Plex Sans', system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        letter-spacing: 0;
         font-feature-settings: 'tnum' 1, 'cv02' 1, 'cv03' 1;
     }
 
@@ -94,8 +99,8 @@ export default createGlobalStyle`
     @media (min-width: 1024px) {
         .server-layout {
             display: grid;
-            grid-template-columns: 18.5rem minmax(0, 1fr);
-            gap: 0.75rem;
+            grid-template-columns: 15rem minmax(0, 1fr);
+            gap: 0;
             width: 100%;
             max-width: 1920px;
             margin: 0 auto;
@@ -104,17 +109,71 @@ export default createGlobalStyle`
 
         .server-workspace {
             min-height: calc(100vh - 1.5rem);
-            padding: 1.75rem;
-            overflow: hidden;
-            border: 1px solid var(--vinus-border);
-            border-radius: 1.25rem;
-            background: rgba(10, 10, 13, 0.76);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+            padding: 1.5rem 2rem;
+            background: transparent;
         }
 
         .server-route-content > * {
             min-width: 0;
         }
+    }
+
+    :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+        outline: 2px solid var(--vinus-accent-soft);
+        outline-offset: 3px;
+    }
+
+    .vinus-surface {
+        background: var(--vinus-glass);
+        border: 1px solid var(--vinus-border);
+        box-shadow: var(--vinus-glass-shadow);
+    }
+
+    .vinus-discord.vinus-discord {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 38px; height: 38px; padding: 8px; flex: 0 0 38px;
+        color: #dedee5; background: transparent; border: 1px solid transparent;
+        border-radius: 8px; text-decoration: none;
+        transition: color 150ms ease, background-color 150ms ease;
+    }
+    .vinus-discord.vinus-discord:hover {
+        color: #fff; background: rgba(88, 101, 242, .16); border-color: rgba(88, 101, 242, .24);
+    }
+    .vinus-discord:disabled { opacity: .45; cursor: not-allowed; }
+    .vinus-discord svg { width: 22px; height: 22px; flex-shrink: 0; }
+    .vinus-discord-announcement {
+        display: flex; align-items: center; gap: 12px;
+        margin-bottom: 24px; padding: 12px 16px;
+        background: #0d0d10; border: 1px solid var(--vinus-border); border-radius: 8px;
+    }
+    .vinus-discord-announcement > svg { flex-shrink: 0; color: #929aff; width: 20px; height: 20px; }
+    .vinus-discord-announcement p { margin: 0; color: #b7b7c2; font-size: 13px; line-height: 1.6; }
+    .vinus-discord-announcement a { color: #d0d4ff; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+    .vinus-discord-announcement a:hover { color: #fff; }
+
+    .skip-navigation {
+        position: fixed;
+        top: -5rem;
+        left: 1rem;
+        z-index: 9999;
+        padding: .75rem 1rem;
+        color: #111315;
+        background: #ffb067;
+        border-radius: .5rem;
+    }
+    .skip-navigation:focus { top: 1rem; }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation: none !important;
+            transition: none !important;
+            scroll-behavior: auto !important;
+        }
+    }
+
+    @media (prefers-reduced-transparency: reduce) {
+        :root { --vinus-glass-navigation: #09090b; --vinus-glass: #101012; }
+        * { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
     }
 
     .fade-enter-active, .fade-appear-active {
@@ -135,17 +194,17 @@ export default createGlobalStyle`
        belong to the same visual system. */
     .bg-neutral-900,
     .bg-gray-900 {
-        background-color: #0d0d11 !important;
+        background-color: #0c0c0e !important;
     }
 
     .bg-neutral-800,
     .bg-gray-800 {
-        background-color: #151519 !important;
+        background: var(--vinus-glass) !important;
     }
 
     .bg-neutral-700,
     .bg-gray-700 {
-        background-color: #1b1b21 !important;
+        background-color: var(--vinus-surface-raised) !important;
     }
 
     .border-neutral-600,
@@ -157,7 +216,7 @@ export default createGlobalStyle`
 
     .shadow-lg,
     .shadow-md {
-        box-shadow: 0 16px 38px rgba(0, 0, 0, 0.2) !important;
+        box-shadow: var(--vinus-glass-shadow) !important;
     }
 
     ::-webkit-scrollbar {

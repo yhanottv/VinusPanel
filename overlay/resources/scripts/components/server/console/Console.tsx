@@ -12,12 +12,10 @@ import { usePermissions } from '@/plugins/usePermissions';
 import { theme as th } from 'twin.macro';
 import useEventListener from '@/plugins/useEventListener';
 import { debounce } from 'debounce';
-import { usePersistedState } from '@/plugins/usePersistedState';
+import { createConsoleIntro } from './intro';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
 import classNames from 'classnames';
 import { ChevronDoubleRightIcon } from '@heroicons/react/solid';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTerminal } from '@fortawesome/free-solid-svg-icons';
 
 import 'xterm/css/xterm.css';
 import styles from './style.module.css';
@@ -51,7 +49,7 @@ const terminalProps: ITerminalOptions = {
     fontSize: 13,
     fontFamily: th('fontFamily.mono'),
     lineHeight: 1.18,
-    rows: 30,
+    rows: 24,
     theme: theme,
 };
 
@@ -59,7 +57,8 @@ export default () => {
     const TERMINAL_PRELUDE = '\u001b[1m\u001b[33mcontainer@pterodactyl~ \u001b[0m';
     const ref = useRef<HTMLDivElement>(null);
     const terminal = useMemo(() => new Terminal({ ...terminalProps }), []);
-    const fitAddon = new FitAddon();
+    const intro = useMemo(() => createConsoleIntro(terminal), [terminal]);
+    const fitAddon = useMemo(() => new FitAddon(), []);
     const searchAddon = new SearchAddon();
     const searchBar = new SearchBarAddon({ searchAddon });
     const webLinksAddon = new WebLinksAddon();
@@ -68,8 +67,12 @@ export default () => {
     const { connected, instance } = ServerContext.useStoreState((state) => state.socket);
     const [canSendCommands] = usePermissions(['control.console']);
     const serverId = ServerContext.useStoreState((state) => state.server.data!.id);
-    const isTransferring = ServerContext.useStoreState((state) => state.server.data!.isTransferring);
-    const [history, setHistory] = usePersistedState<string[]>(`${serverId}:command_history`, []);
+    const [history, setHistory] = useState<string[]>([]);
+    const serverStatus = ServerContext.useStoreState((state) => state.status.value);
+    useEffect(() => {
+        setHistory([]);
+        try { localStorage.removeItem(`${serverId}:command_history`); } catch { /* Storage can be disabled. */ }
+    }, [serverId]);
     const [historyIndex, setHistoryIndex] = useState(-1);
     // SearchBarAddon has hardcoded z-index: 999 :(
     const zIndex = `
@@ -78,24 +81,23 @@ export default () => {
     }`;
 
     const handleConsoleOutput = (line: string, prelude = false) =>
-        terminal.writeln((prelude ? TERMINAL_PRELUDE : '') + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m');
+        intro.writeln((prelude ? TERMINAL_PRELUDE : '') + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m');
 
     const handleTransferStatus = (status: string) => {
         switch (status) {
             // Sent by either the source or target node if a failure occurs.
             case 'failure':
-                terminal.writeln(TERMINAL_PRELUDE + 'Transfer has failed.\u001b[0m');
+                intro.writeln(TERMINAL_PRELUDE + 'Transfert interrompu côté hébergement. Contactez un administrateur avant de réessayer.\u001b[0m');
                 return;
         }
     };
 
     const handleDaemonErrorOutput = (line: string) =>
-        terminal.writeln(
-            TERMINAL_PRELUDE + '\u001b[1m\u001b[41m' + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m'
+        intro.writeln(
+            TERMINAL_PRELUDE + '[Wings — erreur du service de gestion] ' + '\u001b[1m\u001b[41m' + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m'
         );
 
-    const handlePowerChangeEvent = (state: string) =>
-        terminal.writeln(TERMINAL_PRELUDE + 'Server marked as ' + state + '...\u001b[0m');
+    const handlePowerChangeEvent = (state: string) => intro.status(state);
 
     const handleCommandKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'ArrowUp') {
@@ -117,7 +119,7 @@ export default () => {
         }
 
         const command = e.currentTarget.value;
-        if (e.key === 'Enter' && command.length > 0) {
+        if (e.key === 'Enter' && command.trim().length > 0 && canSendCommands && connected && instance) {
             setHistory((prevHistory) => [command, ...prevHistory!].slice(0, 32));
             setHistoryIndex(-1);
 
@@ -160,6 +162,20 @@ export default () => {
         }
     }, [terminal, connected]);
 
+    useEffect(() => {
+        if (!ref.current || !terminal.element) return;
+        const observer = new ResizeObserver(() => fitAddon.fit());
+        observer.observe(ref.current);
+        return () => observer.disconnect();
+    }, [terminal, fitAddon, connected]);
+
+    useEffect(() => {
+        // Socket status may arrive before this console mounts; cover both paths.
+        if (connected && terminal.element) intro.status(serverStatus);
+    }, [connected, serverStatus, intro, terminal]);
+
+    useEffect(() => () => { intro.dispose(); terminal.dispose(); }, [terminal, intro]);
+
     useEventListener(
         'resize',
         debounce(() => {
@@ -181,11 +197,6 @@ export default () => {
         };
 
         if (connected && instance) {
-            // Do not clear the console if the server is being transferred.
-            if (!isTransferring) {
-                terminal.clear();
-            }
-
             Object.keys(listeners).forEach((key: string) => {
                 instance.addListener(key, listeners[key]);
             });
@@ -204,15 +215,8 @@ export default () => {
     return (
         <div className={classNames(styles.terminal, 'relative')}>
             <SpinnerOverlay visible={!connected} size={'large'} />
-            <div className={styles.console_header}>
-                <div>
-                    <FontAwesomeIcon icon={faTerminal} />
-                    <span className={styles.console_title}>Console en direct</span>
-                </div>
-                <span className={styles.console_live}>{connected ? 'Connectée' : 'Reconnexion…'}</span>
-            </div>
             <div className={classNames(styles.container, styles.overflows_container)}>
-                <div className={'h-full'}>
+                <div className={'w-full min-w-0 h-full'}>
                     <div id={styles.terminal} ref={ref} />
                 </div>
             </div>
@@ -221,10 +225,13 @@ export default () => {
                     <input
                         className={classNames('peer', styles.command_input)}
                         type={'text'}
-                        placeholder={'Saisissez une commande…'}
+                        placeholder={'Commande…'}
+                        title={'↑ / ↓ : historique · Entrée : envoyer'}
                         aria-label={'Commande à envoyer au serveur'}
                         disabled={!instance || !connected}
                         onKeyDown={handleCommandKeyDown}
+                        autoComplete={'off'}
+                        spellCheck={false}
                         autoCorrect={'off'}
                         autoCapitalize={'none'}
                     />
