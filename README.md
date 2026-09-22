@@ -1,6 +1,10 @@
 <div align="center">
 
-<img src="overlay/public/assets/images/vinus/eagle.png" alt="Logo VinusPanel — aigle orange" width="120" />
+<img src="docs/assets/banner.png" alt="Bannière VinusPanel — aigle orange sur fond noir et orange" width="100%" />
+
+<br />
+
+<img src="overlay/public/assets/images/vinus/eagle.png" alt="Logo VinusPanel — aigle orange" width="88" />
 
 # VinusPanel
 
@@ -20,7 +24,7 @@ VinusPanel retravaille le tableau de bord, la navigation, la console et les prin
 
 Le dépôt contient une **surcouche de fichiers et ses outils d’installation**, pas une distribution complète de Pterodactyl. Un panel fonctionnel doit déjà être installé. Le thème peut servir à gérer d’autres jeux ; seul le catalogue optionnel de mods et plugins est réservé à Minecraft.
 
-## Ce qui a changé
+## ✨ Ce qui a changé
 
 La version **2.3.6** réunit les évolutions suivantes. Le [changelog](CHANGELOG.md) conserve le détail par version, y compris les anciens designs remplacés depuis.
 
@@ -58,7 +62,9 @@ Cette signature est uniquement visuelle : elle n’est jamais envoyée comme com
 
 Les personnalisations du profil ne changent ni l’identité de connexion, ni les permissions, ni les données du compte dans Pterodactyl. Elles ne se synchronisent pas entre appareils.
 
-## Appareils et navigateurs
+<a id="appareils-et-navigateurs"></a>
+
+## 📱 Appareils et navigateurs
 
 VinusPanel s’utilise dans un navigateur ; aucune application native n’est fournie. La mise en page s’adapte à la **largeur disponible**, pas au modèle de l’appareil.
 
@@ -76,7 +82,9 @@ Le rendu du flou dépend du navigateur et de ses capacités graphiques. La navig
 
 La navigation inclut des indications de focus, un lien d’accès direct au contenu, une recherche utilisable au clavier et des libellés accessibles pour les boutons à icône. Les préférences de réduction des animations et de la transparence sont prises en compte. Ces adaptations ne constituent pas une certification WCAG ni un audit complet avec lecteurs d’écran.
 
-## Compatibilité du panel
+<a id="compatibilité-du-panel"></a>
+
+## 🧩 Compatibilité du panel
 
 | Composant | Version ou condition |
 | --- | --- |
@@ -92,7 +100,9 @@ La navigation inclut des indications de focus, un lien d’accès direct au cont
 
 Les autres versions de Pterodactyl, les forks et les combinaisons avec d’autres thèmes ne sont pas validés. L’installateur refuse une version différente lorsqu’il peut lire celle du panel, ainsi qu’une version Blueprint installée différente de celle attendue. Le contrôle préalable n’est pas une preuve de compatibilité de toutes les extensions tierces.
 
-## Installation
+<a id="installation"></a>
+
+## 🚀 Installation
 
 Prévoir un accès SSH à la machine qui héberge **le panel**, les droits `sudo`, ses sources frontend et ses dépendances. Installer VinusPanel sur le panel, pas uniquement sur un nœud Wings distant.
 
@@ -139,7 +149,9 @@ sudo bash install.sh --panel-dir /chemin/du/panel
 
 En cas d’échec, le script tente de restaurer les fichiers sauvegardés, de recompiler et de sortir du mode maintenance. Les sauvegardes de fichiers ne couvrent pas toute la machine ni toutes les modifications des dépendances : elles ne remplacent pas une sauvegarde complète.
 
-## Catalogue Minecraft optionnel
+<a id="catalogue-minecraft-optionnel"></a>
+
+## 📦 Catalogue Minecraft optionnel
 
 **Blueprint est le framework d’extensions ; Modrinth fournit le catalogue.** Vinus Catalog fonctionne indépendamment du thème. VinusPanel lui ajoute une entrée dans la navigation lorsqu’il est installé.
 
@@ -186,7 +198,7 @@ Les eggs personnalisés ou renommés peuvent nécessiter une correspondance admi
 - Le filtrage utilise les compatibilités déclarées par les auteurs ; il ne garantit pas l’absence de conflits, notamment sur les serveurs hybrides.
 - Les anciennes versions gérées sont conservées dans des dossiers `/vinus-*`. Un fichier inconnu ou modifié manuellement n’est pas écrasé.
 
-## Personnalisation
+## 🎨 Personnalisation
 
 Les réglages de marque se trouvent dans [`overlay/resources/scripts/theme.ts`](overlay/resources/scripts/theme.ts). Le fichier devient `resources/scripts/theme.ts` dans le panel installé.
 
@@ -201,7 +213,7 @@ L’invitation par défaut est **https://discord.gg/vinuspanel**. Pour votre pro
 
 Les réglages frontend nécessitent une recompilation. Pour une installation gérée par ce dépôt, modifier les sources de la surcouche puis relancer l’installateur. Conserver vos personnalisations dans une branche ou un fork : une réinstallation recopie les fichiers et peut remplacer les modifications faites directement dans le panel.
 
-## Mise à jour et désinstallation
+## 🔄 Mise à jour et désinstallation
 
 ### Mettre à jour le thème
 
@@ -236,7 +248,7 @@ Le script restaure les fichiers sauvegardés avant leur prise en charge par le t
 | `/var/lib/vinuspanel/last-transaction` | Chemin de la dernière transaction. |
 | `/var/backups/vinuspanel/uninstalled-*` | État du thème archivé après désinstallation. |
 
-## Permissions, sécurité et diagnostics
+## 🛡️ Permissions, sécurité et diagnostics
 
 VinusPanel conserve les contrôles de permissions de Pterodactyl. Le catalogue vérifie les autorisations, l’état arrêté du serveur et l’aperçu d’installation avant d’écrire des fichiers. Ses jetons d’aperçu sont liés au compte et au serveur, revalidés sous verrou puis consommés avant les téléchargements.
 
@@ -244,7 +256,9 @@ Les téléchargements du catalogue sont limités au CDN HTTPS de Modrinth, sans 
 
 Ces protections ne remplacent pas la maintenance de Pterodactyl et de Wings ni l’évaluation des extensions installées. Une empreinte valide confirme l’intégrité d’un téléchargement, pas l’innocuité du code qu’il contient. Aucun audit de sécurité exhaustif ni garantie d’absence de vulnérabilité n’est annoncé.
 
-## Aide et signalement de bugs
+<a id="aide-et-signalement-de-bugs"></a>
+
+## 💬 Aide et signalement de bugs
 
 Rejoindre **[le Discord VinusPanel](https://discord.gg/vinuspanel)** ou ouvrir une [issue GitHub](https://github.com/yhanottv/VinusPanel/issues).
 
@@ -260,7 +274,7 @@ Rejoindre **[le Discord VinusPanel](https://discord.gg/vinuspanel)** ou ouvrir u
 
 Pour un signalement exploitable, indiquer les versions de VinusPanel, Pterodactyl et Blueprint, le navigateur, l’appareil, la largeur d’écran approximative, les étapes de reproduction et le résultat attendu. Ajouter l’heure et la référence d’erreur lorsqu’elle est disponible. Masquer les jetons, mots de passe, données personnelles et fichiers de configuration privés dans les captures et les logs.
 
-## Validation et contribution
+## 🧪 Validation et contribution
 
 Pour la publication **2.3.6**, les contrôles suivants ont été exécutés dans l’environnement de panel utilisé pour le développement :
 
@@ -288,7 +302,7 @@ php extensions/vinuscatalog/tests/install.php /chemin/du/panel
 
 Les tests frontend et la compilation demandent les sources et les dépendances de Pterodactyl avec la surcouche appliquée. Utiliser un environnement de développement ou de test pour contribuer. Les contributions via pull request sont bienvenues ; préciser les versions testées et joindre une capture pour les changements visuels.
 
-## Structure du dépôt
+## 🗂️ Structure du dépôt
 
 ```text
 VinusPanel/
@@ -304,7 +318,7 @@ VinusPanel/
 └── CHANGELOG.md               # Historique des évolutions
 ```
 
-## Licence et crédits
+## 📄 Licence et crédits
 
 VinusPanel est distribué sous [licence MIT](LICENSE). Les licences des fichiers dérivés de Pterodactyl et de Blueprint sont conservées dans [`licenses/`](licenses/).
 
