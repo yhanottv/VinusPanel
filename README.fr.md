@@ -18,13 +18,36 @@
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-242429)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Rejoindre-5865F2?logo=discord&logoColor=white)](https://discord.gg/vinuspanel)
 
-[Installation](#installation) · [Appareils](#appareils-et-navigateurs) · [Catalogue](#catalogue-minecraft-optionnel) · [Support](#aide-et-signalement-de-bugs)
+[Captures](#captures) · [Installation](#installation) · [Appareils](#appareils-et-navigateurs) · [Catalogue](#catalogue-minecraft-optionnel) · [Support](#aide-et-signalement-de-bugs)
 
 </div>
 
 VinusPanel retravaille le tableau de bord, la navigation, la console et les principaux écrans de gestion de Pterodactyl. Il conserve les actions et les permissions du panel, avec une identité noire et orange et des libellés principalement en français.
 
 Le dépôt contient une **surcouche de fichiers et ses outils d’installation**, pas une distribution complète de Pterodactyl. Un panel fonctionnel doit déjà être installé. Le thème peut servir à gérer d’autres jeux ; seul le catalogue optionnel de mods et plugins est réservé à Minecraft.
+
+<a id="captures"></a>
+
+## 📸 Captures du panel
+
+Captures réelles d’une installation VinusPanel. Le serveur est arrêté dans l’aperçu des ressources : les mesures sont donc à zéro. Les journaux du terminal sont exclus pour protéger les informations des joueurs.
+
+**Ressources du serveur — processeur, mémoire et réseau au-dessus de la console.**
+
+![Page serveur VinusPanel noire et orange, navigation Liquid Glass et graphiques du processeur, de la mémoire et du réseau](docs/assets/screenshots/server-resources.png)
+
+**Catalogue Minecraft optionnel — icônes des projets, recherche et résultats selon le logiciel serveur.**
+
+![Vinus Catalog avec des mods NeoForge pour un serveur Youer 1.21.1 et deux onglets Mods et Plugins](docs/assets/screenshots/catalog-mods.png)
+
+<details>
+<summary>Voir l’onglet Plugins sur le même serveur hybride</summary>
+
+![Vinus Catalog avec des résultats de plugins Paper, Spigot et Bukkit sur un serveur hybride](docs/assets/screenshots/catalog-plugins.png)
+
+</details>
+
+Le catalogue nécessite l’extension Blueprint optionnelle. Les projets disponibles et les résultats peuvent évoluer ; consultez la [compatibilité du catalogue](#catalogue-minecraft-optionnel) avant une installation.
 
 ## ✨ Ce qui a changé
 

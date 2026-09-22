@@ -18,7 +18,7 @@
 
 **English** · [Français](README.fr.md)
 
-[Features](#features) · [Installation](#installation) · [Compatibility](#compatibility) · [Minecraft catalog](#minecraft-catalog) · [Support](#support)
+[Screenshots](#screenshots) · [Features](#features) · [Installation](#installation) · [Compatibility](#compatibility) · [Minecraft catalog](#minecraft-catalog) · [Support](#support)
 
 </div>
 
@@ -27,6 +27,29 @@ VinusPanel gives self-hosted game server panels a consistent black-and-orange in
 This repository contains a **theme overlay and installation tools**, not a complete Pterodactyl distribution. You need an existing Pterodactyl panel. The theme can manage servers for other games; only the optional catalog is Minecraft-specific.
 
 > **Language note:** this documentation is in English, but many custom interface labels are currently in French. A complete English panel localization is not included in this version.
+
+<a id="screenshots"></a>
+
+## 📸 Screenshots
+
+Real captures from a running VinusPanel installation. The interface shown is in French. The server is stopped in the resource preview, so its metrics are zero; terminal logs are excluded to protect player information.
+
+**Server resources — CPU, memory and network above the console.**
+
+![VinusPanel black-and-orange server page with Liquid Glass navigation and CPU, memory and network charts](docs/assets/screenshots/server-resources.png)
+
+**Optional Minecraft catalog — project icons, search and loader-aware results.**
+
+![Vinus Catalog showing NeoForge mods for a Youer 1.21.1 server, with separate Mods and Plugins tabs](docs/assets/screenshots/catalog-mods.png)
+
+<details>
+<summary>View the Plugins tab on the same hybrid server</summary>
+
+![Vinus Catalog showing Paper, Spigot and Bukkit plugin results on a hybrid server](docs/assets/screenshots/catalog-plugins.png)
+
+</details>
+
+The catalog requires the optional Blueprint extension. Available projects and results can change over time; see [catalog compatibility](#minecraft-catalog) before installing.
 
 <a id="features"></a>
 
