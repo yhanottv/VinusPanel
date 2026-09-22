@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React from 'react';
 import styles from '@/components/server/console/style.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -26,7 +27,7 @@ export default ({ title, value, meta, secondaryValue, icon, children }: ChartBlo
             </div>
             {secondaryValue && <div>
                 <p className={styles.chart_value}>{secondaryValue}</p>
-                <p className={styles.chart_meta}><span className={styles.chart_outbound} aria-hidden={'true'}>↑ </span>Sortant</p>
+                <p className={styles.chart_meta}><span className={styles.chart_outbound} aria-hidden={'true'}>↑ </span>{vt("Sortant")}</p>
             </div>}
         </div>
         <div className={styles.chart_canvas}>{children}</div>

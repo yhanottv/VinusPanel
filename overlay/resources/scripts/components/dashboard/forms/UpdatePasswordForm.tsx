@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React from 'react';
 import { Actions, State, useStoreActions, useStoreState } from 'easy-peasy';
 import { Form, Formik, FormikHelpers } from 'formik';
@@ -17,9 +18,9 @@ interface Values {
 }
 
 const schema = Yup.object().shape({
-    current: Yup.string().min(1).required('Votre mot de passe actuel est requis.'),
-    password: Yup.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères.').required(),
-    confirmPassword: Yup.string().test('password', 'Les mots de passe ne correspondent pas.', function (value) {
+    current: Yup.string().min(1).required(vt("Votre mot de passe actuel est requis.")),
+    password: Yup.string().min(8, vt("Le mot de passe doit contenir au moins 8 caractères.")).required(),
+    confirmPassword: Yup.string().test('password', vt("Les mots de passe ne correspondent pas."), function (value) {
         return value === this.parent.password;
     }),
 });
@@ -62,15 +63,15 @@ export default () => {
                             id={'current_password'}
                             type={'password'}
                             name={'current'}
-                            label={'Mot de passe actuel'}
+                            label={vt("Mot de passe actuel")}
                         />
                         <div css={tw`mt-5`}>
                             <Field
                                 id={'new_password'}
                                 type={'password'}
                                 name={'password'}
-                                label={'Nouveau mot de passe'}
-                                description={'Utilisez au moins 8 caractères et un mot de passe unique.'}
+                                label={vt("Nouveau mot de passe")}
+                                description={vt("Utilisez au moins 8 caractères et un mot de passe unique.")}
                             />
                         </div>
                         <div css={tw`mt-5`}>
@@ -78,11 +79,11 @@ export default () => {
                                 id={'confirm_new_password'}
                                 type={'password'}
                                 name={'confirmPassword'}
-                                label={'Confirmer le mot de passe'}
+                                label={vt("Confirmer le mot de passe")}
                             />
                         </div>
                         <div css={tw`mt-6`}>
-                            <Button disabled={isSubmitting || !isValid}>Modifier le mot de passe</Button>
+                            <Button disabled={isSubmitting || !isValid}>{vt("Modifier le mot de passe")}</Button>
                         </div>
                     </Form>
                 </React.Fragment>

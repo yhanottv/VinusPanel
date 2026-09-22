@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import { NavigationRouter } from '@blueprint/extends/routers/DashboardRouter';
 import BeforeSubNavigation from '@blueprint/components/Navigation/SubNavigation/BeforeSubNavigation';
 import AdditionalAccountItems from '@blueprint/components/Navigation/SubNavigation/AdditionalAccountItems';
@@ -69,13 +70,11 @@ export default () => {
 
   return (
     <Shell className={'app-shell'}>
-      <a className={'skip-navigation'} href={'#main-content'}>
-        Aller au contenu
-      </a>
+      <a className={'skip-navigation'} href={'#main-content'}>{vt("Aller au contenu")}</a>
       <NavigationBar />
       <Workspace className={'app-workspace'} id={'main-content'} tabIndex={-1}>
         {location.pathname.startsWith('/account') && (
-          <AccountNavigation aria-label={'Navigation du compte'}>
+          <AccountNavigation aria-label={vt("Navigation du compte")}>
             <BeforeSubNavigation />
             {routes.account
               .filter((route) => !!route.name)

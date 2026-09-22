@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { useEffect, useState } from 'react';
 import Spinner from '@/components/elements/Spinner';
 import { useFlashKey } from '@/plugins/useFlash';
@@ -64,14 +65,11 @@ const NetworkContainer = () => {
                             <SpinnerOverlay visible={loading} />
                             <div css={tw`mt-6 sm:flex items-center justify-end`}>
                                 <p css={tw`text-sm text-neutral-300 mb-4 sm:mr-6 sm:mb-0`}>
-                                    {data.length} allocation{data.length > 1 ? 's' : ''} utilisée
-                                    {data.length > 1 ? 's' : ''}
-                                    {' sur '} {allocationLimit} disponible{allocationLimit > 1 ? 's' : ''}.
+                                    {data.length} allocation{data.length > 1 ? 's' : ''}{vt(" utilisée")}{data.length > 1 ? 's' : ''}
+                                    {' sur '} {allocationLimit}{vt(" disponible")}{allocationLimit > 1 ? 's' : ''}.
                                 </p>
                                 {allocationLimit > data.length && (
-                                    <Button css={tw`w-full sm:w-auto`} color={'primary'} onClick={onCreateAllocation}>
-                                        Ajouter une allocation
-                                    </Button>
+                                    <Button css={tw`w-full sm:w-auto`} color={'primary'} onClick={onCreateAllocation}>{vt("Ajouter une allocation")}</Button>
                                 )}
                             </div>
                         </Can>

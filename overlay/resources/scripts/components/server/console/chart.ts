@@ -1,3 +1,5 @@
+import { formatLocale, panelLanguage } from '@/locales/preferences';
+import { vt } from '@/locales/translate';
 import {
   Chart as ChartJS,
   ChartData,
@@ -81,15 +83,15 @@ const options: ChartOptions<'line'> = {
 };
 
 const numberLabel = (value: number, decimals: number) =>
-  new Intl.NumberFormat('fr-FR', { maximumFractionDigits: decimals }).format(value);
+  new Intl.NumberFormat(formatLocale, { maximumFractionDigits: decimals }).format(value);
 
 export function formatChartValue(value: number, unit: string, decimals = 1): string {
-  if (unit === 'Mio' && value >= 1024) return `${numberLabel(value / 1024, 1)} Gio`;
+  if ((unit === 'Mio' || unit === 'MiB') && value >= 1024) return `${numberLabel(value / 1024, 1)} ${panelLanguage === 'fr' ? 'Gio' : 'GiB'}`;
   return `${numberLabel(value, decimals)} ${unit}`;
 }
 
 export function formatChartBytes(value: number): string {
-  const units = ['o', 'Kio', 'Mio', 'Gio', 'Tio'];
+  const units = panelLanguage === 'fr' ? ['o', 'Kio', 'Mio', 'Gio', 'Tio'] : ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
   const index = value > 0 ? Math.min(units.length - 1, Math.floor(Math.log(value) / Math.log(1024))) : 0;
   const safeIndex = Math.max(0, index);
   return formatChartValue(value / Math.pow(1024, safeIndex), units[safeIndex]);

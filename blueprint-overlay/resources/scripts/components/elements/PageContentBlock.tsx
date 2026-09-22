@@ -1,3 +1,5 @@
+import { vt } from '@/locales/translate';
+import LanguageSelector from '@/components/elements/LanguageSelector';
 import Attribution from '@blueprint/extends/Attribution';
 import BeforeSection from '@blueprint/components/Dashboard/Global/BeforeSection';
 import AfterSection from '@blueprint/components/Dashboard/Global/AfterSection';
@@ -25,14 +27,13 @@ const PageContentBlock: React.FC<PageContentBlockProps> = ({ title, showFlashKey
         <CSSTransition timeout={150} classNames={'fade'} appear in>
             <>
                 <ContentContainer css={tw`my-5 sm:my-8`} className={className}>
+                    <div className={'vinus-language-bar'}><LanguageSelector /></div>
                     <DiscordAnnouncement />
                     {showFlashKey && <FlashMessageRender byKey={showFlashKey} css={tw`mb-4`} />}
                     <BeforeSection />{children}<AfterSection />
                 </ContentContainer>
                 <ContentContainer css={tw`mb-4`}>
-                    <p css={tw`text-center text-xs text-neutral-500`}>
-                        Propulsé par&nbsp;
-                        <a
+                    <p css={tw`text-center text-xs text-neutral-500`}>{vt("Propulsé par ")}<a
                             rel={'noopener nofollow noreferrer'}
                             href={'https://pterodactyl.io'}
                             target={'_blank'}

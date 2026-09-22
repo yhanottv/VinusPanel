@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { useEffect, useState } from 'react';
 import { useActivityLogs } from '@/api/server/activity';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
@@ -35,8 +36,7 @@ export default () => {
                         to={'#'}
                         className={classNames(buttonStyles.button, buttonStyles.text, 'w-full sm:w-auto')}
                         onClick={() => setFilters((value) => ({ ...value, filters: {} }))}
-                    >
-                        Effacer les filtres <XCircleIcon className={'ml-2 h-4 w-4'} />
+                    >{vt("Effacer les filtres ")}<XCircleIcon className={'ml-2 h-4 w-4'} />
                     </Link>
                 </div>
             )}
@@ -45,8 +45,8 @@ export default () => {
             ) : !data?.items.length ? (
                 <div className={style.empty_state}>
                     <ClockIcon />
-                    <h3>Aucune activité serveur</h3>
-                    <p>Les prochaines opérations apparaîtront ici.</p>
+                    <h3>{vt("Aucune activité serveur")}</h3>
+                    <p>{vt("Les prochaines opérations apparaîtront ici.")}</p>
                 </div>
             ) : (
                 <div className={style.list}>

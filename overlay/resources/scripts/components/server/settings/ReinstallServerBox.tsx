@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { useEffect, useState } from 'react';
 import { ServerContext } from '@/state/server';
 import TitledGreyBox from '@/components/elements/TitledGreyBox';
@@ -22,7 +23,7 @@ export default () => {
                 addFlash({
                     key: 'settings',
                     type: 'success',
-                    message: 'La réinstallation du serveur a commencé.',
+                    message: vt("La réinstallation du serveur a commencé."),
                 });
             })
             .catch((error) => {
@@ -39,36 +40,25 @@ export default () => {
 
     if (skipScripts) {
         return (
-            <TitledGreyBox title={'Réinstaller le serveur'}>
-                <p css={tw`text-sm`}>
-                    La réinstallation est désactivée car ce serveur ignore le script d&apos;installation de son egg.
-                    Contactez un administrateur pour effectuer cette opération.
-                </p>
+            <TitledGreyBox title={vt("Réinstaller le serveur")}>
+                <p css={tw`text-sm`}>{vt("La réinstallation est désactivée car ce serveur ignore le script d'installation de son egg. Contactez un administrateur pour effectuer cette opération.")}</p>
             </TitledGreyBox>
         );
     }
 
     return (
-        <TitledGreyBox title={'Réinstaller le serveur'} css={tw`relative`}>
+        <TitledGreyBox title={vt("Réinstaller le serveur")} css={tw`relative`}>
             <Dialog.Confirm
                 open={modalVisible}
-                title={'Confirmer la réinstallation'}
-                confirm={'Réinstaller le serveur'}
+                title={vt("Confirmer la réinstallation")}
+                confirm={vt("Réinstaller le serveur")}
                 onClose={() => setModalVisible(false)}
                 onConfirmed={reinstall}
-            >
-                Le serveur sera arrêté et certains fichiers pourront être supprimés ou modifiés. Voulez-vous continuer ?
-            </Dialog.Confirm>
-            <p css={tw`text-sm`}>
-                Cette opération arrête le serveur puis relance son script d&apos;installation.&nbsp;
-                <strong css={tw`font-medium`}>
-                    Sauvegardez vos données avant de continuer : certains fichiers peuvent être supprimés ou modifiés.
-                </strong>
+            >{vt("Le serveur sera arrêté et certains fichiers pourront être supprimés ou modifiés. Voulez-vous continuer ?")}</Dialog.Confirm>
+            <p css={tw`text-sm`}>{vt("Cette opération arrête le serveur puis relance son script d'installation. ")}<strong css={tw`font-medium`}>{vt("Sauvegardez vos données avant de continuer : certains fichiers peuvent être supprimés ou modifiés.")}</strong>
             </p>
             <div css={tw`mt-6 text-right`}>
-                <Button.Danger variant={Button.Variants.Secondary} onClick={() => setModalVisible(true)}>
-                    Réinstaller le serveur
-                </Button.Danger>
+                <Button.Danger variant={Button.Variants.Secondary} onClick={() => setModalVisible(true)}>{vt("Réinstaller le serveur")}</Button.Danger>
             </div>
         </TitledGreyBox>
     );

@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React from 'react';
 import { Link, useLocation, useRouteMatch } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -72,11 +73,11 @@ const HeaderActions = styled.div`
 `;
 
 const statusDetails = (status: string | null) => {
-    if (status === 'running') return { label: 'En ligne', color: '#43d6a3' };
-    if (status === 'offline' || status === null) return { label: 'Hors ligne', color: '#fb7185' };
-    if (status === 'starting') return { label: 'Démarrage', color: '#fbbf24' };
-    if (status === 'stopping') return { label: 'Arrêt en cours', color: '#fbbf24' };
-    return { label: 'Connexion…', color: '#94a3b8' };
+    if (status === 'running') return { label: vt("En ligne"), color: '#43d6a3' };
+    if (status === 'offline' || status === null) return { label: vt("Hors ligne"), color: '#fb7185' };
+    if (status === 'starting') return { label: vt("Démarrage"), color: '#fbbf24' };
+    if (status === 'stopping') return { label: vt("Arrêt en cours"), color: '#fbbf24' };
+    return { label: vt("Connexion…"), color: '#94a3b8' };
 };
 
 export default () => {
@@ -96,9 +97,7 @@ export default () => {
         <Header>
             <Breadcrumb>
                 <Link to={'/'}>
-                    <FontAwesomeIcon icon={faChevronLeft} css={tw`mr-1.5`} />
-                    Tous les serveurs
-                </Link>
+                    <FontAwesomeIcon icon={faChevronLeft} css={tw`mr-1.5`} />{vt("Tous les serveurs")}</Link>
                 <span css={tw`mx-2 text-neutral-700`}>/</span>
                 <span>{route?.name || 'Serveur'}</span>
             </Breadcrumb>
@@ -119,7 +118,7 @@ export default () => {
                             <FontAwesomeIcon icon={faEthernet} css={tw`mr-2 text-primary-300`} />
                             {allocation
                                 ? `${allocation.alias || ip(allocation.ip)}:${allocation.port}`
-                                : 'Aucune allocation principale'}
+                                : vt("Aucune allocation principale")}
                         </span>
                         <span>{server.description || `Identifiant ${server.id}`}</span>
                     </Meta>

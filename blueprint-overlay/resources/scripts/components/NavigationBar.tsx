@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import DiscordButton from '@/components/elements/DiscordButton';
 import BeforeNavigation from '@blueprint/components/Navigation/NavigationBar/BeforeNavigation';
 import AdditionalItems from '@blueprint/components/Navigation/NavigationBar/AdditionalItems';
@@ -193,18 +194,18 @@ export default () => {
                     </BrandMark>
                     <BrandCopy>
                         <strong>{VINUS.name}</strong>
-                        <small>Panel de gestion</small>
+                        <small>{vt("Panel de gestion")}</small>
                     </BrandCopy>
                 </Brand>
-                <SectionLabel>Espace de travail</SectionLabel>
-                <MainNavigation aria-label={'Navigation principale'}>
-                    <NavLink to={'/'} exact aria-label={'Serveurs'}>
+                <SectionLabel>{vt("Espace de travail")}</SectionLabel>
+                <MainNavigation aria-label={vt("Navigation principale")}>
+                    <NavLink to={'/'} exact aria-label={vt("Serveurs")}>
                         <FontAwesomeIcon icon={faServer} fixedWidth />
-                        <span>Serveurs</span>
+                        <span>{vt("Serveurs")}</span>
                     </NavLink>
-                    <NavLink to={'/account'} aria-label={'Compte'}>
+                    <NavLink to={'/account'} aria-label={vt("Compte")}>
                         <FontAwesomeIcon icon={faUserCircle} fixedWidth />
-                        <span>Compte</span>
+                        <span>{vt("Compte")}</span>
                     </NavLink>
                     {user.rootAdmin && (
                         <a href={'/admin'} aria-label={'Administration'}>
@@ -212,7 +213,7 @@ export default () => {
                             <span>Administration</span>
                         </a>
                     )}
-                    <div className={'search-entry'} aria-label={'Rechercher'}>
+                    <div className={'search-entry'} aria-label={vt("Rechercher")}>
                         <SearchContainer />
                     </div>
                 <AdditionalItems />
@@ -228,9 +229,9 @@ export default () => {
                             <small>{user.email}</small>
                         </span>
                     </UserCard>
-                    <LogoutButton onClick={onTriggerLogout} aria-label={'Déconnexion'}>
+                    <LogoutButton onClick={onTriggerLogout} aria-label={vt("Déconnexion")}>
                         <FontAwesomeIcon icon={faSignOutAlt} fixedWidth />
-                        <span>Déconnexion</span>
+                        <span>{vt("Déconnexion")}</span>
                     </LogoutButton>
                 </Footer>
             </NavigationInner>

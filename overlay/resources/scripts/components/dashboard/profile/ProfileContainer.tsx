@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { useEffect, useRef, useState } from 'react';
 import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
@@ -61,10 +62,10 @@ const Editor = styled.section`
 const resizeImage = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onerror = () => reject(new Error('Impossible de lire cette image.'));
+        reader.onerror = () => reject(new Error(vt("Impossible de lire cette image.")));
         reader.onload = () => {
             const image = new Image();
-            image.onerror = () => reject(new Error('Format d’image non pris en charge.'));
+            image.onerror = () => reject(new Error(vt("Format d’image non pris en charge.")));
             image.onload = () => {
                 const canvas = document.createElement('canvas');
                 const size = 320;
@@ -72,7 +73,7 @@ const resizeImage = (file: File): Promise<string> =>
                 canvas.width = size;
                 canvas.height = size;
                 const context = canvas.getContext('2d');
-                if (!context) return reject(new Error('Impossible de préparer cette image.'));
+                if (!context) return reject(new Error(vt("Impossible de préparer cette image.")));
                 context.drawImage(
                     image,
                     (image.width - sourceSize) / 2,
@@ -102,39 +103,35 @@ export default () => {
 
     const selectImage = async (file?: File) => {
         if (!file) return;
-        if (!file.type.startsWith('image/')) return setMessage('Sélectionnez un fichier image valide.');
-        if (file.size > 6 * 1024 * 1024) return setMessage('L’image doit faire moins de 6 Mo.');
+        if (!file.type.startsWith('image/')) return setMessage(vt("Sélectionnez un fichier image valide."));
+        if (file.size > 6 * 1024 * 1024) return setMessage(vt("L’image doit faire moins de 6 Mo."));
         try {
             const avatar = await resizeImage(file);
             setDraft((current) => ({ ...current, avatar }));
             setMessage('');
         } catch (error) {
-            setMessage(error instanceof Error ? error.message : 'Impossible de traiter cette image.');
+            setMessage(error instanceof Error ? error.message : vt("Impossible de traiter cette image."));
         }
     };
 
     const save = () => {
         update(draft);
-        setMessage('Profil visuel enregistré sur cet appareil.');
+        setMessage(vt("Profil visuel enregistré sur cet appareil."));
     };
 
     return (
-        <PageContentBlock title={'Profil | VinusPanel'}>
+        <PageContentBlock title={vt("Profil | VinusPanel")}>
             <Header>
-                <p css={tw`mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary-300`}>
-                    Personnalisation
-                </p>
-                <h1>Votre profil</h1>
-                <p>
-                    Choisissez le nom et la photo affichés dans VinusPanel sans modifier votre identifiant de connexion.
-                </p>
+                <p css={tw`mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary-300`}>{vt("Personnalisation")}</p>
+                <h1>{vt("Votre profil")}</h1>
+                <p>{vt("Choisissez le nom et la photo affichés dans VinusPanel sans modifier votre identifiant de connexion.")}</p>
             </Header>
             <ProfileLayout>
                 <Preview>
-                    <p css={tw`text-xs font-semibold uppercase tracking-[0.17em] text-neutral-500`}>Aperçu</p>
+                    <p css={tw`text-xs font-semibold uppercase tracking-[0.17em] text-neutral-500`}>{vt("Aperçu")}</p>
                     <AvatarFrame>
                         {draft.avatar ? (
-                            <img src={draft.avatar} alt={'Aperçu du profil'} css={tw`h-full w-full object-cover`} />
+                            <img src={draft.avatar} alt={vt("Aperçu du profil")} css={tw`h-full w-full object-cover`} />
                         ) : (
                             <Avatar.User size={144} />
                         )}
@@ -145,8 +142,7 @@ export default () => {
                         <span
                             css={tw`mt-4 inline-flex items-center rounded-full border border-green-400 border-opacity-20 bg-green-400 bg-opacity-5 px-3 py-1 text-xs font-medium text-green-400`}
                         >
-                            <span css={tw`mr-2 h-1.5 w-1.5 rounded-full bg-green-400`} /> Profil actif
-                        </span>
+                            <span css={tw`mr-2 h-1.5 w-1.5 rounded-full bg-green-400`} />{vt(" Profil actif")}</span>
                     </div>
                 </Preview>
                 <Editor>
@@ -157,16 +153,12 @@ export default () => {
                             <FontAwesomeIcon icon={faPalette} />
                         </span>
                         <div>
-                            <h2 css={tw`text-lg font-semibold text-neutral-100`}>Identité visuelle</h2>
-                            <p css={tw`mt-0.5 text-xs text-neutral-500`}>
-                                Ces réglages restent privés dans votre navigateur.
-                            </p>
+                            <h2 css={tw`text-lg font-semibold text-neutral-100`}>{vt("Identité visuelle")}</h2>
+                            <p css={tw`mt-0.5 text-xs text-neutral-500`}>{vt("Ces réglages restent privés dans votre navigateur.")}</p>
                         </div>
                     </div>
                     <div css={tw`mt-7`}>
-                        <label htmlFor={'display-name'} css={tw`mb-2 block text-sm font-semibold text-neutral-200`}>
-                            Nom affiché
-                        </label>
+                        <label htmlFor={'display-name'} css={tw`mb-2 block text-sm font-semibold text-neutral-200`}>{vt("Nom affiché")}</label>
                         <Input
                             id={'display-name'}
                             maxLength={32}
@@ -176,22 +168,18 @@ export default () => {
                                 setDraft((current) => ({ ...current, displayName: event.target.value }))
                             }
                         />
-                        <p css={tw`mt-2 text-xs text-neutral-500`}>
-                            Votre nom d’utilisateur réel reste « {user.username} ».
+                        <p css={tw`mt-2 text-xs text-neutral-500`}>{vt("Votre nom d’utilisateur réel reste « ")}{user.username} ».
                         </p>
                     </div>
                     <div css={tw`mt-7`}>
-                        <p css={tw`text-sm font-semibold text-neutral-200`}>Photo de profil</p>
+                        <p css={tw`text-sm font-semibold text-neutral-200`}>{vt("Photo de profil")}</p>
                         <div className={'upload-zone'}>
                             <div>
-                                <p css={tw`text-sm text-neutral-300`}>PNG, JPG ou WebP</p>
-                                <p css={tw`mt-1 text-xs text-neutral-500`}>
-                                    Recadrage carré automatique, 6 Mo maximum.
-                                </p>
+                                <p css={tw`text-sm text-neutral-300`}>{vt("PNG, JPG ou WebP")}</p>
+                                <p css={tw`mt-1 text-xs text-neutral-500`}>{vt("Recadrage carré automatique, 6 Mo maximum.")}</p>
                             </div>
                             <Button.Text onClick={() => fileInput.current?.click()}>
-                                <FontAwesomeIcon icon={faCamera} css={tw`mr-2`} /> Choisir une image
-                            </Button.Text>
+                                <FontAwesomeIcon icon={faCamera} css={tw`mr-2`} />{vt(" Choisir une image")}</Button.Text>
                             <input
                                 ref={fileInput}
                                 type={'file'}
@@ -216,14 +204,12 @@ export default () => {
                                 const reset = { displayName: '', avatar: '' };
                                 setDraft(reset);
                                 update(reset);
-                                setMessage('Personnalisation supprimée.');
+                                setMessage(vt("Personnalisation supprimée."));
                             }}
                         >
-                            <FontAwesomeIcon icon={faTrashAlt} css={tw`mr-2`} /> Réinitialiser
-                        </Button.Text>
+                            <FontAwesomeIcon icon={faTrashAlt} css={tw`mr-2`} />{vt(" Réinitialiser")}</Button.Text>
                         <Button onClick={save}>
-                            <FontAwesomeIcon icon={faCheck} css={tw`mr-2`} /> Enregistrer le profil
-                        </Button>
+                            <FontAwesomeIcon icon={faCheck} css={tw`mr-2`} />{vt(" Enregistrer le profil")}</Button>
                     </div>
                 </Editor>
             </ProfileLayout>

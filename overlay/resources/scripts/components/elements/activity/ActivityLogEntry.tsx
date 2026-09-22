@@ -1,9 +1,11 @@
+import { panelLanguage } from '@/locales/preferences';
+import { vt } from '@/locales/translate';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Tooltip from '@/components/elements/tooltip/Tooltip';
 import Translate from '@/components/elements/Translate';
 import { format, formatDistanceToNowStrict } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr, enUS } from 'date-fns/locale';
 import { ActivityLog } from '@definitions/user';
 import ActivityLogMetaButton from '@/components/elements/activity/ActivityLogMetaButton';
 import classNames from 'classnames';
@@ -18,14 +20,14 @@ interface Props {
 }
 
 const friendlyEvents: Record<string, { label: string; description: string }> = {
-    'auth:success': { label: 'Connexion réussie', description: 'Connexion au compte autorisée.' },
-    'auth:failed': { label: 'Connexion refusée', description: 'Une tentative de connexion a été refusée.' },
+    'auth:success': { label: vt("Connexion réussie"), description: vt("Connexion au compte autorisée.") },
+    'auth:failed': { label: vt("Connexion refusée"), description: vt("Une tentative de connexion a été refusée.") },
     'auth:password-reset': {
-        label: 'Mot de passe',
-        description: 'Une réinitialisation du mot de passe a été demandée.',
+        label: vt("Mot de passe"),
+        description: vt("Une réinitialisation du mot de passe a été demandée."),
     },
-    'account:email.update': { label: 'Adresse e-mail', description: 'L’adresse e-mail du compte a été mise à jour.' },
-    'account:password.update': { label: 'Mot de passe', description: 'Le mot de passe du compte a été modifié.' },
+    'account:email.update': { label: vt("Adresse e-mail"), description: vt("L’adresse e-mail du compte a été mise à jour.") },
+    'account:password.update': { label: vt("Mot de passe"), description: vt("Le mot de passe du compte a été modifié.") },
 };
 
 function wrapProperties(value: unknown): any {
@@ -58,8 +60,8 @@ export default ({ activity, children }: Props) => {
             <div className={style.content}>
                 <div className={style.event_row}>
                     <div className={style.event_identity}>
-                        <Tooltip placement={'top'} content={actor?.email || 'Événement système'}>
-                            <strong>{actor?.username || 'Système'}</strong>
+                        <Tooltip placement={'top'} content={actor?.email || vt("Événement système")}>
+                            <strong>{actor?.username || vt("Système")}</strong>
                         </Tooltip>
                         <Link to={`#${pathTo({ event: activity.event })}`} className={style.event_badge}>
                             {friendly?.label || activity.event.replace(/[:.]/g, ' · ')}
@@ -68,10 +70,10 @@ export default ({ activity, children }: Props) => {
                     </div>
                     <Tooltip
                         placement={'left'}
-                        content={format(activity.timestamp, 'dd MMMM yyyy à HH:mm:ss', { locale: fr })}
+                        content={format(activity.timestamp, (panelLanguage === 'fr' ? "dd MMMM yyyy 'à' HH:mm:ss" : "MMM dd yyyy 'at' HH:mm:ss"), { locale: panelLanguage === 'fr' ? fr : enUS })}
                     >
                         <time className={style.event_time}>
-                            {formatDistanceToNowStrict(activity.timestamp, { addSuffix: true, locale: fr })}
+                            {formatDistanceToNowStrict(activity.timestamp, { addSuffix: true, locale: panelLanguage === 'fr' ? fr : enUS })}
                         </time>
                     </Tooltip>
                 </div>
@@ -88,7 +90,7 @@ export default ({ activity, children }: Props) => {
                             {activity.ip}
                         </Link>
                     )}
-                    <span className={style.meta_chip}>{activity.isApi ? 'API' : 'Interface web'}</span>
+                    <span className={style.meta_chip}>{activity.isApi ? 'API' : vt("Interface web")}</span>
                     {activity.hasAdditionalMetadata && <ActivityLogMetaButton meta={activity.properties} />}
                 </div>
             </div>

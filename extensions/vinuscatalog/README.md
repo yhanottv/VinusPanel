@@ -2,6 +2,8 @@
 
 Catalogue Modrinth pour Pterodactyl 1.15.1 et Blueprint **beta-2026-06**. Il fonctionne indépendamment du thème ; VinusPanel ajoute son entrée dans la navigation latérale.
 
+La version **1.2.0** traduit les commandes du catalogue en français ou en anglais selon la langue active du panel. Les descriptions Modrinth, noms de fichiers et messages du service conservent leur langue d’origine. Les ressources de traduction sont incluses dans l’extension : le thème VinusPanel n’est pas requis.
+
 ## Installation
 
 1. Installer Blueprint depuis sa [source officielle](https://blueprint.zip/guides/admin/install), en sauvegardant le panel et sa base.

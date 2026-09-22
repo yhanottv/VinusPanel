@@ -5,6 +5,11 @@ import { VINUS } from '@/theme';
 import font from '@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-latin-wght-normal.woff2';
 
 export default createGlobalStyle`
+    .vinus-language-bar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+    .vinus-language { display: inline-flex; align-items: center; gap: 10px; color: #9696a0; font-size: 12px; }
+    .vinus-language > span { font-size: 10px; letter-spacing: .08em; }
+    .vinus-language select { color: #e8e8ed; background: #101012; border: 1px solid #303036; border-radius: 6px; padding: 7px 28px 7px 10px; font-size: 12px; cursor: pointer; }
+    .vinus-language select:focus-visible { outline: 2px solid #ff7a1a; outline-offset: 3px; }
     :root {
         --vinus-accent: ${VINUS.colors.accent};
         --vinus-accent-dark: ${VINUS.colors.accentDark};

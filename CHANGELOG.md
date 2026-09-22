@@ -1,5 +1,14 @@
 # VinusPanel changelog
 
+## 2.4.0 — French and English
+
+- added a French/English selector to authentication and client pages, with a browser preference and a URL fallback when storage is unavailable;
+- localized VinusPanel interface labels, validation messages, console status, charts, dates and navigation; switching language reloads the current page;
+- added self-contained catalog UI translations in Vinus Catalog 1.2.0, preserving standalone Blueprint installation;
+- refreshed the screenshot gallery with the login screen, server list, live resource charts and the terminal eagle.
+
+Server names, user content, game logs and third-party extension text are not translated. Legacy administration and original upstream screens retain their own translations.
+
 ## 2.3.6 — Discord community link
 
 - replaced the chat button with an accessible Discord logo link;

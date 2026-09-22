@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React from 'react';
 import { NavLink, Route, Switch, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -66,13 +67,11 @@ export default () => {
 
     return (
         <Shell className={'app-shell'}>
-            <a className={'skip-navigation'} href={'#main-content'}>
-                Aller au contenu
-            </a>
+            <a className={'skip-navigation'} href={'#main-content'}>{vt("Aller au contenu")}</a>
             <NavigationBar />
             <Workspace className={'app-workspace'} id={'main-content'} tabIndex={-1}>
                 {location.pathname.startsWith('/account') && (
-                    <AccountNavigation aria-label={'Navigation du compte'}>
+                    <AccountNavigation aria-label={vt("Navigation du compte")}>
                         {routes.account
                             .filter((route) => !!route.name)
                             .map(({ path, name, exact = false }) => (

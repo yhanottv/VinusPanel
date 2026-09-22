@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faEthernet, faHdd, faMemory, faMicrochip, faServer } from '@fortawesome/free-solid-svg-icons';
@@ -188,16 +189,16 @@ type DisplayStatus = {
 
 function getDisplayStatus(stats: ServerStats | null, server: Server, isSuspended: boolean): DisplayStatus {
     if (isSuspended) {
-        return { key: 'suspended', label: server.status === 'suspended' ? 'Suspendu' : 'Connexion impossible' };
+        return { key: 'suspended', label: server.status === 'suspended' ? vt("Suspendu") : vt("Connexion impossible") };
     }
     if (server.isNodeUnderMaintenance) return { key: 'maintenance', label: 'Maintenance' };
-    if (server.isTransferring) return { key: 'maintenance', label: 'Transfert' };
+    if (server.isTransferring) return { key: 'maintenance', label: vt("Transfert") };
     if (server.status === 'installing') return { key: 'maintenance', label: 'Installation' };
-    if (server.status === 'restoring_backup') return { key: 'maintenance', label: 'Restauration' };
-    if (!stats) return { key: 'loading', label: 'Connexion…' };
-    if (stats.status === 'running') return { key: 'running', label: 'En ligne' };
-    if (stats.status === 'offline') return { key: 'offline', label: 'Hors ligne' };
-    return { key: stats.status || 'unavailable', label: 'Indisponible' };
+    if (server.status === 'restoring_backup') return { key: 'maintenance', label: vt('Restauration') };
+    if (!stats) return { key: 'loading', label: vt("Connexion…") };
+    if (stats.status === 'running') return { key: 'running', label: vt("En ligne") };
+    if (stats.status === 'offline') return { key: 'offline', label: vt("Hors ligne") };
+    return { key: stats.status || 'unavailable', label: vt("Indisponible") };
 }
 
 const percent = (value: number, limit: number) => (limit > 0 ? Math.max(0, Math.min(100, (value / limit) * 100)) : 0);
@@ -218,7 +219,7 @@ const Metric = memo(({ icon, label, value, limit, usage, alarm }: MetricProps) =
             <span>{label}</span>
         </div>
         <p css={tw`mt-1 truncate text-sm font-semibold text-neutral-100`}>{value}</p>
-        <p css={tw`truncate text-xs text-neutral-500`}>sur {limit}</p>
+        <p css={tw`truncate text-xs text-neutral-500`}>{vt("sur ")}{limit}</p>
         <MetricTrack
             $alarm={alarm}
             role={'progressbar'}
@@ -279,9 +280,9 @@ export default ({
         alarms.disk = server.limits.disk === 0 ? false : isAlarmState(stats.diskUsageInBytes, server.limits.disk);
     }
 
-    const diskLimit = server.limits.disk !== 0 ? bytesToString(mbToBytes(server.limits.disk)) : 'Illimité';
-    const memoryLimit = server.limits.memory !== 0 ? bytesToString(mbToBytes(server.limits.memory)) : 'Illimité';
-    const cpuLimit = server.limits.cpu !== 0 ? server.limits.cpu + ' %' : 'Illimité';
+    const diskLimit = server.limits.disk !== 0 ? bytesToString(mbToBytes(server.limits.disk)) : vt("Illimité");
+    const memoryLimit = server.limits.memory !== 0 ? bytesToString(mbToBytes(server.limits.memory)) : vt("Illimité");
+    const cpuLimit = server.limits.cpu !== 0 ? server.limits.cpu + ' %' : vt("Illimité");
 
     const displayStatus = getDisplayStatus(stats, server, isSuspended);
     const allocation = server.allocations.find((item) => item.isDefault);
@@ -316,11 +317,11 @@ export default ({
                 </div>
             </ServerIdentity>
             <AddressBlock>
-                <p css={tw`text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-neutral-500`}>Adresse</p>
+                <p css={tw`text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-neutral-500`}>{vt("Adresse")}</p>
                 <div css={tw`mt-1 flex items-center`}>
                     <FontAwesomeIcon icon={faEthernet} css={tw`mr-2 text-neutral-500`} />
                     <p css={tw`truncate text-sm font-medium text-neutral-200`}>
-                        {allocation ? `${allocation.alias || ip(allocation.ip)}:${allocation.port}` : 'Non attribuée'}
+                        {allocation ? `${allocation.alias || ip(allocation.ip)}:${allocation.port}` : vt("Non attribuée")}
                     </p>
                 </div>
             </AddressBlock>
@@ -335,7 +336,7 @@ export default ({
                 />
                 <Metric
                     icon={faMemory}
-                    label={'Mémoire'}
+                    label={vt("Mémoire")}
                     value={stats ? bytesToString(stats.memoryUsageInBytes) : '—'}
                     limit={memoryLimit}
                     usage={memoryUsage}
@@ -343,7 +344,7 @@ export default ({
                 />
                 <Metric
                     icon={faHdd}
-                    label={'Disque'}
+                    label={vt('Disque')}
                     value={stats ? bytesToString(stats.diskUsageInBytes) : '—'}
                     limit={diskLimit}
                     usage={diskUsage}

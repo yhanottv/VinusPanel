@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import login from '@/api/auth/login';
@@ -69,17 +70,17 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
             onSubmit={onSubmit}
             initialValues={{ username: '', password: '' }}
             validationSchema={object().shape({
-                username: string().required('Saisissez votre identifiant ou votre adresse e-mail.'),
-                password: string().required('Saisissez le mot de passe de votre compte.'),
+                username: string().required(vt("Saisissez votre identifiant ou votre adresse e-mail.")),
+                password: string().required(vt("Saisissez le mot de passe de votre compte.")),
             })}
         >
             {({ isSubmitting, setSubmitting, submitForm }) => (
-                <LoginFormContainer title={'Connexion à VinusPanel'} css={tw`w-full flex`}>
+                <LoginFormContainer title={vt("Connexion à VinusPanel")} css={tw`w-full flex`}>
                     <Field
                         id={'username'}
                         light
                         type={'text'}
-                        label={'Identifiant ou adresse e-mail'}
+                        label={vt("Identifiant ou adresse e-mail")}
                         name={'username'}
                         autoComplete={'username'}
                         disabled={isSubmitting}
@@ -89,16 +90,14 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                             id={'password'}
                             light
                             type={'password'}
-                            label={'Mot de passe'}
+                            label={vt("Mot de passe")}
                             name={'password'}
                             autoComplete={'current-password'}
                             disabled={isSubmitting}
                         />
                     </div>
                     <div css={tw`mt-6`}>
-                        <Button type={'submit'} size={'xlarge'} isLoading={isSubmitting} disabled={isSubmitting}>
-                            Se connecter
-                        </Button>
+                        <Button type={'submit'} size={'xlarge'} isLoading={isSubmitting} disabled={isSubmitting}>{vt("Se connecter")}</Button>
                     </div>
                     {recaptchaEnabled && (
                         <Reaptcha
@@ -119,9 +118,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                         <Link
                             to={'/auth/password'}
                             css={tw`text-xs text-neutral-500 tracking-wide no-underline uppercase hover:text-neutral-600`}
-                        >
-                            Mot de passe oublié ?
-                        </Link>
+                        >{vt("Mot de passe oublié ?")}</Link>
                     </div>
                 </LoginFormContainer>
             )}

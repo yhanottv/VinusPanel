@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React from 'react';
 import { ServerContext } from '@/state/server';
 import TitledGreyBox from '@/components/elements/TitledGreyBox';
@@ -24,10 +25,10 @@ const RenameServerBox = () => {
     const { isSubmitting } = useFormikContext<Values>();
 
     return (
-        <TitledGreyBox title={'Identité du serveur'} css={tw`relative`}>
+        <TitledGreyBox title={vt("Identité du serveur")} css={tw`relative`}>
             <SpinnerOverlay visible={isSubmitting} />
             <Form css={tw`mb-0`}>
-                <Field id={'name'} name={'name'} label={'Nom du serveur'} type={'text'} />
+                <Field id={'name'} name={'name'} label={vt("Nom du serveur")} type={'text'} />
                 <div css={tw`mt-6`}>
                     <Label>Description</Label>
                     <FormikFieldWrapper name={'description'}>
@@ -35,7 +36,7 @@ const RenameServerBox = () => {
                     </FormikFieldWrapper>
                 </div>
                 <div css={tw`mt-6 text-right`}>
-                    <Button type={'submit'}>Enregistrer</Button>
+                    <Button type={'submit'}>{vt("Enregistrer")}</Button>
                 </div>
             </Form>
         </TitledGreyBox>

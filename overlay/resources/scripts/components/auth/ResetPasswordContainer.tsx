@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -52,53 +53,49 @@ export default ({ match, location }: RouteComponentProps<{ token: string }>) => 
             }}
             validationSchema={object().shape({
                 password: string()
-                    .required('Saisissez un nouveau mot de passe.')
-                    .min(8, 'Le mot de passe doit contenir au moins 8 caractères.'),
+                    .required(vt("Saisissez un nouveau mot de passe."))
+                    .min(8, vt("Le mot de passe doit contenir au moins 8 caractères.")),
                 passwordConfirmation: string()
-                    .required('Les mots de passe ne correspondent pas.')
+                    .required(vt("Les mots de passe ne correspondent pas."))
                     // @ts-expect-error this is valid
-                    .oneOf([ref('password'), null], 'Les mots de passe ne correspondent pas.'),
+                    .oneOf([ref('password'), null], vt("Les mots de passe ne correspondent pas.")),
             })}
         >
             {({ isSubmitting }) => (
-                <LoginFormContainer title={'Choisir un nouveau mot de passe'} css={tw`w-full flex`}>
+                <LoginFormContainer title={vt("Choisir un nouveau mot de passe")} css={tw`w-full flex`}>
                     <div>
-                        <label htmlFor={'reset-email'}>Adresse e-mail</label>
+                        <label htmlFor={'reset-email'}>{vt("Adresse e-mail")}</label>
                         <Input id={'reset-email'} value={email} autoComplete={'email'} isLight disabled />
                     </div>
                     <div css={tw`mt-6`}>
                         <Field
                             light
                             id={'new-password'}
-                            label={'Nouveau mot de passe'}
+                            label={vt("Nouveau mot de passe")}
                             name={'password'}
                             type={'password'}
                             autoComplete={'new-password'}
-                            description={'Utilisez au moins 8 caractères.'}
+                            description={vt("Utilisez au moins 8 caractères.")}
                         />
                     </div>
                     <div css={tw`mt-6`}>
                         <Field
                             id={'confirm-password'}
                             light
-                            label={'Confirmer le mot de passe'}
+                            label={vt("Confirmer le mot de passe")}
                             name={'passwordConfirmation'}
                             type={'password'}
                             autoComplete={'new-password'}
                         />
                     </div>
                     <div css={tw`mt-6`}>
-                        <Button size={'xlarge'} type={'submit'} disabled={isSubmitting} isLoading={isSubmitting}>
-                            Enregistrer le mot de passe
-                        </Button>
+                        <Button size={'xlarge'} type={'submit'} disabled={isSubmitting} isLoading={isSubmitting}>{vt("Enregistrer le mot de passe")}</Button>
                     </div>
                     <div css={tw`mt-6 text-center`}>
                         <Link
                             to={'/auth/login'}
                             css={tw`text-xs text-neutral-500 tracking-wide no-underline uppercase hover:text-neutral-600`}
-                        >
-                            Retour à la connexion
-                        </Link>
+                        >{vt("Retour à la connexion")}</Link>
                     </div>
                 </LoginFormContainer>
             )}

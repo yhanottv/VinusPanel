@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -165,17 +166,12 @@ export default () => {
     }, [error]);
 
     return (
-        <PageContentBlock title={'VinusPanel — Serveurs'} showFlashKey={'dashboard'}>
+        <PageContentBlock title={vt("VinusPanel — Serveurs")} showFlashKey={'dashboard'}>
             <DashboardHero>
                 <HeroContent>
-                    <p css={tw`mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-400`}>
-                        Vue d’ensemble
-                    </p>
-                    <h1>Vos serveurs</h1>
-                    <p css={tw`mt-3 max-w-xl text-sm leading-relaxed text-neutral-300`}>
-                        Bonjour {appearance.displayName || username}. Retrouvez vos serveurs et leur activité en un coup
-                        d’œil.
-                    </p>
+                    <p css={tw`mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-400`}>{vt("Vue d’ensemble")}</p>
+                    <h1>{vt("Vos serveurs")}</h1>
+                    <p css={tw`mt-3 max-w-xl text-sm leading-relaxed text-neutral-300`}>{vt("Bonjour ")}{appearance.displayName || username}{vt(". Retrouvez vos serveurs et leur activité en un coup d’œil.")}</p>
                 </HeroContent>
                 <SummaryGrid>
                     <SummaryItem>
@@ -184,7 +180,7 @@ export default () => {
                             <p css={tw`text-3xl font-semibold text-neutral-50`}>
                                 {servers ? servers.pagination.total : '—'}
                             </p>
-                            <p css={tw`text-xs text-neutral-400`}>Serveurs au total</p>
+                            <p css={tw`text-xs text-neutral-400`}>{vt("Serveurs au total")}</p>
                         </div>
                     </SummaryItem>
                     <SummaryItem $tone={'success'}>
@@ -193,7 +189,7 @@ export default () => {
                             <p css={tw`text-3xl font-semibold text-neutral-50`}>
                                 {statusSummary.loaded ? statusSummary.online : '—'}
                             </p>
-                            <p css={tw`text-xs text-neutral-400`}>En ligne · cette page</p>
+                            <p css={tw`text-xs text-neutral-400`}>{vt("En ligne · cette page")}</p>
                         </div>
                     </SummaryItem>
                     <SummaryItem $tone={'danger'}>
@@ -202,7 +198,7 @@ export default () => {
                             <p css={tw`text-3xl font-semibold text-neutral-50`}>
                                 {statusSummary.loaded ? statusSummary.offline : '—'}
                             </p>
-                            <p css={tw`text-xs text-neutral-400`}>Hors ligne · cette page</p>
+                            <p css={tw`text-xs text-neutral-400`}>{vt("Hors ligne · cette page")}</p>
                         </div>
                     </SummaryItem>
                 </SummaryGrid>
@@ -215,11 +211,11 @@ export default () => {
                         <FontAwesomeIcon icon={faServer} css={tw`text-primary-300`} />
                     </span>
                     <div>
-                        <p css={tw`text-sm font-semibold text-neutral-100`}>Vos serveurs</p>
+                        <p css={tw`text-sm font-semibold text-neutral-100`}>{vt("Vos serveurs")}</p>
                         <p css={tw`text-xs text-neutral-500`}>
                             {servers
-                                ? `${servers.items.length} affiché${servers.items.length > 1 ? 's' : ''}`
-                                : 'Chargement…'}
+                                ? vt('{{count}} affiché(s)', { count: servers.items.length })
+                                : vt("Chargement…")}
                         </p>
                     </div>
                 </div>
@@ -227,7 +223,7 @@ export default () => {
                     {rootAdmin && (
                         <AdminToggle>
                             <p css={tw`mr-3 text-xs font-medium text-neutral-300`}>
-                                {showOnlyAdmin ? 'Vue administrateur' : 'Mes serveurs'}
+                                {showOnlyAdmin ? vt("Vue administrateur") : vt("Mes serveurs")}
                             </p>
                             <Switch
                                 name={'show_all_servers'}
@@ -236,12 +232,12 @@ export default () => {
                             />
                         </AdminToggle>
                     )}
-                    <ViewSwitcher aria-label={'Mode d’affichage'}>
+                    <ViewSwitcher aria-label={vt("Mode d’affichage")}>
                         <button
                             type={'button'}
                             className={currentDisplayMode === 'list' ? 'active' : undefined}
                             onClick={() => setDisplayMode('list')}
-                            aria-label={'Afficher les serveurs en liste'}
+                            aria-label={vt("Afficher les serveurs en liste")}
                             aria-pressed={currentDisplayMode === 'list'}
                         >
                             <FontAwesomeIcon icon={faList} />
@@ -250,7 +246,7 @@ export default () => {
                             type={'button'}
                             className={currentDisplayMode === 'grid' ? 'active' : undefined}
                             onClick={() => setDisplayMode('grid')}
-                            aria-label={'Afficher les serveurs en grille'}
+                            aria-label={vt("Afficher les serveurs en grille")}
                             aria-pressed={currentDisplayMode === 'grid'}
                         >
                             <FontAwesomeIcon icon={faThLarge} />
@@ -277,11 +273,11 @@ export default () => {
                         ) : (
                             <EmptyState>
                                 <FontAwesomeIcon icon={faServer} css={tw`mb-4 text-3xl text-neutral-600`} />
-                                <p css={tw`text-lg font-medium text-neutral-200`}>Aucun serveur à afficher</p>
+                                <p css={tw`text-lg font-medium text-neutral-200`}>{vt("Aucun serveur à afficher")}</p>
                                 <p css={tw`mt-2 text-sm text-neutral-400`}>
                                     {showOnlyAdmin
-                                        ? "Aucun autre serveur n'est disponible dans la vue administrateur."
-                                        : "Aucun serveur n'est encore associé à votre compte."}
+                                        ? vt("Aucun autre serveur n'est disponible dans la vue administrateur.")
+                                        : vt("Aucun serveur n'est encore associé à votre compte.")}
                                 </p>
                             </EmptyState>
                         )

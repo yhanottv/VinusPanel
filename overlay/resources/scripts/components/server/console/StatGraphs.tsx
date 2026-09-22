@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ServerContext } from '@/state/server';
 import { SocketEvent } from '@/components/server/events';
@@ -15,8 +16,8 @@ export default () => {
   const connected = ServerContext.useStoreState((state) => state.socket.connected);
   const [current, setCurrent] = useState({ cpu: 0, memory: 0, inbound: 0, outbound: 0 });
 
-  const cpu = useChartTickLabel('Processeur', limits.cpu, '%', 0);
-  const memory = useChartTickLabel('Mémoire', limits.memory, 'Mio');
+  const cpu = useChartTickLabel(vt("Processeur"), limits.cpu, '%', 0);
+  const memory = useChartTickLabel(vt("Mémoire"), limits.memory, vt("Mio"));
   const networkOptions = useMemo(
     () => ({
       scales: {
@@ -31,13 +32,13 @@ export default () => {
     }),
     []
   );
-  const network = useChart('Réseau', {
+  const network = useChart(vt("Réseau"), {
     sets: 2,
     options: networkOptions,
     callback(opts, index) {
       return {
         ...opts,
-        label: !index ? 'Trafic entrant' : 'Trafic sortant',
+        label: !index ? vt("Trafic entrant") : vt("Trafic sortant"),
         borderColor: !index ? '#43d6a3' : '#ff7a1a',
         backgroundColor: hexToRgba(!index ? '#43d6a3' : '#ff7a1a', 0.12),
       };
@@ -90,29 +91,29 @@ export default () => {
   return (
     <>
       <ChartBlock
-        title={'Processeur'}
+        title={vt("Processeur")}
         value={formatChartValue(current.cpu, '%')}
-        meta={limits.cpu > 0 ? `Limite : ${formatChartValue(limits.cpu, '%', 0)}` : 'Sans limite CPU'}
+        meta={limits.cpu > 0 ? vt('Limite : {{value}}', { value: formatChartValue(limits.cpu, '%', 0) }) : vt("Sans limite CPU")}
         icon={faBolt}
       >
-        <Line {...cpu.props} role={'img'} aria-label={'Historique du processeur en pourcentage'} />
+        <Line {...cpu.props} role={'img'} aria-label={vt("Historique du processeur en pourcentage")} />
       </ChartBlock>
       <ChartBlock
-        title={'Mémoire'}
+        title={vt("Mémoire")}
         value={formatChartBytes(current.memory * 1024 * 1024)}
-        meta={limits.memory > 0 ? `sur ${formatChartBytes(limits.memory * 1024 * 1024)}` : 'Sans limite mémoire'}
+        meta={limits.memory > 0 ? vt('sur {{value}}', { value: formatChartBytes(limits.memory * 1024 * 1024) }) : vt("Sans limite mémoire")}
         icon={faLayerGroup}
       >
-        <Line {...memory.props} role={'img'} aria-label={'Historique de la mémoire utilisée'} />
+        <Line {...memory.props} role={'img'} aria-label={vt("Historique de la mémoire utilisée")} />
       </ChartBlock>
       <ChartBlock
-        title={'Réseau'}
+        title={vt("Réseau")}
         icon={faExchangeAlt}
         value={`${formatChartBytes(current.inbound)}/s`}
-        meta={'Entrant'}
+        meta={vt("Entrant")}
         secondaryValue={`${formatChartBytes(current.outbound)}/s`}
       >
-        <Line {...network.props} role={'img'} aria-label={'Historique des débits entrant et sortant'} />
+        <Line {...network.props} role={'img'} aria-label={vt("Historique des débits entrant et sortant")} />
       </ChartBlock>
     </>
   );

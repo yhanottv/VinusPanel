@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { memo, useCallback, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import tw from 'twin.macro';
@@ -93,7 +94,7 @@ const AllocationRow = ({ allocation }: Props) => {
                         <Code dark>{ip(allocation.ip)}</Code>
                     </CopyOnClick>
                 )}
-                <Label>{allocation.alias ? 'Nom d’hôte' : 'Adresse IP'}</Label>
+                <Label>{allocation.alias ? vt("Nom d’hôte") : vt("Adresse IP")}</Label>
             </div>
             <div className={'overflow-hidden'}>
                 <Code dark>{allocation.port}</Code>
@@ -105,7 +106,7 @@ const AllocationRow = ({ allocation }: Props) => {
                         className={
                             'min-h-[3.2rem] resize-none border-neutral-600 bg-neutral-900 hover:border-neutral-500'
                         }
-                        placeholder={'Ajouter une note…'}
+                        placeholder={vt("Ajouter une note…")}
                         defaultValue={allocation.notes || undefined}
                         onChange={(e) => setAllocationNotes(e.currentTarget.value)}
                     />
@@ -113,18 +114,14 @@ const AllocationRow = ({ allocation }: Props) => {
             </div>
             <div className={'col-span-3 flex w-full justify-end space-x-3 md:col-span-1 md:w-auto'}>
                 {allocation.isDefault ? (
-                    <Button size={Button.Sizes.Small} className={'!text-gray-50 !bg-primary-600'} disabled>
-                        Principale
-                    </Button>
+                    <Button size={Button.Sizes.Small} className={'!text-gray-50 !bg-primary-600'} disabled>{vt("Principale")}</Button>
                 ) : (
                     <>
                         <Can action={'allocation.delete'}>
                             <DeleteAllocationButton allocation={allocation.id} />
                         </Can>
                         <Can action={'allocation.update'}>
-                            <Button.Text size={Button.Sizes.Small} onClick={setPrimaryAllocation}>
-                                Définir par défaut
-                            </Button.Text>
+                            <Button.Text size={Button.Sizes.Small} onClick={setPrimaryAllocation}>{vt("Définir par défaut")}</Button.Text>
                         </Can>
                     </>
                 )}

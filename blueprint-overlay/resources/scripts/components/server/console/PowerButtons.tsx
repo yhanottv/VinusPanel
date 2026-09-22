@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import AdditionalPowerButtons from '@blueprint/components/Server/Terminal/AdditionalPowerButtons';
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/elements/button/index';
@@ -65,18 +66,14 @@ export default ({
                 open={open}
                 hideCloseIcon
                 onClose={() => setOpen(false)}
-                title={'Forcer l’arrêt du serveur'}
-                confirm={'Continuer'}
+                title={vt("Forcer l’arrêt du serveur")}
+                confirm={vt("Continuer")}
                 onConfirmed={onButtonClick.bind(this, 'kill-confirmed')}
-            >
-                Un arrêt forcé peut endommager les données en cours d’écriture.
-            </Dialog.Confirm>
+            >{vt("Un arrêt forcé peut endommager les données en cours d’écriture.")}</Dialog.Confirm>
             {(!deck || status === 'offline' || !status) && (
                 <Can action={'control.start'}>
                     <Button className={'flex-1'} disabled={!allowed.start} onClick={onButtonClick.bind(this, 'start')}>
-                        <FontAwesomeIcon icon={faPlay} className={'mr-2'} />
-                        Démarrer
-                    </Button>
+                        <FontAwesomeIcon icon={faPlay} className={'mr-2'} />{vt("Démarrer")}</Button>
                 </Can>
             )}
             <Can action={'control.restart'}>
@@ -85,9 +82,7 @@ export default ({
                     disabled={!allowed.restart}
                     onClick={onButtonClick.bind(this, 'restart')}
                 >
-                    <FontAwesomeIcon icon={faRedoAlt} className={'mr-2'} />
-                    Redémarrer
-                </Button.Text>
+                    <FontAwesomeIcon icon={faRedoAlt} className={'mr-2'} />{vt("Redémarrer")}</Button.Text>
             </Can>
             {(!deck || (status && status !== 'offline')) && (
                 <Can action={'control.stop'}>
@@ -97,7 +92,7 @@ export default ({
                         onClick={onButtonClick.bind(this, killable ? 'kill' : 'stop')}
                     >
                         <FontAwesomeIcon icon={faStop} className={'mr-2'} />
-                        {killable ? 'Forcer l’arrêt' : 'Arrêter'}
+                        {killable ? vt("Forcer l’arrêt") : vt("Arrêter")}
                     </Button.Danger>
                 </Can>
             )}

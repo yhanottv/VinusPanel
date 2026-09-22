@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { lazy } from 'react';
 import ServerConsole from '@/components/server/console/ServerConsoleContainer';
 import DatabasesContainer from '@/components/server/databases/DatabasesContainer';
@@ -47,28 +48,28 @@ export default {
     account: [
         {
             path: '/',
-            name: 'Compte',
+            name: vt("Compte"),
             component: AccountOverviewContainer,
             exact: true,
         },
         {
             path: '/profile',
-            name: 'Profil',
+            name: vt("Profil"),
             component: ProfileContainer,
         },
         {
             path: '/api',
-            name: 'Clés API',
+            name: vt("Clés API"),
             component: AccountApiContainer,
         },
         {
             path: '/ssh',
-            name: 'Clés SSH',
+            name: vt("Clés SSH"),
             component: AccountSSHContainer,
         },
         {
             path: '/activity',
-            name: 'Activité',
+            name: vt("Activité"),
             component: ActivityLogContainer,
         },
     ],
@@ -83,7 +84,7 @@ export default {
         {
             path: '/files',
             permission: 'file.*',
-            name: 'Fichiers',
+            name: vt("Fichiers"),
             component: FileManagerContainer,
         },
         {
@@ -95,13 +96,13 @@ export default {
         {
             path: '/databases',
             permission: 'database.*',
-            name: 'Bases de données',
+            name: vt("Bases de données"),
             component: DatabasesContainer,
         },
         {
             path: '/schedules',
             permission: 'schedule.*',
-            name: 'Automatisations',
+            name: vt("Automatisations"),
             component: ScheduleContainer,
         },
         {
@@ -113,37 +114,37 @@ export default {
         {
             path: '/users',
             permission: 'user.*',
-            name: 'Accès',
+            name: vt("Accès"),
             component: UsersContainer,
         },
         {
             path: '/backups',
             permission: 'backup.*',
-            name: 'Sauvegardes',
+            name: vt("Sauvegardes"),
             component: BackupContainer,
         },
         {
             path: '/network',
             permission: 'allocation.*',
-            name: 'Réseau',
+            name: vt("Réseau"),
             component: NetworkContainer,
         },
         {
             path: '/startup',
             permission: 'startup.*',
-            name: 'Démarrage',
+            name: vt("Démarrage"),
             component: StartupContainer,
         },
         {
             path: '/settings',
             permission: ['settings.*', 'file.sftp'],
-            name: 'Paramètres',
+            name: vt("Paramètres"),
             component: SettingsContainer,
         },
         {
             path: '/activity',
             permission: 'activity.*',
-            name: 'Activité',
+            name: vt("Activité"),
             component: ServerActivityLogContainer,
         },
     ],

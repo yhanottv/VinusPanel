@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { useState } from 'react';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import loginCheckpoint from '@/api/auth/loginCheckpoint';
@@ -27,17 +28,17 @@ const LoginCheckpointContainer = () => {
     const [isMissingDevice, setIsMissingDevice] = useState(false);
 
     return (
-        <LoginFormContainer title={'Vérification en deux étapes'} css={tw`w-full flex`}>
+        <LoginFormContainer title={vt("Vérification en deux étapes")} css={tw`w-full flex`}>
             <div css={tw`mt-6`}>
                 <Field
                     light
                     id={isMissingDevice ? 'recovery-code' : 'authentication-code'}
                     name={isMissingDevice ? 'recoveryCode' : 'code'}
-                    label={isMissingDevice ? 'Code de récupération' : 'Code d’authentification'}
+                    label={isMissingDevice ? vt("Code de récupération") : vt("Code d’authentification")}
                     description={
                         isMissingDevice
-                            ? 'Saisissez un code de récupération généré lors de l’activation de la double authentification.'
-                            : 'Saisissez le code temporaire généré par votre appareil.'
+                            ? vt("Saisissez un code de récupération généré lors de l’activation de la double authentification.")
+                            : vt("Saisissez le code temporaire généré par votre appareil.")
                     }
                     type={'text'}
                     autoComplete={'one-time-code'}
@@ -45,9 +46,7 @@ const LoginCheckpointContainer = () => {
                 />
             </div>
             <div css={tw`mt-6`}>
-                <Button size={'xlarge'} type={'submit'} disabled={isSubmitting} isLoading={isSubmitting}>
-                    Continuer
-                </Button>
+                <Button size={'xlarge'} type={'submit'} disabled={isSubmitting} isLoading={isSubmitting}>{vt("Continuer")}</Button>
             </div>
             <div css={tw`mt-6 text-center`}>
                 <span
@@ -58,16 +57,14 @@ const LoginCheckpointContainer = () => {
                     }}
                     css={tw`cursor-pointer text-xs text-neutral-500 tracking-wide uppercase no-underline hover:text-neutral-700`}
                 >
-                    {!isMissingDevice ? 'Je n’ai plus accès à mon appareil' : 'J’ai accès à mon appareil'}
+                    {!isMissingDevice ? vt("Je n’ai plus accès à mon appareil") : vt("J’ai accès à mon appareil")}
                 </span>
             </div>
             <div css={tw`mt-6 text-center`}>
                 <Link
                     to={'/auth/login'}
                     css={tw`text-xs text-neutral-500 tracking-wide uppercase no-underline hover:text-neutral-700`}
-                >
-                    Retour à la connexion
-                </Link>
+                >{vt("Retour à la connexion")}</Link>
             </div>
         </LoginFormContainer>
     );

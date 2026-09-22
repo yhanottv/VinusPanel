@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import CommandRow from '@blueprint/components/Server/Terminal/CommandRow';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ITerminalOptions, Terminal } from 'xterm';
@@ -88,14 +89,14 @@ export default () => {
         switch (status) {
             // Sent by either the source or target node if a failure occurs.
             case 'failure':
-                intro.writeln(TERMINAL_PRELUDE + 'Transfert interrompu côté hébergement. Contactez un administrateur avant de réessayer.\u001b[0m');
+                intro.writeln(TERMINAL_PRELUDE + vt("Transfert interrompu côté hébergement. Contactez un administrateur avant de réessayer.\u001b[0m"));
                 return;
         }
     };
 
     const handleDaemonErrorOutput = (line: string) =>
         intro.writeln(
-            TERMINAL_PRELUDE + '[Wings — erreur du service de gestion] ' + '\u001b[1m\u001b[41m' + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m'
+            TERMINAL_PRELUDE + vt("[Wings — erreur du service de gestion] ") + '\u001b[1m\u001b[41m' + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m'
         );
 
     const handlePowerChangeEvent = (state: string) => intro.status(state);
@@ -226,9 +227,9 @@ export default () => {
                     <input
                         className={classNames('peer', styles.command_input)}
                         type={'text'}
-                        placeholder={'Commande…'}
-                        title={'↑ / ↓ : historique · Entrée : envoyer'}
-                        aria-label={'Commande à envoyer au serveur'}
+                        placeholder={vt("Commande…")}
+                        title={vt("↑ / ↓ : historique · Entrée : envoyer")}
+                        aria-label={vt("Commande à envoyer au serveur")}
                         disabled={!instance || !connected}
                         onKeyDown={handleCommandKeyDown}
                         autoComplete={'off'}

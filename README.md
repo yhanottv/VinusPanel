@@ -11,7 +11,7 @@
 **A free, open-source Pterodactyl theme with black surfaces, Liquid Glass navigation, a redesigned server console and an optional Minecraft mod/plugin catalog.**
 
 [![Package checks](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml/badge.svg)](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml)
-[![Source version](https://img.shields.io/badge/source-2.3.6-ff7a1a)](CHANGELOG.md)
+[![Source version](https://img.shields.io/badge/source-2.4.0-ff7a1a)](CHANGELOG.md)
 [![Pterodactyl](https://img.shields.io/badge/Pterodactyl-1.15.1-242429)](#compatibility)
 [![MIT License](https://img.shields.io/badge/license-MIT-242429)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/vinuspanel)
@@ -26,30 +26,44 @@ VinusPanel gives self-hosted game server panels a consistent black-and-orange in
 
 This repository contains a **theme overlay and installation tools**, not a complete Pterodactyl distribution. You need an existing Pterodactyl panel. The theme can manage servers for other games; only the optional catalog is Minecraft-specific.
 
-> **Language note:** this documentation is in English, but many custom interface labels are currently in French. A complete English panel localization is not included in this version.
+> **French / English:** use the language selector on the sign-in screen or at the top of client pages. VinusPanel labels and catalog controls are available in both languages. Switching reloads the current page; save any edits first. Your preference is stored in this browser, with a `?lang=fr` / `?lang=en` fallback when storage is unavailable. Server content, game logs, provider errors, original upstream screens and third-party extensions keep their own language; this is not a translation of the legacy administration area.
 
 <a id="screenshots"></a>
 
 ## 📸 Screenshots
 
-Real captures from a running VinusPanel installation. The interface shown is in French. The server is stopped in the resource preview, so its metrics are zero; terminal logs are excluded to protect player information.
+Real screenshots of VinusPanel 2.4.0, with English selected. The login form contains unsubmitted demonstration values. Server states and charts use real data; no game server was restarted for these previews. Player logs and personal account details are excluded.
 
-**Server resources — CPU, memory and network above the console.**
+**Sign in — choose French or English before accessing the panel.**
 
-![VinusPanel black-and-orange server page with Liquid Glass navigation and CPU, memory and network charts](docs/assets/screenshots/server-resources.png)
+![VinusPanel sign-in screen with orange branding and a French/English language selector](docs/assets/screenshots/login.png)
 
-**Optional Minecraft catalog — project icons, search and loader-aware results.**
+**Your servers — online and offline states at a glance.**
 
-![Vinus Catalog showing NeoForge mods for a Youer 1.21.1 server, with separate Mods and Plugins tabs](docs/assets/screenshots/catalog-mods.png)
+![VinusPanel server list showing three servers, one online and two offline](docs/assets/screenshots/servers.png)
+
+**Live resources — CPU, memory and incoming/outgoing network activity.**
+
+![Actual CPU, memory and network history on a running Velocity server](docs/assets/screenshots/live-resources.png)
+
+**Console — the orange eagle inside the terminal, alongside live resources and power controls.**
+
+![VinusPanel console with the orange Unicode eagle in terminal scrollback and the server online](docs/assets/screenshots/console-eagle.png)
 
 <details>
-<summary>View the Plugins tab on the same hybrid server</summary>
+<summary>Explore the optional Minecraft catalog</summary>
 
-![Vinus Catalog showing Paper, Spigot and Bukkit plugin results on a hybrid server](docs/assets/screenshots/catalog-plugins.png)
+**Mods — search and project icons for the detected loader.**
+
+![Modrinth mod catalog with project icons and a separate Plugins tab](docs/assets/screenshots/catalog-mods.png)
+
+**Plugins — a separate category on supported hybrid servers.**
+
+![Modrinth plugin catalog with project icons on a hybrid server](docs/assets/screenshots/catalog-plugins.png)
+
+The catalog requires the optional Blueprint extension. See [catalog compatibility](#minecraft-catalog) before installing.
 
 </details>
-
-The catalog requires the optional Blueprint extension. Available projects and results can change over time; see [catalog compatibility](#minecraft-catalog) before installing.
 
 <a id="features"></a>
 
@@ -83,10 +97,10 @@ Profile names and avatars are local to the browser. They do not change Pterodact
 
 | Component | Requirement / tested scope |
 | --- | --- |
-| VinusPanel | Source version **2.3.6**. |
+| VinusPanel | Source version **2.4.0**. |
 | Pterodactyl Panel | **1.15.1**. Other versions and forks are not validated. |
 | Blueprint | Optional for the theme; **beta-2026-06** is the validated integration. Required for Vinus Catalog. |
-| Vinus Catalog | Extension **1.1.0**, included in this repository. |
+| Vinus Catalog | Extension **1.2.0**, included in this repository. |
 | Node.js | Installer requires **22+**; builds were validated on Node 22. Later major versions are not automatically certified. |
 | Yarn | **1.x**. |
 | PHP | Validated on **8.3**. Keep the PHP requirements of your panel and Blueprint installation. |
@@ -264,6 +278,8 @@ Include versions of VinusPanel, Pterodactyl and Blueprint, browser/device detail
 **If VinusPanel is useful to you, consider giving the repository a ⭐.** Bug reports, installation feedback and contributions help improve the project for other server owners.
 
 ## 🧪 Testing and contributions
+
+For **2.4.0**, TypeScript checks passed with the theme and Blueprint integration, the production build passed, and all **89 frontend tests across 9 suites** passed. The language selector was checked at desktop, tablet and phone viewport sizes, including persisted navigation and switching back to French.
 
 The **2.3.6** development panel environment passed TypeScript checking, a production build, **85 frontend tests** across 8 suites, **52 catalog detection/artifact checks** and **21 isolated catalog installation checks**. PHP/shell syntax, the file manifest and accidental credential exposure were also checked before publication.
 

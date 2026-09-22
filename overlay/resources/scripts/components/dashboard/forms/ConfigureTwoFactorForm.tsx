@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { useEffect, useState } from 'react';
 import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
@@ -30,14 +31,14 @@ export default () => {
             <DisableTOTPDialog open={visible === 'disable'} onClose={() => setVisible(null)} />
             <p css={tw`text-sm text-neutral-400`}>
                 {isEnabled
-                    ? 'La double authentification protège actuellement votre compte.'
-                    : 'Ajoutez une seconde étape de vérification pour renforcer la sécurité de votre compte.'}
+                    ? vt("La double authentification protège actuellement votre compte.")
+                    : vt("Ajoutez une seconde étape de vérification pour renforcer la sécurité de votre compte.")}
             </p>
             <div css={tw`mt-6`}>
                 {isEnabled ? (
-                    <Button.Danger onClick={() => setVisible('disable')}>Désactiver</Button.Danger>
+                    <Button.Danger onClick={() => setVisible('disable')}>{vt("Désactiver")}</Button.Danger>
                 ) : (
-                    <Button onClick={() => setVisible('enable')}>Activer la protection</Button>
+                    <Button onClick={() => setVisible('enable')}>{vt("Activer la protection")}</Button>
                 )}
             </div>
         </div>

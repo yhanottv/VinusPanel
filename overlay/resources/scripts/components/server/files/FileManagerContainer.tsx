@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { useEffect } from 'react';
 import { httpErrorToHuman } from '@/api/http';
 import { CSSTransition } from 'react-transition-group';
@@ -82,7 +83,7 @@ export default () => {
                             <NewDirectoryButton />
                             <UploadButton />
                             <NavLink to={`/server/${id}/files/new${window.location.hash}`}>
-                                <Button>Nouveau fichier</Button>
+                                <Button>{vt("Nouveau fichier")}</Button>
                             </NavLink>
                         </div>
                     </Can>
@@ -92,9 +93,9 @@ export default () => {
             <div className={style.manager_summary}>
                 <div>
                     <FontAwesomeIcon icon={faFolderOpen} />
-                    <span>{directory === '/' ? 'Racine du serveur' : directory}</span>
+                    <span>{directory === '/' ? vt("Racine du serveur") : directory}</span>
                 </div>
-                <span>{files ? `${files.length} élément${files.length > 1 ? 's' : ''}` : 'Chargement…'}</span>
+                <span>{files ? `${files.length} élément${files.length > 1 ? 's' : ''}` : vt("Chargement…")}</span>
             </div>
 
             {!files ? (
@@ -102,23 +103,21 @@ export default () => {
             ) : !files.length ? (
                 <div className={style.empty_state}>
                     <FontAwesomeIcon icon={faFileAlt} />
-                    <h3>Ce dossier est vide</h3>
-                    <p>Importez un fichier ou créez votre premier document.</p>
+                    <h3>{vt("Ce dossier est vide")}</h3>
+                    <p>{vt("Importez un fichier ou créez votre premier document.")}</p>
                 </div>
             ) : (
                 <CSSTransition classNames={'fade'} timeout={150} appear in>
                     <div className={style.file_table}>
                         <div className={style.file_table_header}>
-                            <span>Nom</span>
-                            <span>Taille</span>
-                            <span>Modification</span>
+                            <span>{vt("Nom")}</span>
+                            <span>{vt("Taille")}</span>
+                            <span>{vt("Modification")}</span>
                             <span />
                         </div>
                         {files.length > 250 && (
                             <div css={tw`rounded-lg bg-yellow-400 mb-2 p-3`}>
-                                <p css={tw`text-center text-sm text-yellow-900`}>
-                                    Ce dossier contient plus de 250 éléments. Seuls les premiers sont affichés.
-                                </p>
+                                <p css={tw`text-center text-sm text-yellow-900`}>{vt("Ce dossier contient plus de 250 éléments. Seuls les premiers sont affichés.")}</p>
                             </div>
                         )}
                         {sortFiles(files.slice(0, 250)).map((file) => (

@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import { consoleBanner } from './banner';
 
 interface IntroTerminal {
@@ -9,8 +10,8 @@ interface IntroTerminal {
 
 const PRELUDE = '\u001b[1m\u001b[33mcontainer@pterodactyl~ \u001b[0m';
 const labels: Record<string, string> = {
-    starting: 'Démarrage du serveur', running: 'Serveur en ligne',
-    stopping: 'Arrêt du serveur', offline: 'Serveur arrêté',
+    starting: vt("Démarrage du serveur"), running: vt("Serveur en ligne"),
+    stopping: vt("Arrêt du serveur"), offline: vt("Serveur arrêté"),
 };
 
 // These are ordinary scrollback lines, just like Wings status messages.

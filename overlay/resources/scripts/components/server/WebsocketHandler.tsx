@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { useEffect, useRef, useState } from 'react';
 import { Websocket } from '@/plugins/Websocket';
 import { ServerContext } from '@/state/server';
@@ -36,7 +37,7 @@ export default () => {
         socket.on('auth success', () => setConnectionState(true));
         socket.on('SOCKET_CLOSE', () => { setConnectionState(false); setError('connecting'); });
         socket.on('SOCKET_CONNECT_ERROR', () => {
-            setError('Connexion au serveur (Wings) impossible. Le panel reste accessible, mais les commandes et mesures en direct sont indisponibles. Réessayez ; si cela persiste, un administrateur doit vérifier Wings, le réseau et le certificat du nœud.');
+            setError(vt("Connexion au serveur (Wings) impossible. Le panel reste accessible, mais les commandes et mesures en direct sont indisponibles. Réessayez ; si cela persiste, un administrateur doit vérifier Wings, le réseau et le certificat du nœud."));
         });
         socket.on('SOCKET_ERROR', () => {
             setError('connecting');
@@ -58,7 +59,7 @@ export default () => {
                 updateToken(uuid, socket);
             } else {
                 setError(
-                    'Le serveur (Wings) a refusé la session de console. Reconnectez-vous au panel ; si cela persiste, un administrateur doit vérifier l’horloge et la configuration du nœud.'
+                    vt("Le serveur (Wings) a refusé la session de console. Reconnectez-vous au panel ; si cela persiste, un administrateur doit vérifier l’horloge et la configuration du nœud.")
                 );
             }
         });
@@ -115,12 +116,10 @@ export default () => {
                     {error === 'connecting' ? (
                         <>
                             <Spinner size={'small'} />
-                            <p css={tw`ml-2 text-sm text-red-100`}>
-                                Liaison avec le serveur interrompue. Reconnexion automatique en cours ; les mesures et commandes sont temporairement indisponibles.
-                            </p>
+                            <p css={tw`ml-2 text-sm text-red-100`}>{vt("Liaison avec le serveur interrompue. Reconnexion automatique en cours ; les mesures et commandes sont temporairement indisponibles.")}</p>
                         </>
                     ) : (
-                        <div><p css={tw`text-sm font-semibold text-white`}>Console — connexion interrompue</p><p css={tw`mt-1 text-sm text-white`}>{error}</p><button type={'button'} css={tw`mt-3 rounded border border-white px-3 py-1 text-sm text-white`} onClick={() => window.location.reload()}>Reconnecter la console</button></div>
+                        <div><p css={tw`text-sm font-semibold text-white`}>{vt("Console — connexion interrompue")}</p><p css={tw`mt-1 text-sm text-white`}>{error}</p><button type={'button'} css={tw`mt-3 rounded border border-white px-3 py-1 text-sm text-white`} onClick={() => window.location.reload()}>{vt("Reconnecter la console")}</button></div>
                     )}
                 </ContentContainer>
             </div>

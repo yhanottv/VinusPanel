@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import DiscordButton from '@/components/elements/DiscordButton';
 import { NavigationRouter } from '@blueprint/extends/routers/ServerRouter';
 import BeforeSubNavigation from '@blueprint/components/Navigation/SubNavigation/BeforeSubNavigation';
@@ -58,17 +59,17 @@ const navigationIcons: Record<string, IconDefinition> = {
 };
 
 const navigationSections = [
-  { label: 'Vue générale', paths: ['/'] },
-  { label: 'Gestion', paths: ['/files', '/databases', '/users', '/backups'] },
+  { label: vt("Vue générale"), paths: ['/'] },
+  { label: vt("Gestion"), paths: ['/files', '/databases', '/users', '/backups'] },
   { label: 'Configuration', paths: ['/schedules', '/network', '/startup', '/settings'] },
-  { label: 'Historique', paths: ['/activity'] },
+  { label: vt("Historique"), paths: ['/activity'] },
 ];
 
 const statusLabel = (status: string | null) => {
-  if (status === 'running') return 'En ligne';
-  if (status === 'starting') return 'Démarrage';
-  if (status === 'stopping') return 'Arrêt en cours';
-  return 'Hors ligne';
+  if (status === 'running') return vt("En ligne");
+  if (status === 'starting') return vt("Démarrage");
+  if (status === 'stopping') return vt("Arrêt en cours");
+  return vt("Hors ligne");
 };
 
 export default () => {
@@ -142,18 +143,16 @@ export default () => {
         )
       ) : (
         <div className={'server-layout'}>
-          <a className={'skip-navigation'} href={'#main-content'}>
-            Aller au contenu
-          </a>
+          <a className={'skip-navigation'} href={'#main-content'}>{vt("Aller au contenu")}</a>
           <CSSTransition timeout={150} classNames={'fade'} appear in>
             <SubNavigation className={'server-sidebar'}>
               <div>
                 <div className={'server-sidebar-brand'}>
-                  <Link to={'/'} aria-label={'Retour aux serveurs'}>
+                  <Link to={'/'} aria-label={vt("Retour aux serveurs")}>
                     <img src={VINUS.logo} alt={''} aria-hidden={'true'} />
                     <div>
                       <strong>{VINUS.name}</strong>
-                      <span>Panel de gestion</span>
+                      <span>{vt("Panel de gestion")}</span>
                     </div>
                   </Link>
                 </div>
@@ -188,11 +187,11 @@ export default () => {
                   <DiscordButton />
                   <Link to={'/'}>
                     <FontAwesomeIcon icon={faServer} fixedWidth />
-                    <span>Tous les serveurs</span>
+                    <span>{vt("Tous les serveurs")}</span>
                   </Link>
                   <Link to={'/account'}>
                     <FontAwesomeIcon icon={faUserCircle} fixedWidth />
-                    <span>Compte</span>
+                    <span>{vt("Compte")}</span>
                   </Link>
                   {rootAdmin && (
                     <a href={`/admin/servers/view/${server.internalId}`}>
@@ -202,7 +201,7 @@ export default () => {
                   )}
                   <button onClick={logout}>
                     <FontAwesomeIcon icon={faSignOutAlt} fixedWidth />
-                    <span>Déconnexion</span>
+                    <span>{vt("Déconnexion")}</span>
                   </button>
                 </div>
               </div>

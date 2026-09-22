@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import BeforeContent from '@blueprint/components/Server/Terminal/BeforeContent';
 import AfterContent from '@blueprint/components/Server/Terminal/AfterContent';
 import React, { memo } from 'react';
@@ -35,11 +36,11 @@ const ServerConsoleContainer = () => {
   const address = allocation ? `${allocation.alias || ip(allocation.ip)}:${allocation.port}` : null;
   const state = !connected || !status ? 'unknown' : status;
   const labels = {
-    unknown: 'Connexion en cours',
-    running: 'En ligne',
-    offline: 'À l’arrêt',
-    starting: 'Démarrage',
-    stopping: 'Arrêt en cours',
+    unknown: vt("Connexion en cours"),
+    running: vt("En ligne"),
+    offline: vt("À l’arrêt"),
+    starting: vt("Démarrage"),
+    stopping: vt("Arrêt en cours"),
   };
 
   return (
@@ -47,21 +48,19 @@ const ServerConsoleContainer = () => {
       <BeforeContent />
       <header className={styles.heading}>
         <Link to={'/'} className={styles.back}>
-          <FontAwesomeIcon icon={faArrowLeft} /> Serveurs
-        </Link>
+          <FontAwesomeIcon icon={faArrowLeft} />{vt(" Serveurs")}</Link>
         <div className={styles.heading_row}>
           <div className={styles.identity}>
-            <p className={styles.eyebrow}>
-              ESPACE SERVEUR <span>/</span> CONSOLE
+            <p className={styles.eyebrow}>{vt("ESPACE SERVEUR ")}<span>/</span> CONSOLE
             </p>
             <h1>{server.name}</h1>
             {server.description && <p className={styles.description}>{server.description}</p>}
           </div>
           {address && (
             <CopyOnClick text={address}>
-              <button type={'button'} className={styles.address} aria-label={`Copier l’adresse ${address}`}>
+              <button type={'button'} className={styles.address} aria-label={vt('Copier l’adresse {{address}}', { address })}>
                 <span>
-                  <small>Adresse de connexion</small>
+                  <small>{vt("Adresse de connexion")}</small>
                   <strong>{address}</strong>
                 </span>
                 <FontAwesomeIcon icon={faCopy} />
@@ -73,22 +72,22 @@ const ServerConsoleContainer = () => {
       {(server.isNodeUnderMaintenance || isInstalling || server.isTransferring) && (
         <Alert type={'warning'} className={'mb-5'}>
           {server.isNodeUnderMaintenance
-            ? 'Le nœud est en maintenance. Les commandes sont temporairement indisponibles.'
+            ? vt("Le nœud est en maintenance. Les commandes sont temporairement indisponibles.")
             : isInstalling
-            ? 'Installation du serveur en cours.'
-            : 'Transfert du serveur en cours.'}
+            ? vt("Installation du serveur en cours.")
+            : vt("Transfert du serveur en cours.")}
         </Alert>
       )}
-      <section className={styles.graphs} aria-label={'Ressources du serveur'}>
+      <section className={styles.graphs} aria-label={vt("Ressources du serveur")}>
         <Spinner.Suspense>
           <StatGraphs />
         </Spinner.Suspense>
       </section>
       <div className={styles.workspace}>
-        <aside className={styles.controls} aria-label={'Pilotage du serveur'}>
+        <aside className={styles.controls} aria-label={vt("Pilotage du serveur")}>
           <section className={styles.power_panel} data-state={state}>
             <div className={styles.panel_label}>
-              <h2>État du serveur</h2>
+              <h2>{vt("État du serveur")}</h2>
             </div>
             <div className={styles.server_state}>
               <span className={styles.status_dot} aria-hidden={'true'} />
@@ -100,22 +99,21 @@ const ServerConsoleContainer = () => {
               <PowerButtons variant={'deck'} status={status} connected={connected} className={styles.power_controls} />
             </Can>
             <div className={styles.node}>
-              <span>Hébergé sur</span>
+              <span>{vt("Hébergé sur")}</span>
               <strong>{server.node}</strong>
             </div>
           </section>
           <ServerDetailsBlock className={styles.telemetry} />
         </aside>
-        <section className={styles.terminal_column} aria-label={'Espace terminal'}>
+        <section className={styles.terminal_column} aria-label={vt("Espace terminal")}>
           <div className={styles.workspace_bar}>
             <h2>
               Console
             </h2>
-            <span className={styles.terminal_connection} data-connected={connected}>{connected ? 'Connectée' : 'Connexion…'}</span>
+            <span className={styles.terminal_connection} data-connected={connected}>{connected ? vt("Connectée") : vt("Connexion…")}</span>
                         <Can action={'file.read'}>
               <Link to={`${url.replace(/\/$/, '')}/files`}>
-                <FontAwesomeIcon icon={faFolderOpen} /> Fichiers
-              </Link>
+                <FontAwesomeIcon icon={faFolderOpen} />{vt(" Fichiers")}</Link>
             </Can>
           </div>
           <Spinner.Suspense>

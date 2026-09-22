@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -47,7 +48,7 @@ export default () => {
         requestPasswordResetEmail(email, token)
             .then((response) => {
                 resetForm();
-                addFlash({ type: 'success', title: 'E-mail envoyé', message: response });
+                addFlash({ type: 'success', title: vt("E-mail envoyé"), message: response });
             })
             .catch((error) => {
                 console.error(error);
@@ -67,25 +68,23 @@ export default () => {
             initialValues={{ email: '' }}
             validationSchema={object().shape({
                 email: string()
-                    .email('Saisissez une adresse e-mail valide.')
-                    .required('Saisissez une adresse e-mail valide.'),
+                    .email(vt("Saisissez une adresse e-mail valide."))
+                    .required(vt("Saisissez une adresse e-mail valide.")),
             })}
         >
             {({ isSubmitting, setSubmitting, submitForm }) => (
-                <LoginFormContainer title={'Réinitialiser le mot de passe'} css={tw`w-full flex`}>
+                <LoginFormContainer title={vt("Réinitialiser le mot de passe")} css={tw`w-full flex`}>
                     <Field
                         id={'email'}
                         light
-                        label={'Adresse e-mail'}
-                        description={'Saisissez l’adresse liée à votre compte pour recevoir les instructions.'}
+                        label={vt("Adresse e-mail")}
+                        description={vt("Saisissez l’adresse liée à votre compte pour recevoir les instructions.")}
                         name={'email'}
                         type={'email'}
                         autoComplete={'email'}
                     />
                     <div css={tw`mt-6`}>
-                        <Button type={'submit'} size={'xlarge'} disabled={isSubmitting} isLoading={isSubmitting}>
-                            Envoyer les instructions
-                        </Button>
+                        <Button type={'submit'} size={'xlarge'} disabled={isSubmitting} isLoading={isSubmitting}>{vt("Envoyer les instructions")}</Button>
                     </div>
                     {recaptchaEnabled && (
                         <Reaptcha
@@ -106,9 +105,7 @@ export default () => {
                         <Link
                             to={'/auth/login'}
                             css={tw`text-xs text-neutral-500 tracking-wide uppercase no-underline hover:text-neutral-700`}
-                        >
-                            Retour à la connexion
-                        </Link>
+                        >{vt("Retour à la connexion")}</Link>
                     </div>
                 </LoginFormContainer>
             )}

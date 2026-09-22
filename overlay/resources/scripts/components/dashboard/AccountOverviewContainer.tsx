@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import * as React from 'react';
 import ContentBox from '@/components/elements/ContentBox';
 import UpdatePasswordForm from '@/components/dashboard/forms/UpdatePasswordForm';
@@ -67,43 +68,39 @@ export default () => {
     const { appearance } = useProfileAppearance(user?.uuid);
 
     return (
-        <PageContentBlock title={'Compte | VinusPanel'}>
+        <PageContentBlock title={vt("Compte | VinusPanel")}>
             <AccountHeader>
                 <div className={'identity'}>
                     <div className={'avatar'}>
                         <Avatar.User />
                     </div>
                     <div className={'min-w-0'}>
-                        <h1>{appearance.displayName || 'Votre compte'}</h1>
-                        <p>{user?.email || 'Gérez vos informations et la sécurité de votre compte.'}</p>
+                        <h1>{appearance.displayName || vt("Votre compte")}</h1>
+                        <p>{user?.email || vt("Gérez vos informations et la sécurité de votre compte.")}</p>
                     </div>
                 </div>
                 <span className={'security-label'}>
-                    <FontAwesomeIcon icon={faShieldAlt} css={tw`mr-2 text-green-400`} />
-                    Centre de sécurité
-                </span>
+                    <FontAwesomeIcon icon={faShieldAlt} css={tw`mr-2 text-green-400`} />{vt("Centre de sécurité")}</span>
             </AccountHeader>
 
             {state?.twoFactorRedirect && (
-                <MessageBox title={'Authentification requise'} type={'error'}>
-                    Activez la double authentification pour pouvoir continuer.
-                </MessageBox>
+                <MessageBox title={vt("Authentification requise")} type={'error'}>{vt("Activez la double authentification pour pouvoir continuer.")}</MessageBox>
             )}
 
             <AccountGrid css={state?.twoFactorRedirect ? tw`mt-5` : undefined}>
                 <ContentBox
-                    title={<SectionTitle icon={faKey}>Mot de passe</SectionTitle>}
+                    title={<SectionTitle icon={faKey}>{vt("Mot de passe")}</SectionTitle>}
                     showFlashes={'account:password'}
                 >
                     <UpdatePasswordForm />
                 </ContentBox>
                 <ContentBox
-                    title={<SectionTitle icon={faEnvelope}>Adresse e-mail</SectionTitle>}
+                    title={<SectionTitle icon={faEnvelope}>{vt("Adresse e-mail")}</SectionTitle>}
                     showFlashes={'account:email'}
                 >
                     <UpdateEmailAddressForm />
                 </ContentBox>
-                <ContentBox title={<SectionTitle icon={faShieldAlt}>Double authentification</SectionTitle>}>
+                <ContentBox title={<SectionTitle icon={faShieldAlt}>{vt("Double authentification")}</SectionTitle>}>
                     <ConfigureTwoFactorForm />
                 </ContentBox>
             </AccountGrid>

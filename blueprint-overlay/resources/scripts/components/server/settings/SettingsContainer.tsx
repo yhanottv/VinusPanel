@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import BeforeContent from '@blueprint/components/Server/Settings/BeforeContent';
 import AfterContent from '@blueprint/components/Server/Settings/AfterContent';
 import React from 'react';
@@ -31,15 +32,15 @@ export default () => {
             <div css={tw`grid grid-cols-1 gap-6 xl:grid-cols-2`}>
                 <div css={tw`w-full`}>
                     <Can action={'file.sftp'}>
-                        <TitledGreyBox title={'Connexion SFTP'} css={tw`mb-6`}>
+                        <TitledGreyBox title={vt("Connexion SFTP")} css={tw`mb-6`}>
                             <div>
-                                <Label>Adresse du serveur</Label>
+                                <Label>{vt("Adresse du serveur")}</Label>
                                 <CopyOnClick text={`sftp://${ip(sftp.ip)}:${sftp.port}`}>
                                     <Input type={'text'} value={`sftp://${ip(sftp.ip)}:${sftp.port}`} readOnly />
                                 </CopyOnClick>
                             </div>
                             <div css={tw`mt-6`}>
-                                <Label>Identifiant</Label>
+                                <Label>{vt("Identifiant")}</Label>
                                 <CopyOnClick text={`${username}.${id}`}>
                                     <Input type={'text'} value={`${username}.${id}`} readOnly />
                                 </CopyOnClick>
@@ -47,27 +48,25 @@ export default () => {
                             <div css={tw`mt-6 flex items-center`}>
                                 <div css={tw`flex-1`}>
                                     <div css={tw`border-l-4 border-cyan-500 p-3`}>
-                                        <p css={tw`text-xs text-neutral-200`}>
-                                            Le mot de passe SFTP est identique à celui utilisé pour accéder à ce panel.
-                                        </p>
+                                        <p css={tw`text-xs text-neutral-200`}>{vt("Le mot de passe SFTP est identique à celui utilisé pour accéder à ce panel.")}</p>
                                     </div>
                                 </div>
                                 <div css={tw`ml-4`}>
                                     <a href={`sftp://${username}.${id}@${ip(sftp.ip)}:${sftp.port}`}>
-                                        <Button.Text variant={Button.Variants.Secondary}>Ouvrir SFTP</Button.Text>
+                                        <Button.Text variant={Button.Variants.Secondary}>{vt("Ouvrir SFTP")}</Button.Text>
                                     </a>
                                 </div>
                             </div>
                         </TitledGreyBox>
                     </Can>
-                    <TitledGreyBox title={'Informations techniques'} css={tw`mb-6`}>
+                    <TitledGreyBox title={vt("Informations techniques")} css={tw`mb-6`}>
                         <div css={tw`flex items-center justify-between text-sm`}>
-                            <p>Nœud</p>
+                            <p>{vt("Nœud")}</p>
                             <code css={tw`font-mono bg-neutral-900 rounded py-1 px-2`}>{node}</code>
                         </div>
                         <CopyOnClick text={uuid}>
                             <div css={tw`flex items-center justify-between mt-2 text-sm`}>
-                                <p>Identifiant serveur</p>
+                                <p>{vt("Identifiant serveur")}</p>
                                 <code css={tw`font-mono bg-neutral-900 rounded py-1 px-2`}>{uuid}</code>
                             </div>
                         </CopyOnClick>

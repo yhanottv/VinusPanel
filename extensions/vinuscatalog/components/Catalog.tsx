@@ -1,3 +1,4 @@
+import { formatLocale, vt } from './locale';
 import React, { useEffect, useRef, useState } from 'react';
 import http, { httpErrorToHuman } from '@/api/http';
 import { ServerContext } from '@/state/server';
@@ -56,7 +57,7 @@ export default () => {
             setProfile(data.profile); setVersions(data.versions); setInstalled(data.installed);
             setKind(Object.keys(data.profile.categories)[0] as Kind || 'mods');
             setVersion(data.profile.game_version || '');
-        }).catch((err) => active && setError('Catalogue — ' + httpErrorToHuman(err))).finally(() => active && setLoading(false));
+        }).catch((err) => active && setError(vt("Catalogue — ") + httpErrorToHuman(err))).finally(() => active && setLoading(false));
         return () => { active = false; requestId.current++; };
     }, [endpoint]);
 
@@ -67,7 +68,7 @@ export default () => {
         const timer = setTimeout(() => {
             http.get(`${endpoint}/search`, { params: { kind, game_version: version, query, offset, sort } }).then(({ data }) => {
                 if (id === requestId.current) { setHits(data.hits); setTotal(data.total); }
-            }).catch((err) => { if (id === requestId.current) { setError('Catalogue — ' + httpErrorToHuman(err)); setHits([]); } })
+            }).catch((err) => { if (id === requestId.current) { setError(vt("Catalogue — ") + httpErrorToHuman(err)); setHits([]); } })
                 .finally(() => { if (id === requestId.current) setLoading(false); });
         }, 300);
         return () => { clearTimeout(timer); requestId.current++; };
@@ -78,63 +79,63 @@ export default () => {
         setBusy(project.project_id); setError(''); setMessage('');
         http.post(`${endpoint}/plan`, { kind, game_version: version, project_id: project.project_id })
             .then(({ data }) => { if (selection.current === requestedSelection) setPlan(data); })
-            .catch((err) => { if (selection.current === requestedSelection) setError('Catalogue — ' + httpErrorToHuman(err)); }).finally(() => setBusy(''));
+            .catch((err) => { if (selection.current === requestedSelection) setError(vt("Catalogue — ") + httpErrorToHuman(err)); }).finally(() => setBusy(''));
     };
     const install = () => {
         if (!plan || busy) return;
         setBusy('install'); setError('');
         http.post(`${endpoint}/install`, { token: plan.token }, { timeout: 300000 })
             .then(({ data }) => { setInstalled(data.installed); setMessage(data.message); setPlan(null); })
-            .catch((err) => { setError('Catalogue — ' + httpErrorToHuman(err)); setPlan(null); }).finally(() => setBusy(''));
+            .catch((err) => { setError(vt("Catalogue — ") + httpErrorToHuman(err)); setPlan(null); }).finally(() => setBusy(''));
     };
     const categories = profile ? Object.keys(profile.categories) as Kind[] : [];
     const displayed = view === 'installed' ? installed.filter((item) => item.kind === kind) : hits;
     const stopped = connected && status === 'offline';
 
-    return <PageContentBlock title={'Catalogue Minecraft'} className={styles.page}>
+    return <PageContentBlock title={vt("Catalogue Minecraft")} className={styles.page}>
         <div className={styles.heading}>
-            <div><p className={styles.eyebrow}>CATALOGUE MINECRAFT</p><h1>{categories.length === 1 ? kind === 'mods' ? 'Mods' : 'Plugins' : 'Mods et plugins'}</h1>
-                <p>Des extensions choisies pour votre serveur. Catalogue Modrinth.</p></div>
+            <div><p className={styles.eyebrow}>{vt("CATALOGUE MINECRAFT")}</p><h1>{categories.length === 1 ? kind === 'mods' ? 'Mods' : 'Plugins' : vt("Mods et plugins")}</h1>
+                <p>{vt("Des extensions choisies pour votre serveur. Catalogue Modrinth.")}</p></div>
             {profile?.software && <span className={styles.software}>{profile.software} {version && `· ${version}`}</span>}
         </div>
-        {error && <div role={'alert'} className={styles.error}><strong>La demande n’a pas abouti</strong><p>{error}</p></div>}
+        {error && <div role={'alert'} className={styles.error}><strong>{vt("La demande n’a pas abouti")}</strong><p>{error}</p></div>}
         {message && <p role={'status'} className={styles.success}>{message}</p>}
-        {!profile && loading && <p role={'status'}>Identification du serveur…</p>}
+        {!profile && loading && <p role={'status'}>{vt("Identification du serveur…")}</p>}
         {profile && categories.length === 0 && <div className={styles.empty}>
-            <h2>{profile.software === 'vanilla' ? 'Ce serveur Vanilla ne charge pas de mods ou plugins.' : 'Logiciel du serveur non identifié.'}</h2>
-            <p>{profile.software === 'vanilla' ? 'Le logiciel du serveur doit être adapté avant de pouvoir ajouter des extensions.' : 'Demandez à un administrateur d’associer un profil compatible à cet egg dans la configuration du catalogue.'}</p>
+            <h2>{profile.software === 'vanilla' ? vt("Ce serveur Vanilla ne charge pas de mods ou plugins.") : vt("Logiciel du serveur non identifié.")}</h2>
+            <p>{profile.software === 'vanilla' ? vt("Le logiciel du serveur doit être adapté avant de pouvoir ajouter des extensions.") : vt("Demandez à un administrateur d’associer un profil compatible à cet egg dans la configuration du catalogue.")}</p>
         </div>}
         {categories.length > 0 && <>
             <div className={styles.filters}>
-                {categories.length > 1 && <div className={styles.tabs} role={'group'} aria-label={'Type d’extension'}>{categories.map((item) => <button key={item} type={'button'} aria-pressed={kind === item} onClick={() => { setKind(item); setOffset(0); setPlan(null); }}>{item === 'mods' ? 'Mods' : 'Plugins'}</button>)}</div>}
-                <label>Version Minecraft<select value={version} disabled={!!profile?.game_version} onChange={(e) => { setVersion(e.target.value); setOffset(0); setPlan(null); }}><option value={''}>Choisir la version du serveur</option>{versions.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
-                <div className={styles.tabs} role={'group'} aria-label={'Vue du catalogue'}><button type={'button'} aria-pressed={view === 'catalog'} onClick={() => setView('catalog')}>Découvrir</button><button type={'button'} aria-pressed={view === 'installed'} onClick={() => setView('installed')}>Installés avec ce catalogue</button></div>
+                {categories.length > 1 && <div className={styles.tabs} role={'group'} aria-label={vt("Type d’extension")}>{categories.map((item) => <button key={item} type={'button'} aria-pressed={kind === item} onClick={() => { setKind(item); setOffset(0); setPlan(null); }}>{item === 'mods' ? 'Mods' : 'Plugins'}</button>)}</div>}
+                <label>{vt("Version Minecraft")}<select value={version} disabled={!!profile?.game_version} onChange={(e) => { setVersion(e.target.value); setOffset(0); setPlan(null); }}><option value={''}>{vt("Choisir la version du serveur")}</option>{versions.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+                <div className={styles.tabs} role={'group'} aria-label={vt("Vue du catalogue")}><button type={'button'} aria-pressed={view === 'catalog'} onClick={() => setView('catalog')}>{vt("Découvrir")}</button><button type={'button'} aria-pressed={view === 'installed'} onClick={() => setView('installed')}>{vt("Installés avec ce catalogue")}</button></div>
             </div>
-            {!version ? <p className={styles.empty}>La version Minecraft n’est pas déclarée dans cet egg. Sélectionnez celle qui est réellement installée.</p> : <>
+            {!version ? <p className={styles.empty}>{vt("La version Minecraft n’est pas déclarée dans cet egg. Sélectionnez celle qui est réellement installée.")}</p> : <>
                 {view === 'catalog' && <div className={styles.search}>
-                    <input aria-label={kind === 'mods' ? 'Rechercher un mod' : 'Rechercher un plugin'} placeholder={kind === 'mods' ? 'Rechercher un mod…' : 'Rechercher un plugin…'} value={query} onChange={(e) => { setQuery(e.target.value); setOffset(0); }} />
-                    <select aria-label={'Trier les résultats'} value={sort} onChange={(e) => { setSort(e.target.value); setOffset(0); }}><option value={'relevance'}>Pertinence</option><option value={'downloads'}>Popularité</option><option value={'updated'}>Mis à jour récemment</option></select>
+                    <input aria-label={kind === 'mods' ? vt("Rechercher un mod") : vt("Rechercher un plugin")} placeholder={kind === 'mods' ? vt("Rechercher un mod…") : vt("Rechercher un plugin…")} value={query} onChange={(e) => { setQuery(e.target.value); setOffset(0); }} />
+                    <select aria-label={vt("Trier les résultats")} value={sort} onChange={(e) => { setSort(e.target.value); setOffset(0); }}><option value={'relevance'}>{vt("Pertinence")}</option><option value={'downloads'}>{vt("Popularité")}</option><option value={'updated'}>{vt("Mis à jour récemment")}</option></select>
                 </div>}
-                <p className={styles.note}>{profile?.categories[kind]?.join(', ')} · Versions stables compatibles. {categories.length > 1 && 'Les logiciels hybrides peuvent imposer des contraintes supplémentaires.'}</p>
-                {loading && view === 'catalog' ? <p role={'status'} className={styles.empty}>Recherche dans le catalogue…</p> : <div className={styles.results}>
+                <p className={styles.note}>{profile?.categories[kind]?.join(', ')}{vt(" · Versions stables compatibles. ")}{categories.length > 1 && vt("Les logiciels hybrides peuvent imposer des contraintes supplémentaires.")}</p>
+                {loading && view === 'catalog' ? <p role={'status'} className={styles.empty}>{vt("Recherche dans le catalogue…")}</p> : <div className={styles.results}>
                     {displayed.map((project) => <article key={project.project_id} className={styles.result}>
-                        <div className={styles.project_heading}><ProjectIcon project={project} /><h2>{project.title}</h2><a href={`https://modrinth.com/project/${project.project_id}`} target={'_blank'} rel={'noopener noreferrer'}>Fiche ↗</a></div>
-                        {project.author && <p className={styles.author}>par {project.author}</p>}
+                        <div className={styles.project_heading}><ProjectIcon project={project} /><h2>{project.title}</h2><a href={`https://modrinth.com/project/${project.project_id}`} target={'_blank'} rel={'noopener noreferrer'}>{vt("Fiche ↗")}</a></div>
+                        {project.author && <p className={styles.author}>{vt("par ")}{project.author}</p>}
                         <p className={styles.description}>{project.description || `Version installée : ${project.version}`}</p>
-                        <div className={styles.bottom}><span>{project.downloads !== undefined ? `${new Intl.NumberFormat('fr', { notation: 'compact' }).format(project.downloads)} téléchargements` : 'Installation suivie'}</span>
-                            {canInstall && <button type={'button'} disabled={!!busy} onClick={() => prepare(project)}>{busy === project.project_id ? 'Préparation…' : view === 'installed' ? 'Vérifier la mise à jour' : 'Voir les fichiers'}</button>}</div>
+                        <div className={styles.bottom}><span>{project.downloads !== undefined ? vt('{{count}} téléchargements', { count: new Intl.NumberFormat(formatLocale, { notation: 'compact' }).format(project.downloads) }) : vt("Installation suivie")}</span>
+                            {canInstall && <button type={'button'} disabled={!!busy} onClick={() => prepare(project)}>{busy === project.project_id ? vt("Préparation…") : view === 'installed' ? vt("Vérifier la mise à jour") : vt("Voir les fichiers")}</button>}</div>
                     </article>)}
-                    {!displayed.length && <p className={styles.empty}>{view === 'installed' ? 'Aucune installation suivie dans cette catégorie.' : 'Aucun résultat pour ces critères.'}</p>}
+                    {!displayed.length && <p className={styles.empty}>{view === 'installed' ? vt("Aucune installation suivie dans cette catégorie.") : vt("Aucun résultat pour ces critères.")}</p>}
                 </div>}
-                {view === 'catalog' && <div className={styles.pagination}><button type={'button'} disabled={loading || offset === 0} onClick={() => setOffset(Math.max(0, offset - 12))}>Précédent</button><span>{total ? `${offset + 1}–${Math.min(offset + 12, total)} sur ${total}` : '0 résultat'}</span><button type={'button'} disabled={loading || offset + 12 >= total} onClick={() => setOffset(offset + 12)}>Suivant</button></div>}
+                {view === 'catalog' && <div className={styles.pagination}><button type={'button'} disabled={loading || offset === 0} onClick={() => setOffset(Math.max(0, offset - 12))}>{vt("Précédent")}</button><span>{total ? vt('{{range}} sur {{total}}', { range: `${offset + 1}–${Math.min(offset + 12, total)}`, total }) : vt("0 résultat")}</span><button type={'button'} disabled={loading || offset + 12 >= total} onClick={() => setOffset(offset + 12)}>{vt("Suivant")}</button></div>}
             </>}
         </>}
-        <Dialog open={!!plan} onClose={() => { if (!busy) setPlan(null); }} title={'Fichiers à installer'}>
+        <Dialog open={!!plan} onClose={() => { if (!busy) setPlan(null); }} title={vt("Fichiers à installer")}>
             {plan && <div className={styles.plan}>
-                <p>Les dépendances requises sont incluses. Destination : /{kind}.</p>
-                <ul>{plan.files.map((file) => <li key={file.filename}><strong>{file.title}</strong><span>{file.version} · {(file.size / 1024 / 1024).toFixed(1)} Mio</span><code>{file.filename}</code><small>{file.action === 'update' ? 'Mise à jour · ancien fichier conservé' : file.action === 'verify' ? 'Vérification de la version installée' : 'Nouvelle installation'}</small></li>)}</ul>
-                {!stopped && <p>Arrêtez le serveur depuis la console avant de confirmer l’installation.</p>}
-                <button type={'button'} disabled={!stopped || !!busy} onClick={install}>{busy === 'install' ? 'Téléchargement et vérification…' : 'Confirmer l’installation'}</button>
+                <p>{vt("Les dépendances requises sont incluses. Destination : /")}{kind}.</p>
+                <ul>{plan.files.map((file) => <li key={file.filename}><strong>{file.title}</strong><span>{file.version} · {(file.size / 1024 / 1024).toFixed(1)}{vt(" Mio")}</span><code>{file.filename}</code><small>{file.action === 'update' ? vt("Mise à jour · ancien fichier conservé") : file.action === 'verify' ? vt("Vérification de la version installée") : vt("Nouvelle installation")}</small></li>)}</ul>
+                {!stopped && <p>{vt("Arrêtez le serveur depuis la console avant de confirmer l’installation.")}</p>}
+                <button type={'button'} disabled={!stopped || !!busy} onClick={install}>{busy === 'install' ? vt("Téléchargement et vérification…") : vt("Confirmer l’installation")}</button>
             </div>}
         </Dialog>
     </PageContentBlock>;

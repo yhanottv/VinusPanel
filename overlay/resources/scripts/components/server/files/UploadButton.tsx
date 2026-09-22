@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import axios, { AxiosProgressEvent } from 'axios';
 import getFileUploadUrl from '@/api/server/files/getFileUploadUrl';
 import tw from 'twin.macro';
@@ -103,9 +104,7 @@ export default ({ className }: WithClassname) => {
                                 }
                             >
                                 <CloudUploadIcon className={'h-10 w-10 flex-shrink-0 text-primary-300'} />
-                                <p className={'flex-1 text-center font-header text-lg text-neutral-100'}>
-                                    Déposez vos fichiers ici pour les importer.
-                                </p>
+                                <p className={'flex-1 text-center font-header text-lg text-neutral-100'}>{vt("Déposez vos fichiers ici pour les importer.")}</p>
                             </div>
                         </div>
                     </ModalMask>
@@ -122,9 +121,7 @@ export default ({ className }: WithClassname) => {
                 }}
                 multiple
             />
-            <Button className={className} onClick={() => fileUploadInput.current?.click()}>
-                Importer
-            </Button>
+            <Button className={className} onClick={() => fileUploadInput.current?.click()}>{vt("Importer")}</Button>
         </>
     );
 };

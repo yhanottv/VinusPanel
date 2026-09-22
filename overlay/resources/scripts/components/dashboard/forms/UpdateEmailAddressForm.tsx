@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React from 'react';
 import { Actions, State, useStoreActions, useStoreState } from 'easy-peasy';
 import { Form, Formik, FormikHelpers } from 'formik';
@@ -15,8 +16,8 @@ interface Values {
 }
 
 const schema = Yup.object().shape({
-    email: Yup.string().email('Saisissez une adresse e-mail valide.').required('Ce champ est obligatoire.'),
-    password: Yup.string().required('Votre mot de passe actuel est requis.'),
+    email: Yup.string().email(vt("Saisissez une adresse e-mail valide.")).required(vt("Ce champ est obligatoire.")),
+    password: Yup.string().required(vt("Votre mot de passe actuel est requis.")),
 });
 
 export default () => {
@@ -28,7 +29,7 @@ export default () => {
         clearFlashes('account:email');
         updateEmail({ ...values })
             .then(() =>
-                addFlash({ type: 'success', key: 'account:email', message: 'Votre adresse e-mail a été mise à jour.' })
+                addFlash({ type: 'success', key: 'account:email', message: vt("Votre adresse e-mail a été mise à jour.") })
             )
             .catch((error) =>
                 addFlash({ type: 'error', key: 'account:email', title: 'Erreur', message: httpErrorToHuman(error) })
@@ -45,17 +46,17 @@ export default () => {
                 <React.Fragment>
                     <SpinnerOverlay size={'large'} visible={isSubmitting} />
                     <Form css={tw`m-0`}>
-                        <Field id={'current_email'} type={'email'} name={'email'} label={'Adresse e-mail'} />
+                        <Field id={'current_email'} type={'email'} name={'email'} label={vt("Adresse e-mail")} />
                         <div css={tw`mt-5`}>
                             <Field
                                 id={'confirm_password'}
                                 type={'password'}
                                 name={'password'}
-                                label={'Mot de passe actuel'}
+                                label={vt("Mot de passe actuel")}
                             />
                         </div>
                         <div css={tw`mt-6`}>
-                            <Button disabled={isSubmitting || !isValid}>Mettre à jour</Button>
+                            <Button disabled={isSubmitting || !isValid}>{vt("Mettre à jour")}</Button>
                         </div>
                     </Form>
                 </React.Fragment>

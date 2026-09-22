@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
@@ -19,15 +20,15 @@ export default () => {
     return (
         <>
             {visible && <SearchModal appear visible={visible} onDismissed={() => setVisible(false)} />}
-            <Tooltip placement={'bottom'} content={'Rechercher un serveur'}>
+            <Tooltip placement={'bottom'} content={vt("Rechercher un serveur")}>
                 <button
                     type={'button'}
                     className={'navigation-link'}
-                    aria-label={'Rechercher un serveur'}
+                    aria-label={vt("Rechercher un serveur")}
                     onClick={() => setVisible(true)}
                 >
                     <FontAwesomeIcon icon={faSearch} />
-                    <span>Rechercher</span>
+                    <span>{vt("Rechercher")}</span>
                 </button>
             </Tooltip>
         </>

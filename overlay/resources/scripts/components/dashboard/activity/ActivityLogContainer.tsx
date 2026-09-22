@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { useEffect, useState } from 'react';
 import { ActivityLogFilters, useActivityLogs } from '@/api/account/activity';
 import { useFlashKey } from '@/plugins/useFlash';
@@ -29,13 +30,13 @@ export default () => {
     const filtered = !!(filters.filters?.event || filters.filters?.ip);
 
     return (
-        <PageContentBlock title={'Activité | VinusPanel'}>
+        <PageContentBlock title={vt("Activité | VinusPanel")}>
             <FlashMessageRender byKey={'account'} />
             <header className={style.activity_page_header}>
                 <div>
-                    <p className={style.eyebrow}>Journal de sécurité</p>
-                    <h1>Activité du compte</h1>
-                    <p>Retrouvez les connexions et opérations sensibles liées à votre compte.</p>
+                    <p className={style.eyebrow}>{vt("Journal de sécurité")}</p>
+                    <h1>{vt("Activité du compte")}</h1>
+                    <p>{vt("Retrouvez les connexions et opérations sensibles liées à votre compte.")}</p>
                 </div>
                 <div className={style.activity_summary}>
                     <ClockIcon className={'h-5 w-5'} />
@@ -43,9 +44,9 @@ export default () => {
                         <strong>
                             {data
                                 ? `${data.pagination.total} événement${data.pagination.total > 1 ? 's' : ''}`
-                                : 'Chargement…'}
+                                : vt("Chargement…")}
                         </strong>
-                        <span>Du plus récent au plus ancien</span>
+                        <span>{vt("Du plus récent au plus ancien")}</span>
                     </div>
                 </div>
             </header>
@@ -55,8 +56,7 @@ export default () => {
                         to={'#'}
                         className={classNames(buttonStyles.button, buttonStyles.text, 'w-full sm:w-auto')}
                         onClick={() => setFilters((value) => ({ ...value, filters: {} }))}
-                    >
-                        Effacer les filtres <XCircleIcon className={'ml-2 h-4 w-4'} />
+                    >{vt("Effacer les filtres ")}<XCircleIcon className={'ml-2 h-4 w-4'} />
                     </Link>
                 </div>
             )}
@@ -65,8 +65,8 @@ export default () => {
             ) : !data?.items.length ? (
                 <div className={style.empty_state}>
                     <ClockIcon />
-                    <h3>Aucune activité disponible</h3>
-                    <p>Les prochains événements de votre compte apparaîtront ici.</p>
+                    <h3>{vt("Aucune activité disponible")}</h3>
+                    <p>{vt("Les prochains événements de votre compte apparaîtront ici.")}</p>
                 </div>
             ) : (
                 <div className={style.list}>

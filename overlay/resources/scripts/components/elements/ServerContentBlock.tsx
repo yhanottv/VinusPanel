@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import PageContentBlock, { PageContentBlockProps } from '@/components/elements/PageContentBlock';
 import React from 'react';
 import { ServerContext } from '@/state/server';
@@ -10,40 +11,40 @@ interface Props extends PageContentBlockProps {
 
 const pageDetails: Record<string, { label: string; description: string }> = {
     'File Manager': {
-        label: 'Fichiers',
-        description: 'Parcourez, modifiez et organisez les fichiers de cette instance.',
+        label: vt("Fichiers"),
+        description: vt("Parcourez, modifiez et organisez les fichiers de cette instance."),
     },
     Databases: {
-        label: 'Bases de données',
-        description: 'Gérez les accès et les bases utilisées par votre serveur.',
+        label: vt("Bases de données"),
+        description: vt("Gérez les accès et les bases utilisées par votre serveur."),
     },
     Schedules: {
-        label: 'Automatisations',
-        description: 'Planifiez des commandes et des actions récurrentes.',
+        label: vt("Automatisations"),
+        description: vt("Planifiez des commandes et des actions récurrentes."),
     },
     Users: {
-        label: 'Accès',
-        description: 'Contrôlez les personnes autorisées et leurs permissions.',
+        label: vt("Accès"),
+        description: vt("Contrôlez les personnes autorisées et leurs permissions."),
     },
     Backups: {
-        label: 'Sauvegardes',
-        description: 'Créez et restaurez des points de récupération fiables.',
+        label: vt("Sauvegardes"),
+        description: vt("Créez et restaurez des points de récupération fiables."),
     },
     Network: {
-        label: 'Réseau',
-        description: 'Consultez les allocations et les ports exposés par le serveur.',
+        label: vt("Réseau"),
+        description: vt("Consultez les allocations et les ports exposés par le serveur."),
     },
     'Startup Settings': {
-        label: 'Démarrage',
-        description: 'Configurez la commande, l’image et les variables de lancement.',
+        label: vt("Démarrage"),
+        description: vt("Configurez la commande, l’image et les variables de lancement."),
     },
     Settings: {
-        label: 'Paramètres',
-        description: 'Modifiez l’identité du serveur et ses options de maintenance.',
+        label: vt("Paramètres"),
+        description: vt("Modifiez l’identité du serveur et ses options de maintenance."),
     },
     'Activity Log': {
-        label: 'Activité',
-        description: 'Retracez les actions récentes effectuées sur cette instance.',
+        label: vt("Activité"),
+        description: vt("Retracez les actions récentes effectuées sur cette instance."),
     },
 };
 

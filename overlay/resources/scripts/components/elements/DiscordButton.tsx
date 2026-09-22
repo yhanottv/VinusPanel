@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React from 'react';
 import { VINUS } from '@/theme';
 
@@ -11,10 +12,9 @@ const DiscordLogo = () => (
 );
 
 export const DiscordAnnouncement = () => inviteUrl ? (
-    <aside className={'vinus-discord-announcement'} aria-label={'Aide et signalement de bugs'}>
+    <aside className={'vinus-discord-announcement'} aria-label={vt("Aide et signalement de bugs")}>
         <DiscordLogo />
-        <p>
-            Besoin d’aide ou un bug à signaler ? Rejoignez notre Discord :{' '}
+        <p>{vt("Besoin d’aide ou un bug à signaler ? Rejoignez notre Discord :")}{' '}
             <a href={inviteUrl} target={'_blank'} rel={'noopener noreferrer'}>{inviteUrl.replace('https://', '')}</a>
         </p>
     </aside>
@@ -22,12 +22,12 @@ export const DiscordAnnouncement = () => inviteUrl ? (
 
 export default () => inviteUrl ? (
     <a className={'vinus-discord'} href={inviteUrl} target={'_blank'} rel={'noopener noreferrer'}
-        aria-label={'Rejoindre notre Discord'} title={'Rejoindre notre Discord'}>
+        aria-label={vt("Rejoindre notre Discord")} title={vt("Rejoindre notre Discord")}>
         <DiscordLogo />
     </a>
 ) : (
     <button type={'button'} className={'vinus-discord'} disabled
-        aria-label={'Discord bientôt disponible'} title={'Le serveur Discord n’est pas encore disponible.'}>
+        aria-label={vt("Discord bientôt disponible")} title={vt("Le serveur Discord n’est pas encore disponible.")}>
         <DiscordLogo />
     </button>
 );

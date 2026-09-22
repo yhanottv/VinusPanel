@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import BeforeInformation from '@blueprint/components/Server/Terminal/BeforeInformation';
 import AfterInformation from '@blueprint/components/Server/Terminal/AfterInformation';
 import React, { useEffect, useState } from 'react';
@@ -46,7 +47,7 @@ const Resource = ({
             >
                 <span style={{ width: `${percent || 0}%` }} />
             </div>
-            <p>{maximum > 0 ? `sur ${limit}` : 'Sans limite configurée'}</p>
+            <p>{maximum > 0 ? vt('sur {{value}}', { value: limit }) : vt("Sans limite configurée")}</p>
         </div>
     );
 };
@@ -81,22 +82,22 @@ export default ({ className }: { className?: string }) => {
         !connected || !status
             ? '—'
             : status === 'offline'
-            ? 'À l’arrêt'
+            ? vt("À l’arrêt")
             : stats && stats.uptime > 0
             ? `${Math.floor(stats.uptime / 3600000)} h ${Math.floor(stats.uptime / 60000) % 60} min`
             : status === 'starting'
-            ? 'Démarrage'
+            ? vt("Démarrage")
             : '—';
     return (
-        <section className={className} aria-label={'Ressources du serveur'}>
+        <section className={className} aria-label={vt("Ressources du serveur")}>
 <BeforeInformation />
             <div className={styles.telemetry_heading}>
-                <h2>Stockage et session</h2>
-                <span>{live ? 'En direct' : 'En attente'}</span>
+                <h2>{vt("Stockage et session")}</h2>
+                <span>{live ? vt("En direct") : vt("En attente")}</span>
             </div>
             <Resource
                 icon={faHdd}
-                label={'Stockage'}
+                label={vt("Stockage")}
                 value={connected && stats ? bytesToString(stats.disk) : '—'}
                 limit={bytesToString(mbToBytes(limits.disk))}
                 used={connected && stats ? stats.disk : null}
@@ -104,8 +105,7 @@ export default ({ className }: { className?: string }) => {
             />
             <div className={styles.uptime}>
                 <span>
-                    <FontAwesomeIcon icon={faClock} /> Durée de session
-                </span>
+                    <FontAwesomeIcon icon={faClock} />{vt(" Durée de session")}</span>
                 <strong>{uptime}</strong>
             </div>
                         <AfterInformation />

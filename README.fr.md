@@ -13,7 +13,7 @@
 **Un thème open source pour Pterodactyl : interface noire, navigation Liquid Glass et console repensée.**
 
 [![Validation du paquet](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml/badge.svg)](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml)
-[![Version des sources](https://img.shields.io/badge/sources-2.3.6-ff7a1a)](CHANGELOG.md)
+[![Version des sources](https://img.shields.io/badge/sources-2.4.0-ff7a1a)](CHANGELOG.md)
 [![Pterodactyl](https://img.shields.io/badge/Pterodactyl-1.15.1-242429)](#compatibilité-du-panel)
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-242429)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Rejoindre-5865F2?logo=discord&logoColor=white)](https://discord.gg/vinuspanel)
@@ -22,7 +22,7 @@
 
 </div>
 
-VinusPanel retravaille le tableau de bord, la navigation, la console et les principaux écrans de gestion de Pterodactyl. Il conserve les actions et les permissions du panel, avec une identité noire et orange et des libellés principalement en français.
+VinusPanel retravaille le tableau de bord, la navigation, la console et les principaux écrans de gestion de Pterodactyl. Il conserve les actions et les permissions du panel, avec une identité noire et orange et un sélecteur Français / English pour les textes du thème et les commandes du catalogue.
 
 Le dépôt contient une **surcouche de fichiers et ses outils d’installation**, pas une distribution complète de Pterodactyl. Un panel fonctionnel doit déjà être installé. Le thème peut servir à gérer d’autres jeux ; seul le catalogue optionnel de mods et plugins est réservé à Minecraft.
 
@@ -30,28 +30,48 @@ Le dépôt contient une **surcouche de fichiers et ses outils d’installation**
 
 ## 📸 Captures du panel
 
-Captures réelles d’une installation VinusPanel. Le serveur est arrêté dans l’aperçu des ressources : les mesures sont donc à zéro. Les journaux du terminal sont exclus pour protéger les informations des joueurs.
+Captures réelles de VinusPanel 2.4.0, avec l’anglais sélectionné. Le formulaire de connexion contient des valeurs de démonstration non envoyées. Les états et graphiques utilisent de vraies données ; aucun serveur de jeu n’a été redémarré pour ces aperçus. Les journaux de joueurs et les informations personnelles du compte sont exclus.
 
-**Ressources du serveur — processeur, mémoire et réseau au-dessus de la console.**
+**Connexion — choix du français ou de l’anglais avant d’accéder au panel.**
 
-![Page serveur VinusPanel noire et orange, navigation Liquid Glass et graphiques du processeur, de la mémoire et du réseau](docs/assets/screenshots/server-resources.png)
+![Connexion VinusPanel avec l’identité orange et le sélecteur Français / English](docs/assets/screenshots/login.png)
 
-**Catalogue Minecraft optionnel — icônes des projets, recherche et résultats selon le logiciel serveur.**
+**Vos serveurs — les états en ligne et hors ligne en un coup d’œil.**
 
-![Vinus Catalog avec des mods NeoForge pour un serveur Youer 1.21.1 et deux onglets Mods et Plugins](docs/assets/screenshots/catalog-mods.png)
+![Liste de trois serveurs dans VinusPanel, dont un en ligne et deux hors ligne](docs/assets/screenshots/servers.png)
+
+**Ressources en direct — processeur, mémoire et trafic réseau entrant/sortant.**
+
+![Historique réel du processeur, de la mémoire et du réseau d’un serveur Velocity démarré](docs/assets/screenshots/live-resources.png)
+
+**Console — l’aigle orange dans le terminal, les ressources et les commandes du serveur.**
+
+![Console VinusPanel avec l’aigle orange Unicode dans l’historique du terminal et le serveur en ligne](docs/assets/screenshots/console-eagle.png)
 
 <details>
-<summary>Voir l’onglet Plugins sur le même serveur hybride</summary>
+<summary>Voir le catalogue Minecraft optionnel</summary>
 
-![Vinus Catalog avec des résultats de plugins Paper, Spigot et Bukkit sur un serveur hybride](docs/assets/screenshots/catalog-plugins.png)
+**Mods — recherche et icônes des projets pour le chargeur détecté.**
+
+![Catalogue de mods Modrinth avec icônes et onglet Plugins séparé](docs/assets/screenshots/catalog-mods.png)
+
+**Plugins — une catégorie distincte sur les serveurs hybrides pris en charge.**
+
+![Catalogue de plugins Modrinth avec icônes sur un serveur hybride](docs/assets/screenshots/catalog-plugins.png)
+
+Le catalogue nécessite l’extension Blueprint optionnelle. Consulter la [compatibilité du catalogue](#catalogue-minecraft-optionnel) avant une installation.
 
 </details>
 
-Le catalogue nécessite l’extension Blueprint optionnelle. Les projets disponibles et les résultats peuvent évoluer ; consultez la [compatibilité du catalogue](#catalogue-minecraft-optionnel) avant une installation.
+## 🌍 Français / English
+
+Le sélecteur est disponible sur la connexion et en haut des pages client. Le choix est mémorisé dans ce navigateur ; `?lang=fr` ou `?lang=en` sert de solution de repli si le stockage est bloqué. Changer de langue recharge la page : enregistrer les modifications en cours auparavant.
+
+Les noms de serveurs, fichiers, journaux de jeu, messages des services externes et extensions tierces ne sont pas traduits. Les écrans Pterodactyl d’origine et l’administration historique conservent leurs propres traductions.
 
 ## ✨ Ce qui a changé
 
-La version **2.3.6** réunit les évolutions suivantes. Le [changelog](CHANGELOG.md) conserve le détail par version, y compris les anciens designs remplacés depuis.
+La version **2.4.0** réunit les évolutions suivantes. Le [changelog](CHANGELOG.md) conserve le détail par version, y compris les anciens designs remplacés depuis.
 
 | Espace | Fonctionnement actuel |
 | --- | --- |
@@ -113,10 +133,10 @@ La navigation inclut des indications de focus, un lien d’accès direct au cont
 
 | Composant | Version ou condition |
 | --- | --- |
-| VinusPanel | Sources **2.3.6**. |
+| VinusPanel | Sources **2.4.0**. |
 | Pterodactyl Panel | **1.15.1**, version validée pour cette surcouche. |
 | Blueprint | Optionnel pour le thème ; intégration validée pour **beta-2026-06** uniquement. Requis pour Vinus Catalog. |
-| Vinus Catalog | Extension **1.1.0**, incluse dans ce dépôt. |
+| Vinus Catalog | Extension **1.2.0**, incluse dans ce dépôt. |
 | Node.js | L’installateur exige **22 minimum** ; compilation validée avec Node 22. Les versions majeures suivantes ne sont pas automatiquement certifiées. |
 | Yarn | **1.x** pour la chaîne de compilation utilisée. |
 | PHP | Environnement validé avec **8.3** ; conserver les prérequis PHP du panel et de Blueprint. |
@@ -302,6 +322,8 @@ Pour un signalement exploitable, indiquer les versions de VinusPanel, Pterodacty
 ## 🧪 Validation et contribution
 
 **L’installation complète sur une instance Pterodactyl vierge et séparée reste à valider.** Les compilations préparées à part et les tests du catalogue avec Wings simulé ne remplacent pas ce scénario. La prochaine étape recommandée est de tester installation, mise à jour, désinstallation et restauration dans un environnement jetable, sans Blueprint puis avec sa version compatible.
+
+Pour la version **2.4.0**, les contrôles TypeScript du thème et de l’intégration Blueprint, la compilation de production et les **89 tests frontend répartis en 9 suites** passent. Le sélecteur a été vérifié aux formats ordinateur, tablette et téléphone, avec navigation persistante et retour au français.
 
 Pour la publication **2.3.6**, les contrôles suivants ont été exécutés dans l’environnement de panel utilisé pour le développement :
 

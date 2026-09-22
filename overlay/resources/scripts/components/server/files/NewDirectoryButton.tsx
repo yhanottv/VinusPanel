@@ -1,3 +1,4 @@
+import { vt } from '@/locales/translate';
 import React, { useContext, useEffect, useState } from 'react';
 import { ServerContext } from '@/state/server';
 import { Form, Formik, FormikHelpers } from 'formik';
@@ -21,7 +22,7 @@ interface Values {
 }
 
 const schema = object().shape({
-    directoryName: string().required('Indiquez un nom de dossier valide.'),
+    directoryName: string().required(vt("Indiquez un nom de dossier valide.")),
 });
 
 const displayNameForDirectory = (name: string): string =>
@@ -47,7 +48,7 @@ const generateDirectoryData = (name: string): FileObject => {
     };
 };
 
-const NewDirectoryDialog = asDialog({ title: 'Créer un dossier' })(() => {
+const NewDirectoryDialog = asDialog({ title: vt("Créer un dossier") })(() => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const directory = ServerContext.useStoreState((state) => state.files.directory);
     const { mutate } = useFileManagerSWR();
@@ -72,9 +73,9 @@ const NewDirectoryDialog = asDialog({ title: 'Créer un dossier' })(() => {
                 <>
                     <FlashMessageRender key={'files:directory-modal'} />
                     <Form css={tw`m-0`}>
-                        <Field autoFocus id={'directoryName'} name={'directoryName'} label={'Nom'} />
+                        <Field autoFocus id={'directoryName'} name={'directoryName'} label={vt("Nom")} />
                         <p css={tw`mt-2 break-all text-sm md:text-base`}>
-                            <span css={tw`text-neutral-300`}>Le dossier sera créé dans&nbsp;</span>
+                            <span css={tw`text-neutral-300`}>{vt("Le dossier sera créé dans ")}</span>
                             <Code>
                                 /home/container/
                                 <span css={tw`text-primary-300`}>
@@ -84,12 +85,8 @@ const NewDirectoryDialog = asDialog({ title: 'Créer un dossier' })(() => {
                         </p>
                     </Form>
                     <Dialog.Footer>
-                        <Button.Text className={'w-full sm:w-auto'} onClick={close}>
-                            Annuler
-                        </Button.Text>
-                        <Button className={'w-full sm:w-auto'} onClick={submitForm}>
-                            Créer
-                        </Button>
+                        <Button.Text className={'w-full sm:w-auto'} onClick={close}>{vt("Annuler")}</Button.Text>
+                        <Button className={'w-full sm:w-auto'} onClick={submitForm}>{vt("Créer")}</Button>
                     </Dialog.Footer>
                 </>
             )}
@@ -102,9 +99,7 @@ export default ({ className }: WithClassname) => {
     return (
         <>
             <NewDirectoryDialog open={open} onClose={setOpen.bind(this, false)} />
-            <Button.Text onClick={setOpen.bind(this, true)} className={className}>
-                Nouveau dossier
-            </Button.Text>
+            <Button.Text onClick={setOpen.bind(this, true)} className={className}>{vt("Nouveau dossier")}</Button.Text>
         </>
     );
 };

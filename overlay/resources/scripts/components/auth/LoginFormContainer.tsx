@@ -1,3 +1,5 @@
+import LanguageSelector from '@/components/elements/LanguageSelector';
+import { vt } from '@/locales/translate';
 import React, { forwardRef } from 'react';
 import { Form } from 'formik';
 import styled from 'styled-components/macro';
@@ -75,26 +77,19 @@ export default forwardRef<HTMLFormElement, Props>(({ title, children, ...props }
         <Brand>
             <img src={VINUS.logo} alt={''} aria-hidden={'true'} />
             <strong>{VINUS.name}</strong>
-            <span>Panel de gestion</span>
+            <div style={{ marginLeft: 'auto' }}><LanguageSelector /></div>
         </Brand>
         <Shell>
             <Form {...props} ref={ref}>
                 <Editorial>
-                    <span className={'eyebrow'}>Votre espace, simplement.</span>
-                    <h1>
-                        Vos serveurs.
-                        <br />
-                        Les idées qui vont avec.
-                    </h1>
-                    <p>
-                        Console, fichiers, sauvegardes. Tout ce qu’il faut pour faire vivre vos projets, au même
-                        endroit.
-                    </p>
+                    <span className={'eyebrow'}>{vt("Votre espace, simplement.")}</span>
+                    <h1>{vt("Vos serveurs.")}<br />{vt("Les idées qui vont avec.")}</h1>
+                    <p>{vt("Console, fichiers, sauvegardes. Tout ce qu’il faut pour faire vivre vos projets, au même endroit.")}</p>
                 </Editorial>
                 <AuthPanel>
-                    <p className={'auth-label'}>{VINUS.name} / Compte</p>
+                    <p className={'auth-label'}>{VINUS.name}{vt(" / Compte")}</p>
                     {title && <h2>{title}</h2>}
-                    <p className={'form-caption'}>Accédez à votre espace de gestion.</p>
+                    <p className={'form-caption'}>{vt("Accédez à votre espace de gestion.")}</p>
                     <FlashMessageRender css={tw`mb-4`} />
                     {children}
                 </AuthPanel>
@@ -102,9 +97,7 @@ export default forwardRef<HTMLFormElement, Props>(({ title, children, ...props }
         </Shell>
         <Footer>
             <span>{VINUS.name}</span>
-            <a href={'https://pterodactyl.io'} target={'_blank'} rel={'noopener noreferrer'}>
-                Propulsé par Pterodactyl
-            </a>
+            <a href={'https://pterodactyl.io'} target={'_blank'} rel={'noopener noreferrer'}>{vt("Propulsé par Pterodactyl")}</a>
         </Footer>
     </Stage>
 ));
