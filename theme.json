@@ -1,7 +1,7 @@
 {
   "name": "VinusPanel",
   "version": "2.3.6",
-  "description": "Satin Pterodactyl workspace with Liquid Glass navigation and an optional Blueprint Minecraft catalogue.",
+  "description": "Free, open-source Pterodactyl theme with Liquid Glass navigation, a redesigned server console and an optional Blueprint-powered Modrinth catalog.",
   "author": "yhanottv",
   "license": "MIT",
   "compatibility": {
