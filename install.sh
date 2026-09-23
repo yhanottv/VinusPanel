@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-THEME_VERSION="2.4.0"
+THEME_VERSION="3.0.0"
 DEFAULT_PANEL_DIR="/var/www/pterodactyl"
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PANEL_DIR="$DEFAULT_PANEL_DIR"
@@ -77,6 +77,7 @@ validate_environment() {
     [[ -f "$PANEL_DIR/package.json" ]] || fail "package.json est absent de $PANEL_DIR"
     [[ -f "$PANEL_DIR/resources/scripts/index.tsx" ]] || fail "la source frontend Pterodactyl est absente"
     require_command php
+    require_command composer
     require_command node
     require_command yarn
     require_command find
@@ -162,8 +163,9 @@ rollback() {
     if ((INSTALL_STARTED)) && [[ -n "$TRANSACTION_BACKUP" && -d "$TRANSACTION_BACKUP" ]]; then
         printf '\n\033[1;31m[VinusPanel] Installation interrompue, restauration automatique…\033[0m\n' >&2
         restore_from "$TRANSACTION_BACKUP"
+        (cd "$PANEL_DIR" && composer dump-autoload --no-interaction --no-scripts) >/dev/null 2>&1 || true
         (cd "$PANEL_DIR" && yarn build:production) >/dev/null 2>&1 || true
-        (cd "$PANEL_DIR" && php artisan view:clear && php artisan cache:clear) >/dev/null 2>&1 || true
+        (cd "$PANEL_DIR" && php artisan route:clear && php artisan view:clear && php artisan cache:clear) >/dev/null 2>&1 || true
     fi
     finish_maintenance
     exit "$exit_code"
@@ -212,6 +214,8 @@ while IFS= read -r relative_path; do
 done < "$MANIFEST"
 
 cd "$PANEL_DIR"
+log "Mise à jour de l'autoload PHP…"
+composer dump-autoload --no-interaction --no-scripts
 if [[ ! -d node_modules ]]; then
     log "Installation des dépendances frontend…"
     yarn install --frozen-lockfile
@@ -224,6 +228,7 @@ yarn build:production
 
 log "Nettoyage des caches…"
 php artisan view:clear
+php artisan route:clear
 php artisan cache:clear
 chown -R www-data:www-data storage bootstrap/cache public/assets
 

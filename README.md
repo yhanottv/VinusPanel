@@ -8,10 +8,10 @@
 
 # VinusPanel — Pterodactyl Theme
 
-**A free, open-source Pterodactyl theme with black surfaces, Liquid Glass navigation, a redesigned server console and an optional Minecraft mod/plugin catalog.**
+**A free, open-source Pterodactyl theme with an administrator Design Studio, per-server banners, Liquid Glass navigation, a redesigned console and an optional Minecraft catalog.**
 
 [![Package checks](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml/badge.svg)](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml)
-[![Source version](https://img.shields.io/badge/source-2.4.0-ff7a1a)](CHANGELOG.md)
+[![Source version](https://img.shields.io/badge/source-3.0.0-ff7a1a)](CHANGELOG.md)
 [![Pterodactyl](https://img.shields.io/badge/Pterodactyl-1.15.1-242429)](#compatibility)
 [![MIT License](https://img.shields.io/badge/license-MIT-242429)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/vinuspanel)
@@ -19,6 +19,8 @@
 **English** · [Français](README.fr.md)
 
 [Screenshots](#screenshots) · [Features](#features) · [Installation](#installation) · [Compatibility](#compatibility) · [Minecraft catalog](#minecraft-catalog) · [Support](#support)
+
+**New in 3.0:** open **Administration → Design** to change colors, the panel name, logo and background, plus colors and banners for individual servers. Settings and uploaded images persist across theme upgrades. See the [complete French VPS installation and Design guide](INSTALLATION.fr.md).
 
 </div>
 
@@ -32,7 +34,7 @@ This repository contains a **theme overlay and installation tools**, not a compl
 
 ## 📸 Screenshots
 
-Real screenshots of VinusPanel 2.4.0, with English selected. The login form contains unsubmitted demonstration values. Server states and charts use real data; no game server was restarted for these previews. Player logs and personal account details are excluded.
+Real screenshots of VinusPanel 2.4.0, with English selected. IP addresses are masked. The login form contains unsubmitted demonstration values. Server states and charts use real data; no game server was restarted for these previews. Player logs and personal account details are excluded.
 
 **Sign in — choose French or English before accessing the panel.**
 
@@ -71,7 +73,8 @@ The catalog requires the optional Blueprint extension. See [catalog compatibilit
 
 | Area | What you get |
 | --- | --- |
-| Black interface | Dark content surfaces, compact buttons and orange accents without raised metallic panels. |
+| Design Studio | Admin controls for the panel name, colors, logo and background, plus individual server colors and banners. |
+| Black interface | Dark content surfaces and compact buttons, with colors that administrators can change. |
 | Liquid Glass navigation | Translucent black navigation with subtle reflections, blur and an opaque fallback. |
 | Server dashboard | Live status, search, and persistent grid/list view preferences. |
 | Redesigned console | Live logs, command input, connection diagnostics and state-aware power controls. |
@@ -97,7 +100,7 @@ Profile names and avatars are local to the browser. They do not change Pterodact
 
 | Component | Requirement / tested scope |
 | --- | --- |
-| VinusPanel | Source version **2.4.0**. |
+| VinusPanel | Source version **3.0.0**. |
 | Pterodactyl Panel | **1.15.1**. Other versions and forks are not validated. |
 | Blueprint | Optional for the theme; **beta-2026-06** is the validated integration. Required for Vinus Catalog. |
 | Vinus Catalog | Extension **1.2.0**, included in this repository. |
@@ -205,18 +208,18 @@ Detection uses declared software, the selected JAR name and the egg name, with n
 
 ## 🎨 Customization
 
-Edit [`overlay/resources/scripts/theme.ts`](overlay/resources/scripts/theme.ts) in your source checkout. Its installed path is `resources/scripts/theme.ts` inside the panel.
+Use **Administration → Design** for the panel name, colors, logo, background and per-server colors and banners. These settings apply on page refresh without rebuilding. The [French VPS guide](INSTALLATION.fr.md) covers the menu and installation. For advanced source changes, edit [`overlay/resources/scripts/theme.ts`](overlay/resources/scripts/theme.ts) and other components in the overlay.
 
 | Setting | Purpose |
 | --- | --- |
-| `VINUS.name` | Name used by components consuming this setting. |
-| `VINUS.logo` | Graphic logo path; does not regenerate the Unicode terminal artwork. |
+| `VINUS.name` | Name supplied by Design Studio to client components. |
+| `VINUS.logo` | Logo supplied by Design Studio; does not regenerate the Unicode terminal artwork. |
 | `VINUS.colors` | Colors for components consuming these tokens; some styles are defined separately. |
 | `VINUS.discordInvite` | Shared invitation for the Discord logo and help announcement. |
 
 The default invite is **https://discord.gg/vinuspanel**. Use an HTTPS `discord.gg/...` or `discord.com/invite/...` URL for your own community. An empty value hides the announcement and disables the button. Announcement copy lives in [`DiscordButton.tsx`](overlay/resources/scripts/components/elements/DiscordButton.tsx).
 
-Frontend changes require rebuilding. For a repository-managed installation, edit the overlay and rerun the installer. Keep custom changes in a branch or fork: reinstalling copies source files over the panel and can overwrite direct panel edits.
+Source changes still require rebuilding: edit the overlay and rerun the installer. Keep custom source changes in a branch or fork because reinstalling copies the theme files into the panel.
 
 ## 🔄 Updates, backups and removal
 
@@ -278,6 +281,8 @@ Include versions of VinusPanel, Pterodactyl and Blueprint, browser/device detail
 **If VinusPanel is useful to you, consider giving the repository a ⭐.** Bug reports, installation feedback and contributions help improve the project for other server owners.
 
 ## 🧪 Testing and contributions
+
+For **3.0.0**, the package and PHP syntax checks passed, Blade views compiled, the three Design routes registered, design settings passed a persistence smoke test, TypeScript and production builds passed, and all **89 frontend tests across 9 suites** passed. The version was installed on the existing VPS panel and the sign-in page returned HTTP 200 after maintenance ended.
 
 For **2.4.0**, TypeScript checks passed with the theme and Blueprint integration, the production build passed, and all **89 frontend tests across 9 suites** passed. The language selector was checked at desktop, tablet and phone viewport sizes, including persisted navigation and switching back to French.
 

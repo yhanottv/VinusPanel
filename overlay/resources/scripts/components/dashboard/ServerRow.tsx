@@ -9,6 +9,7 @@ import { bytesToString, ip, mbToBytes } from '@/lib/formatters';
 import tw from 'twin.macro';
 import GreyRowBox from '@/components/elements/GreyRowBox';
 import styled from 'styled-components/macro';
+import { serverDesign, vinusDesign } from '@/vinusDesign';
 
 // Determines if the current value is in an alarm threshold so we can show it in red rather
 // than the more faded default style.
@@ -24,13 +25,17 @@ const statusColor = (status: ServerPowerState | 'loading' | 'suspended' | 'maint
 const ServerCard = styled(GreyRowBox)<{
     $status: ReturnType<typeof getDisplayStatus>['key'];
     $view: 'grid' | 'list';
+    $color: string;
+    $banner: string;
 }>`
     ${tw`relative grid min-h-[14rem] gap-4 overflow-hidden rounded-xl border p-5 no-underline`};
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto 1fr;
-    background: var(--vinus-glass);
+    background: ${({ $banner, $color }) => $banner
+        ? `linear-gradient(90deg, rgba(4,4,6,.91), rgba(4,4,6,.62)), url(${$banner}) center / cover, ${$color}`
+        : $color};
     border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: var(--vinus-glass-shadow);
+    box-shadow: inset 3px 0 0 ${({ $color }) => $color === vinusDesign.server_card ? 'var(--vinus-accent)' : $color};
     transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 
     &::before {
@@ -52,13 +57,12 @@ const ServerCard = styled(GreyRowBox)<{
 
     &:hover {
         border-color: rgba(255, 255, 255, 0.15);
-        background: #151518;
-        box-shadow: none;
+        filter: brightness(1.12);
         transform: none;
     }
 
     &:focus-visible {
-        outline: 2px solid #ff7a1a;
+        outline: 2px solid var(--vinus-accent);
         outline-offset: 3px;
     }
 
@@ -285,6 +289,7 @@ export default ({
     const cpuLimit = server.limits.cpu !== 0 ? server.limits.cpu + ' %' : vt("Illimité");
 
     const displayStatus = getDisplayStatus(stats, server, isSuspended);
+    const appearance = serverDesign(server.uuid);
     const allocation = server.allocations.find((item) => item.isDefault);
     const cpuUsage = stats ? percent(stats.cpuUsagePercent, server.limits.cpu) : 0;
     const memoryUsage = stats ? percent(stats.memoryUsageInBytes, mbToBytes(server.limits.memory)) : 0;
@@ -301,6 +306,8 @@ export default ({
             className={className}
             $status={displayStatus.key}
             $view={view}
+            $color={appearance.color || vinusDesign.server_card}
+            $banner={appearance.banner || ''}
         >
             <ServerIdentity>
                 <ServerIcon $status={displayStatus.key}>

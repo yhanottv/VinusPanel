@@ -1,5 +1,13 @@
 # VinusPanel changelog
 
+## 3.0.0 — Design Studio
+
+- added an administrator-only Design page for the panel name, accent, background, surface, text, logo and background image;
+- added per-server colors and uploaded banners on dashboard cards, server navigation and headers;
+- stored design settings and uploaded images on the VPS so theme upgrades retain them;
+- added a detailed French VPS installation and customization guide;
+- kept uploads limited to validated PNG, JPEG and WebP images and scoped server design data to accessible servers.
+
 ## 2.4.0 — French and English
 
 - added a French/English selector to authentication and client pages, with a browser preference and a URL fallback when storage is unavailable;

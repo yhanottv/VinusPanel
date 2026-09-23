@@ -1,4 +1,5 @@
 import { BreakpointFunction, createBreakpoint } from 'styled-components-breakpoint';
+import { vinusDesign } from '@/vinusDesign';
 
 type Breakpoints = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export const breakpoint: BreakpointFunction<Breakpoints> = createBreakpoint<Breakpoints>({
@@ -14,10 +15,10 @@ export const breakpoint: BreakpointFunction<Breakpoints> = createBreakpoint<Brea
  * status colors, and image paths) in one place so future rebrands stay small.
  */
 export const VINUS = {
-    name: 'VinusPanel',
+    name: vinusDesign.brand_name,
     // Configure your community invitation here; an empty value hides the announcement.
     discordInvite: 'https://discord.gg/vinuspanel' as string,
-    logo: '/assets/images/vinus/eagle.png',
+    logo: vinusDesign.logo,
     colors: {
         accent: '#ff7a1a',
         accentDark: '#d84b00',

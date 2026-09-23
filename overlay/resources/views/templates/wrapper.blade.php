@@ -1,7 +1,17 @@
 <!DOCTYPE html>
-<html lang="fr">
+@php
+    $vinusDesign = \Pterodactyl\Services\VinusDesign::read();
+    if (!Auth::check()) {
+        $vinusDesign['servers'] = [];
+    } elseif (!Auth::user()->root_admin) {
+        $accessible = Auth::user()->accessibleServers()->pluck('servers.uuid')->all();
+        $vinusDesign['servers'] = array_intersect_key($vinusDesign['servers'], array_flip($accessible));
+    }
+    $accentRgb = implode(', ', array_map('hexdec', str_split(substr($vinusDesign['accent'], 1), 2)));
+@endphp
+<html lang="fr" style="--vinus-accent: {{ $vinusDesign['accent'] }}; --vinus-accent-rgb: {{ $accentRgb }}; --vinus-bg: {{ $vinusDesign['background'] }}; --vinus-glass: {{ $vinusDesign['surface'] }}; --vinus-surface: {{ $vinusDesign['surface'] }}; --vinus-server-card: {{ $vinusDesign['server_card'] }}; --vinus-text: {{ $vinusDesign['text'] }}; --vinus-background-image: {{ $vinusDesign['background_image'] ? 'url(' . $vinusDesign['background_image'] . ')' : 'none' }};">
     <head>
-        <title>VinusPanel</title>
+        <title>{{ $vinusDesign['brand_name'] }}</title>
 
         @section('meta')
             <meta charset="utf-8">
@@ -9,8 +19,8 @@
             <meta content="width=device-width, initial-scale=1" name="viewport">
             <meta name="csrf-token" content="{{ csrf_token() }}">
             <meta name="robots" content="noindex">
-            <link rel="apple-touch-icon" href="/assets/images/vinus/eagle.png">
-            <link rel="icon" type="image/png" href="/assets/images/vinus/eagle.png">
+            <link rel="apple-touch-icon" href="{{ $vinusDesign['logo'] }}">
+            <link rel="icon" href="{{ $vinusDesign['logo'] }}">
             <link rel="manifest" href="/favicons/manifest.json">
             <link rel="mask-icon" href="/favicons/safari-pinned-tab.svg" color="#bc6e3c">
             <link rel="shortcut icon" href="/favicons/favicon.ico">
@@ -19,6 +29,7 @@
         @show
 
         @section('user-data')
+            <script>window.VinusDesign = @json($vinusDesign, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);</script>
             @if(!is_null(Auth::user()))
                 <script>
                     window.PterodactylUser = {!! json_encode(Auth::user()->toVueObject()) !!};

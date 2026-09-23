@@ -51,6 +51,7 @@ done
 [[ -f "$PANEL_DIR/artisan" ]] || fail "artisan est absent de $PANEL_DIR"
 [[ -f "$ORIGINAL_BACKUP/tracked.list" ]] || fail "aucune sauvegarde d'origine VinusPanel trouvée"
 command -v php >/dev/null 2>&1 || fail "PHP est absent"
+command -v composer >/dev/null 2>&1 || fail "Composer est absent"
 command -v yarn >/dev/null 2>&1 || fail "Yarn est absent"
 
 finish_maintenance() {
@@ -79,9 +80,11 @@ while IFS= read -r relative_path; do
 done < "$ORIGINAL_BACKUP/tracked.list"
 
 cd "$PANEL_DIR"
+composer dump-autoload --no-interaction --no-scripts
 log "Recompilation des assets d'origine…"
 yarn build:production
 php artisan view:clear
+php artisan route:clear
 php artisan cache:clear
 chown -R www-data:www-data storage bootstrap/cache public/assets
 

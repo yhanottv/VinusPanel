@@ -1,3 +1,5 @@
+app/Http/Controllers/Admin/VinusDesignController.php
+app/Services/VinusDesign.php
 public/assets/css/vinus-admin.css
 public/assets/images/vinus/eagle.png
 resources/scripts/api/errorMessage.spec.ts
@@ -76,6 +78,10 @@ resources/scripts/routers/DashboardRouter.tsx
 resources/scripts/routers/ServerRouter.tsx
 resources/scripts/routers/routes.ts
 resources/scripts/theme.ts
+resources/scripts/vinusDesign.ts
+resources/views/admin/design.blade.php
+resources/views/layouts/admin.blade.php
 resources/views/layouts/scripts.blade.php
 resources/views/templates/wrapper.blade.php
+routes/admin.php
 tailwind.config.js

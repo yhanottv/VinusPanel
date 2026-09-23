@@ -50,7 +50,11 @@ export default createGlobalStyle`
         ${tw`font-sans text-neutral-200`};
         min-height: 100vh;
         background: var(--vinus-bg);
+        background-image: var(--vinus-background-image, none);
+        background-size: cover;
+        background-position: center;
         background-attachment: fixed;
+        color: var(--vinus-text, #e5e5e9);
         font-family: 'IBM Plex Sans', system-ui, sans-serif;
         -webkit-font-smoothing: antialiased;
         letter-spacing: 0;
@@ -77,6 +81,18 @@ export default createGlobalStyle`
     ::selection {
         color: #fff;
         background: rgba(var(--vinus-accent-rgb), 0.36);
+    }
+
+    .text-primary-300, .text-primary-400, .text-primary-500, .text-primary-600 {
+        color: var(--vinus-accent) !important;
+    }
+
+    .bg-primary-500, .bg-primary-600 {
+        background-color: var(--vinus-accent) !important;
+    }
+
+    .border-primary-500, .border-primary-600 {
+        border-color: var(--vinus-accent) !important;
     }
 
     a, button {

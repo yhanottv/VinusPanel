@@ -10,10 +10,16 @@ import { ip } from '@/lib/formatters';
 import Can from '@/components/elements/Can';
 import PowerButtons from '@/components/server/console/PowerButtons';
 import routes from '@/routers/routes';
+import { serverDesign } from '@/vinusDesign';
 
-const Header = styled.header`
+const Header = styled.header<{ $color: string; $banner: string }>`
     ${tw`relative mb-6 border-b pb-5`};
-    border-color: rgba(255, 255, 255, 0.08);
+    border-color: ${({ $color }) => $color};
+    padding: ${({ $banner }) => $banner ? '1.25rem' : '0 0 1.25rem'};
+    border-radius: ${({ $banner }) => $banner ? '.75rem' : '0'};
+    background: ${({ $banner }) => $banner
+        ? `linear-gradient(90deg, rgba(4,4,6,.91), rgba(4,4,6,.56)), url(${$banner}) center / cover`
+        : 'transparent'};
 `;
 
 const Breadcrumb = styled.div`
@@ -92,9 +98,10 @@ export default () => {
         .filter((item) => item.path === '/' || relativePath.startsWith(item.path))
         .sort((left, right) => right.path.length - left.path.length)[0];
     const currentStatus = statusDetails(status);
+    const appearance = serverDesign(server.uuid);
 
     return (
-        <Header>
+        <Header $color={appearance.color || 'rgba(255,255,255,.08)'} $banner={appearance.banner || ''}>
             <Breadcrumb>
                 <Link to={'/'}>
                     <FontAwesomeIcon icon={faChevronLeft} css={tw`mr-1.5`} />{vt("Tous les serveurs")}</Link>
