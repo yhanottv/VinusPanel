@@ -1,5 +1,7 @@
 // VinusPanel UI translations. Server content and logs are never translated.
 export default {
+    "Tuer": "Kill",
+    "Statut": "Status",
     "Options du dashboard": "Dashboard options",
     "Rechercher des serveurs": "Search servers",
     "VinusPanel — Tableau de bord": "VinusPanel — Dashboard",
