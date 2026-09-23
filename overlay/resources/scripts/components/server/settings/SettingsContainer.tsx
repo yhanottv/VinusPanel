@@ -1,3 +1,4 @@
+import PrivateValue from '@/components/elements/PrivateValue';
 import { vt } from '@/locales/translate';
 import React from 'react';
 import TitledGreyBox from '@/components/elements/TitledGreyBox';
@@ -33,13 +34,13 @@ export default () => {
                             <div>
                                 <Label>{vt("Adresse du serveur")}</Label>
                                 <CopyOnClick text={`sftp://${ip(sftp.ip)}:${sftp.port}`}>
-                                    <Input type={'text'} value={`sftp://${ip(sftp.ip)}:${sftp.port}`} readOnly />
+                                    <PrivateValue block><Input aria-label={vt('Adresse du serveur')} type={'text'} value={`sftp://${ip(sftp.ip)}:${sftp.port}`} readOnly /></PrivateValue>
                                 </CopyOnClick>
                             </div>
                             <div css={tw`mt-6`}>
                                 <Label>{vt("Identifiant")}</Label>
                                 <CopyOnClick text={`${username}.${id}`}>
-                                    <Input type={'text'} value={`${username}.${id}`} readOnly />
+                                    <PrivateValue block><Input aria-label={vt('Identifiant')} type={'text'} value={`${username}.${id}`} readOnly /></PrivateValue>
                                 </CopyOnClick>
                             </div>
                             <div css={tw`mt-6 flex items-center`}>

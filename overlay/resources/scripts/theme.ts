@@ -20,7 +20,7 @@ export const VINUS = {
     discordInvite: 'https://discord.gg/vinuspanel' as string,
     logo: vinusDesign.logo,
     colors: {
-        accent: '#ff7a1a',
+        accent: '#ff9b52',
         accentDark: '#d84b00',
         accentSoft: '#ffb067',
         success: '#43d6a3',

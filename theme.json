@@ -1,7 +1,7 @@
 {
   "name": "VinusPanel",
-  "version": "3.1.1",
-  "description": "Free, open-source Pterodactyl theme with a live-preview client Design Studio, per-server banners and colors, Liquid Glass navigation, and an optional Blueprint-powered Modrinth catalog.",
+  "version": "3.2.0",
+  "description": "Open-source Pterodactyl theme with a responsive dashboard, Design Studio, server workspace and optional Minecraft software, catalog, modpack, world and BlueMap tools.",
   "author": "yhanottv",
   "license": "MIT",
   "compatibility": {
@@ -15,7 +15,7 @@
   "overlay": "overlay",
   "brand": {
     "name": "VinusPanel",
-    "accent": "#ff7a1a",
+    "accent": "#ff9b52",
     "accentDark": "#d84b00"
   }
 }

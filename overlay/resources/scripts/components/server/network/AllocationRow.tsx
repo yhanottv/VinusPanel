@@ -1,3 +1,4 @@
+import PrivateValue from '@/components/elements/PrivateValue';
 import { vt } from '@/locales/translate';
 import React, { memo, useCallback, useState } from 'react';
 import isEqual from 'react-fast-compare';
@@ -86,18 +87,18 @@ const AllocationRow = ({ allocation }: Props) => {
                 {allocation.alias ? (
                     <CopyOnClick text={allocation.alias}>
                         <Code dark className={'block truncate'}>
-                            {allocation.alias}
+                            <PrivateValue>{allocation.alias}</PrivateValue>
                         </Code>
                     </CopyOnClick>
                 ) : (
                     <CopyOnClick text={ip(allocation.ip)}>
-                        <Code dark>{ip(allocation.ip)}</Code>
+                        <Code dark><PrivateValue>{ip(allocation.ip)}</PrivateValue></Code>
                     </CopyOnClick>
                 )}
                 <Label>{allocation.alias ? vt("Nom d’hôte") : vt("Adresse IP")}</Label>
             </div>
             <div className={'overflow-hidden'}>
-                <Code dark>{allocation.port}</Code>
+                <Code dark><PrivateValue>{allocation.port}</PrivateValue></Code>
                 <Label>Port</Label>
             </div>
             <div className={'col-span-3 w-full md:col-span-1'}>

@@ -1,3 +1,4 @@
+import PrivateValue from '@/components/elements/PrivateValue';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ServerContext } from '@/state/server';
@@ -24,7 +25,7 @@ export default function ServerOverview() {
             <section className={styles.panel}><h2>{vt('Infos du serveur')}</h2><dl className={styles.details}>
                 <div><dt>{vt('Statut')}</dt><dd>{!connected || !status ? vt('Connexion…') : status === 'running' ? vt('En ligne') : status === 'offline' ? vt('Hors ligne') : vt('Transition')}</dd></div>
                 <div><dt>{vt('Disponibilité')}</dt><dd>{uptime}</dd></div>
-                <div><dt>{vt('Adresse')}</dt><dd><CopyOnClick text={address}><button type="button" title={vt('Copier l’adresse')}>{address} ⧉</button></CopyOnClick></dd></div>
+                <div><dt>{vt('Adresse')}</dt><dd><CopyOnClick text={address}><button type="button" title={vt('Copier l’adresse')}><PrivateValue>{address}</PrivateValue> ⧉</button></CopyOnClick></dd></div>
                 <div><dt>{vt('Nœud')}</dt><dd>{server.node}</dd></div>
                 <div><dt>{vt('ID du serveur')}</dt><dd><CopyOnClick text={server.id}><button type="button">{server.id} ⧉</button></CopyOnClick></dd></div>
             </dl></section>

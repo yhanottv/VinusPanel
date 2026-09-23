@@ -1,3 +1,4 @@
+import PrivateValue from '@/components/elements/PrivateValue';
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
@@ -27,9 +28,11 @@ const sections = [
         { path: '/players', name: 'Joueurs', icon: faUsers, permission: 'file.read-content' },
         { path: '/plugins', name: 'Plugins', icon: faPuzzlePiece, permission: 'file.read' },
         { path: '/mods', name: 'Mods', icon: faCubes, permission: 'file.read' },
+        { path: '/modpacks', name: 'Modpacks', icon: faArchive, permission: 'file.read' },
         { path: '/version', name: 'Version', icon: faSlidersH, permission: 'startup.read' },
         { path: '/properties', name: 'Propriétés', icon: faCog, permission: 'file.read-content' },
         { path: '/worlds', name: 'Mondes', icon: faGlobe, permission: 'file.read' },
+        { path: '/world-viewer', name: 'World Viewer', icon: faGlobe, permission: 'file.read-content' },
     ] },
     { name: 'Gestion', items: [
         { path: '/databases', name: 'Bases de données', icon: faDatabase, permission: 'database.*' },
@@ -49,7 +52,7 @@ export default function ServerNavigation({ before, after, extensions }: { before
     const allocation = server.allocations.find(a => a.isDefault);
     const address = allocation ? `${allocation.alias || ip(allocation.ip)}:${allocation.port}` : '';
     const profile = server.softwareProfile;
-    const proxy = ['velocity', 'bungeecord', 'waterfall'].includes(profile?.software || '');
+    const proxy = ['velocity', 'velocity_ctd', 'bungeecord', 'waterfall', 'loohplimbo', 'nanolimbo'].includes(profile?.software || '');
     useEffect(() => setMobile(false), [location.pathname, location.search]);
     useEffect(() => {
         const escape = (e: KeyboardEvent) => { if (e.key === 'Escape') setMobile(false); };
@@ -61,13 +64,13 @@ export default function ServerNavigation({ before, after, extensions }: { before
         <nav className={dash.nav} id="server-navigation" aria-label={vt('Sections du serveur')}>
             <Link to="/" className={styles.backLink}>‹ {vt('Tableau de bord')}</Link>
             <div className={styles.sidebarIdentity}><SoftwareIcon software={profile?.software} /><div><strong title={server.name}>{server.name}</strong><small>{server.node}</small></div></div>
-            {address && <CopyOnClick text={address}><button className={styles.sidebarAddress} type="button" title={vt('Copier l’adresse')}>{address} ⧉</button></CopyOnClick>}
+            {address && <CopyOnClick text={address}><button className={styles.sidebarAddress} type="button" title={vt('Copier l’adresse')}><PrivateValue>{address}</PrivateValue> ⧉</button></CopyOnClick>}
             {before}
             {sections.filter(section => section.name !== 'Outils MC' || !!profile?.software).map((section, index) => {
                 const items = section.items.filter(item => {
                     if (item.path === '/mods') return !!profile?.categories.mods;
                     if (item.path === '/plugins') return !!profile?.categories.plugins;
-                    return !proxy || !['/players', '/properties', '/worlds'].includes(item.path);
+                    return !proxy || !['/players', '/properties', '/worlds', '/world-viewer', '/modpacks'].includes(item.path);
                 });
                 return <React.Fragment key={section.name}>
                     <button className={dash.sectionToggle} type="button" aria-expanded={!closed.includes(section.name)} aria-controls={`server-section-${index}`} onClick={() => setClosed(s => s.includes(section.name) ? s.filter(x => x !== section.name) : [...s, section.name])}>{vt(section.name)}<Icon name="down" /></button>

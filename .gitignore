@@ -5,3 +5,12 @@
 node_modules/
 .DS_Store
 Thumbs.db
+
+# Deployment-only configuration and credentials
+.env
+.env.*
+!.env.example
+config/vinuscatalog.php
+**/config/vinuscatalog.php
+*.pem
+*.key

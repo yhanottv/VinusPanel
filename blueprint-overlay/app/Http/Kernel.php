@@ -3,7 +3,7 @@
 namespace Pterodactyl\Http;
 
 use Illuminate\Auth\Middleware\Authorize;
-use Illuminate\Http\Middleware\HandleCors;
+use Pterodactyl\Http\Middleware\VinusMapCors as HandleCors;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Http\Middleware\TrustProxies;
 use Pterodactyl\Http\Middleware\TrimStrings;

@@ -26,12 +26,12 @@ export default function ServerTools() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(0);
-    const [tab, setTab] = useState<'installed' | 'catalog'>('installed');
-    useEffect(() => { setQuery(''); setTab('installed'); }, [tool, server.uuid]);
+    const [tab, setTab] = useState<'installed' | 'catalog'>('catalog');
+    useEffect(() => { setQuery(''); setTab('catalog'); }, [tool, server.uuid]);
     useEffect(() => {
         let active = true;
         setError(''); setFiles([]); setPlayers([]);
-        if (!['plugins', 'mods', 'worlds', 'players'].includes(tool)) return;
+        if (!['plugins', 'mods', 'worlds', 'players'].includes(tool) || (['plugins', 'mods'].includes(tool) && tab === 'catalog')) { setLoading(false); return; }
         setLoading(true);
         const load = async () => {
             if (tool === 'players') {
@@ -61,14 +61,14 @@ export default function ServerTools() {
         };
         load().catch(e => { if (active) setError(httpErrorToHuman(e)); }).finally(() => { if (active) setLoading(false); });
         return () => { active = false; };
-    }, [tool, server.uuid, refresh]);
+    }, [tool, server.uuid, refresh, tab]);
     const catalog = tool === 'mods' || tool === 'plugins';
     return <PageContentBlock title={`${server.name} | ${title}`} className={styles.page}>
         <div className={styles.toolHeading}><div><h2>{title}</h2><p>{catalog ? vt('Extensions installées et catalogue compatible avec votre serveur.') : tool === 'worlds' ? vt('Mondes présents dans les fichiers du serveur.') : tool === 'players' ? vt('Joueurs connus du serveur, lus depuis usercache.json.') : ''}</p></div>
             {['plugins','mods','worlds','players'].includes(tool) && <button className={styles.action} type="button" disabled={loading} onClick={() => setRefresh(v => v + 1)}>{vt('Actualiser')}</button>}
         </div>
-        {catalog && <div className={styles.toolbar} role="group" aria-label={vt('Vue du catalogue')}><button type="button" className={styles.action} aria-pressed={tab === 'installed'} onClick={() => setTab('installed')}>{vt('Installés')}</button><button type="button" className={styles.action} aria-pressed={tab === 'catalog'} onClick={() => setTab('catalog')}>{vt('Découvrir')}</button></div>}
-        {catalog && tab === 'catalog' ? <VinusCatalogEntry kind={tool as 'mods' | 'plugins'} /> : <>
+        {catalog && <div className={styles.toolbar} role="group" aria-label={vt('Vue du catalogue')}><button type="button" className={styles.action} aria-pressed={tab === 'catalog'} onClick={() => setTab('catalog')}>{vt('Découvrir')}</button><button type="button" className={styles.action} aria-pressed={tab === 'installed'} onClick={() => setTab('installed')}>{vt('Installés')}</button></div>}
+        {catalog && tab === 'catalog' ? <VinusCatalogEntry key={`${server.uuid}:${tool}:${refresh}`} kind={tool as 'mods' | 'plugins'} /> : <>
             {error && <div role="alert" className={styles.error}>{error}<p>{tool === 'players' ? vt('La liste devient disponible après les premières connexions sur un serveur Minecraft compatible.') : vt('Vérifiez les permissions et la disponibilité des fichiers du serveur.')}</p></div>}
             {loading && <p role="status" className={styles.note}>{vt('Chargement…')}</p>}
             {(catalog || tool === 'worlds') && !loading && !error && <>

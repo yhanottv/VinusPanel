@@ -65,7 +65,7 @@ final class Modrinth
             'filename' => $filename, 'url' => $file['url'], 'sha512' => $file['hashes']['sha512'], 'size' => $file['size']];
     }
 
-    public function resolve(string $project, array $loaders, string $game): array
+    public function resolve(string $project, array $loaders, string $game, ?string $versionId = null): array
     {
         $result = [];
         $visiting = [];
@@ -95,7 +95,9 @@ final class Modrinth
             }
             $result[$id] = $artifact;
         };
-        $visit($this->latest($project, $loaders, $game));
+        $selected = $versionId ? $this->get('version/'.rawurlencode($versionId)) : $this->latest($project, $loaders, $game);
+        if (($selected['project_id'] ?? '') !== $project) throw new HttpException(422, 'Version étrangère au projet.');
+        $visit($selected);
         $files = array_values($result);
         if (count(array_unique(array_column($files, 'filename'))) !== count($files)) throw new HttpException(422, 'Deux projets utilisent le même nom de fichier. Installation manuelle nécessaire.');
         if (array_sum(array_column($files, 'size')) > 100 * 1024 * 1024) throw new HttpException(422, 'Ce lot dépasse 100 Mio. Installez les projets séparément.');

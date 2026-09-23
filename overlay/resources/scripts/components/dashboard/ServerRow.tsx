@@ -1,3 +1,4 @@
+import PrivateValue from '@/components/elements/PrivateValue';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import copy from 'copy-to-clipboard';
@@ -80,7 +81,7 @@ export default function ServerRow({ server, view = 'list', className = '', onSta
                 {/* BEFORE_NAME */}<Link className={styles.serverName} to={`/server/${server.id}/overview`} title={server.description || server.name}>{server.name}</Link>{/* AFTER_NAME */}
                 {/* BEFORE_DESCRIPTION */}
                 <button className={styles.address} type="button" title={vt('Copier l’adresse')} aria-label={`${vt('Copier l’adresse')} ${address}`} disabled={!allocation} onClick={() => setCopied(copy(address))}>
-                    <span>{copied ? vt('Adresse copiée') : address}</span>{copied && <Icon name="check" />}
+                    <span>{copied ? vt('Adresse copiée') : <PrivateValue>{address}</PrivateValue>}</span>{copied && <Icon name="check" />}
                 </button>
                 {/* AFTER_DESCRIPTION */}
                 {!['running','offline'].includes(status) && <span className={styles.serverState} role="status">{statusLabel}</span>}

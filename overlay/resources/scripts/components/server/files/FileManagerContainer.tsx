@@ -1,132 +1,76 @@
 import { vt } from '@/locales/translate';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { httpErrorToHuman } from '@/api/http';
-import { CSSTransition } from 'react-transition-group';
 import Spinner from '@/components/elements/Spinner';
-import FileObjectRow from '@/components/server/files/FileObjectRow';
-import FileManagerBreadcrumbs from '@/components/server/files/FileManagerBreadcrumbs';
-import { FileObject } from '@/api/server/files/loadDirectory';
-import NewDirectoryButton from '@/components/server/files/NewDirectoryButton';
+import FileObjectRow from './FileObjectRow';
+import FileManagerBreadcrumbs from './FileManagerBreadcrumbs';
+import NewDirectoryButton from './NewDirectoryButton';
 import { NavLink, useLocation } from 'react-router-dom';
 import Can from '@/components/elements/Can';
 import { ServerError } from '@/components/elements/ScreenBlock';
-import tw from 'twin.macro';
 import { Button } from '@/components/elements/button/index';
 import { ServerContext } from '@/state/server';
 import useFileManagerSWR from '@/plugins/useFileManagerSwr';
-import FileManagerStatus from '@/components/server/files/FileManagerStatus';
-import MassActionsBar from '@/components/server/files/MassActionsBar';
-import UploadButton from '@/components/server/files/UploadButton';
+import FileManagerStatus from './FileManagerStatus';
+import MassActionsBar from './MassActionsBar';
+import UploadButton from './UploadButton';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import { useStoreActions } from '@/state/hooks';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
-import { FileActionCheckbox } from '@/components/server/files/SelectFileCheckbox';
+import { FileActionCheckbox } from './SelectFileCheckbox';
 import { hashToPath } from '@/helpers';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileAlt, faFolderOpen } from '@fortawesome/free-solid-svg-icons';
+import { browseFiles, selectPage, SortKey } from './browse';
 import style from './style.module.css';
 
-const sortFiles = (files: FileObject[]): FileObject[] => {
-    const sortedFiles: FileObject[] = files
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .sort((a, b) => (a.isFile === b.isFile ? 0 : a.isFile ? 1 : -1));
-    return sortedFiles.filter((file, index) => index === 0 || file.name !== sortedFiles[index - 1].name);
-};
-
 export default () => {
-    const id = ServerContext.useStoreState((state) => state.server.data!.id);
+    const id = ServerContext.useStoreState(state => state.server.data!.id);
     const { hash } = useLocation();
     const { data: files, error, mutate } = useFileManagerSWR();
-    const directory = ServerContext.useStoreState((state) => state.files.directory);
-    const clearFlashes = useStoreActions((actions) => actions.flashes.clearFlashes);
-    const setDirectory = ServerContext.useStoreActions((actions) => actions.files.setDirectory);
-    const setSelectedFiles = ServerContext.useStoreActions((actions) => actions.files.setSelectedFiles);
-    const selectedFilesLength = ServerContext.useStoreState((state) => state.files.selectedFiles.length);
-
-    useEffect(() => {
-        clearFlashes('files');
-        setSelectedFiles([]);
-        setDirectory(hashToPath(hash));
-    }, [hash]);
-
-    useEffect(() => {
-        mutate();
-    }, [directory]);
-
-    const onSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSelectedFiles(event.currentTarget.checked ? files?.map((file) => file.name) || [] : []);
-    };
-
-    if (error) {
-        return <ServerError message={httpErrorToHuman(error)} onRetry={() => mutate()} />;
-    }
-
-    return (
-        <ServerContentBlock title={'File Manager'} showFlashKey={'files'}>
-            <ErrorBoundary>
-                <div className={style.manager_toolbar}>
-                    <div className={style.manager_path}>
-                        <FileManagerBreadcrumbs
-                            renderLeft={
-                                <FileActionCheckbox
-                                    type={'checkbox'}
-                                    css={tw`mr-3`}
-                                    checked={selectedFilesLength === (files?.length === 0 ? -1 : files?.length)}
-                                    onChange={onSelectAllClick}
-                                />
-                            }
-                        />
-                    </div>
-                    <Can action={'file.create'}>
-                        <div className={style.manager_actions}>
-                            <FileManagerStatus />
-                            <NewDirectoryButton />
-                            <UploadButton />
-                            <NavLink to={`/server/${id}/files/new${window.location.hash}`}>
-                                <Button>{vt("Nouveau fichier")}</Button>
-                            </NavLink>
-                        </div>
-                    </Can>
+    const directory = ServerContext.useStoreState(state => state.files.directory);
+    const clearFlashes = useStoreActions(actions => actions.flashes.clearFlashes);
+    const setDirectory = ServerContext.useStoreActions(actions => actions.files.setDirectory);
+    const setSelectedFiles = ServerContext.useStoreActions(actions => actions.files.setSelectedFiles);
+    const selected = ServerContext.useStoreState(state => state.files.selectedFiles);
+    const [query, setQuery] = useState('');
+    const [sort, setSort] = useState<SortKey>('name');
+    const [descending, setDescending] = useState(false);
+    const [page, setPage] = useState(0);
+    const [refreshing, setRefreshing] = useState(false);
+    useEffect(() => { clearFlashes('files'); setSelectedFiles([]); setDirectory(hashToPath(hash)); setQuery(''); setPage(0); }, [hash]);
+    useEffect(() => { mutate(); }, [directory]);
+    const filtered = browseFiles(files || [], query, sort, descending);
+    const lastPage = Math.max(0, Math.ceil(filtered.length / 100) - 1);
+    const currentPage = Math.min(page, lastPage);
+    const visible = filtered.slice(currentPage * 100, currentPage * 100 + 100);
+    const order = (key: SortKey) => { setDescending(sort === key ? !descending : false); setSort(key); setPage(0); };
+    const refresh = async () => { setRefreshing(true); try { await mutate(); } finally { setRefreshing(false); } };
+    if (error) return <ServerError message={httpErrorToHuman(error)} onRetry={() => mutate()} />;
+    return <ServerContentBlock title={'File Manager'} showFlashKey="files">
+        {/* BEFORE_CONTENT */}
+        <ErrorBoundary><section className={style.manager}>
+            <div className={style.manager_toolbar}>
+                <input className={style.search} type="search" aria-label={vt('Rechercher dans ce dossier')} placeholder={vt('Rechercher dans ce dossier…')} value={query} onChange={e => { setQuery(e.target.value); setPage(0); }} />
+                <div className={style.manager_actions}>
+                    <FileManagerStatus />
+                    <Button.Text disabled={refreshing} onClick={refresh}>{refreshing ? vt('Chargement…') : vt('Actualiser')}</Button.Text>
+                    <Can action="file.create"><NewDirectoryButton /><UploadButton className={style.primary_action} /><NavLink to={`/server/${id}/files/new${hash}`}><Button className={style.primary_action}>{vt('Nouveau fichier')}</Button></NavLink></Can>
+                    {/* FILE_BUTTONS */}
                 </div>
-            </ErrorBoundary>
-
-            <div className={style.manager_summary}>
-                <div>
-                    <FontAwesomeIcon icon={faFolderOpen} />
-                    <span>{directory === '/' ? vt("Racine du serveur") : directory}</span>
-                </div>
-                <span>{files ? `${files.length} élément${files.length > 1 ? 's' : ''}` : vt("Chargement…")}</span>
             </div>
-
-            {!files ? (
-                <Spinner size={'large'} centered />
-            ) : !files.length ? (
-                <div className={style.empty_state}>
-                    <FontAwesomeIcon icon={faFileAlt} />
-                    <h3>{vt("Ce dossier est vide")}</h3>
-                    <p>{vt("Importez un fichier ou créez votre premier document.")}</p>
-                </div>
-            ) : (
-                <CSSTransition classNames={'fade'} timeout={150} appear in>
-                    <div className={style.file_table}>
-                        <div className={style.file_table_header}>
-                            <span>{vt("Nom")}</span>
-                            <span>{vt("Taille")}</span>
-                            <span>{vt("Modification")}</span>
-                            <span />
-                        </div>
-                        {files.length > 250 && (
-                            <div css={tw`rounded-lg bg-yellow-400 mb-2 p-3`}>
-                                <p css={tw`text-center text-sm text-yellow-900`}>{vt("Ce dossier contient plus de 250 éléments. Seuls les premiers sont affichés.")}</p>
-                            </div>
-                        )}
-                        {sortFiles(files.slice(0, 250)).map((file) => (
-                            <FileObjectRow key={file.key} file={file} />
-                        ))}
-                        <MassActionsBar />
+            <div className={style.manager_path}><FileManagerBreadcrumbs /></div>
+            {!files ? <Spinner size="large" centered /> : <>
+                <div className={style.file_table}>
+                    <div className={style.file_table_header}>
+                        <FileActionCheckbox type="checkbox" aria-label={vt('Sélectionner les fichiers affichés')} checked={visible.length > 0 && visible.every(file => selected.includes(file.name))} onChange={e => setSelectedFiles(selectPage(selected, visible.map(file => file.name), e.currentTarget.checked))} />
+                        {([['name','Nom'],['size','Taille'],['modified','Modification']] as [SortKey,string][]).map(([key,label]) => <button type="button" key={key} onClick={() => order(key)} aria-label={`${vt(label)} — ${vt('Trier')}`}>{vt(label)}{sort === key ? descending ? ' ↓' : ' ↑' : ''}</button>)}<span />
                     </div>
-                </CSSTransition>
-            )}
-        </ServerContentBlock>
-    );
+                    {visible.map(file => <FileObjectRow key={file.key} file={file} />)}
+                    {!visible.length && <div className={style.empty_state}><h3>{query ? vt('Aucun fichier ne correspond à la recherche.') : vt('Ce dossier est vide')}</h3><p>{query ? vt('Essayez un autre nom de fichier.') : vt('Importez un fichier ou créez votre premier document.')}</p></div>}
+                    <MassActionsBar />
+                </div>
+                <div className={style.pagination}><span>{filtered.length} {vt(filtered.length === 1 ? 'élément' : 'éléments')}{selected.length ? ` · ${selected.length} ${vt('sélectionnés')}` : ''}</span>{lastPage > 0 && <><button disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>{vt('Précédent')}</button><span>{currentPage + 1} / {lastPage + 1}</span><button disabled={currentPage === lastPage} onClick={() => setPage(currentPage + 1)}>{vt('Suivant')}</button></>}</div>
+            </>}
+        </section></ErrorBoundary>
+        {/* AFTER_CONTENT */}
+    </ServerContentBlock>;
 };

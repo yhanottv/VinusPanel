@@ -1,3 +1,4 @@
+import PrivateValue from '@/components/elements/PrivateValue';
 import React from 'react';
 import { ServerContext } from '@/state/server';
 import PageContentBlock from '@/components/elements/PageContentBlock';
@@ -22,7 +23,7 @@ export default () => {
         <div className={styles.consoleGrid}>
             <section aria-label="Console"><Spinner.Suspense><Console /></Spinner.Suspense></section>
             <aside aria-label={vt('Ressources du serveur')}>
-                {address && <CopyOnClick text={address}><button className={styles.connectCard} type="button"><small>{vt('Copier l’adresse')} ⧉</small><strong>{address}</strong><small>{vt('Connectez votre client à cette adresse.')}</small></button></CopyOnClick>}
+                {address && <CopyOnClick text={address}><button className={styles.connectCard} type="button"><small>{vt('Copier l’adresse')} ⧉</small><strong><PrivateValue>{address}</PrivateValue></strong><small>{vt('Connectez votre client à cette adresse.')}</small></button></CopyOnClick>}
                 {/* BEFORE_INFO */}<ServerResourceCards stats={stats} vertical />{/* AFTER_INFO */}
             </aside>
         </div>

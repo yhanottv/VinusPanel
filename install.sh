@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-THEME_VERSION="3.1.1"
+THEME_VERSION="3.2.0"
 DEFAULT_PANEL_DIR="/var/www/pterodactyl"
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PANEL_DIR="$DEFAULT_PANEL_DIR"

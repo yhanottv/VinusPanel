@@ -9,3 +9,7 @@ The following marks identify third-party server software. They are not covered b
 - youer.png: https://raw.githubusercontent.com/MohistMC/Youer/HEAD/.idea/icon.png
 - forge-mark.svg: https://raw.githubusercontent.com/MinecraftForge/MinecraftForge/HEAD/docs/assets/Forge_logo.svg
 - paper-mark.svg: https://raw.githubusercontent.com/PaperMC/website/HEAD/src/assets/brand/paper.svg
+
+## Software catalog icons
+
+The 28 `catalog-*.png` icons were obtained from the icon URLs returned by the public [MCJars type catalog](https://versions.mcjars.app/api/v2/types). They identify their respective Minecraft software projects and remain the property of their owners. They are not licensed as VinusPanel artwork. No endorsement is implied.

@@ -6,6 +6,11 @@ final class VinusSoftware
 {
     public static function forServer(\Pterodactyl\Models\Server $server): array
     {
+        $installed = storage_path('app/vinussoftware/'.$server->uuid.'.json');
+        if (is_file($installed)) {
+            $record = json_decode(file_get_contents($installed), true);
+            if (is_array($record) && ($record['startup'] ?? null) === $server->startup && ($record['image'] ?? null) === $server->image && isset($record['profile']['software'], $record['profile']['categories'])) return $record['profile'];
+        }
         $variables = [];
         foreach ($server->variables as $variable) {
             if (in_array($variable->env_variable, ['MC_VERSION', 'MINECRAFT_VERSION', 'MINECRAFT_VER', 'MC_VER', 'LOADER', 'MOD_LOADER', 'SOFTWARE', 'SERVER_TYPE', 'SERVER_JARFILE', 'JARFILE', 'SERVER_JAR_PATH'], true)) {

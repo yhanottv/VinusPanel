@@ -1,5 +1,16 @@
 # VinusPanel changelog
 
+## 3.2.0 — 2026-09-24
+
+- Use the full available dashboard width on Full HD and ultrawide screens; retain mobile layout.
+- Adopt orange defaults while retaining administrator design settings and personal palettes.
+- Add software logos and reorganized server Overview/Console, compact file browsing and address privacy controls.
+- Add Minecraft software/version installation, modpack and world workflows, MOTD editing and an authenticated BlueMap viewer through Vinus Catalog 1.3.0.
+- Add Modrinth and free SpigotMC catalogs plus an optional CurseForge adapter requiring a private API key. Live CurseForge validation remains pending.
+- Preserve Blueprint hooks, Pterodactyl permissions, stopped-server requirements and operation recovery copies.
+- Refresh documentation and promotional images with demonstration data; exclude deployment notes and personal configuration.
+
+
 ## 3.1.1 — Catalog rate-limit fix
 
 - separated Vinus Catalog's browsing and installation rate-limit counters. Browsing or preparing a mod no longer exhausts the five-installs-per-minute allowance;
