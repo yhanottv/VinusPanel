@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/banner.png" alt="VinusPanel banner — orange eagle on a dark background" width="100%" />
+<img src="docs/assets/banner.png" alt="VinusPanel — clean dashboard presentation" width="100%" />
 
 <br />
 
