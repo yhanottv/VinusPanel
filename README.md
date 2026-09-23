@@ -11,7 +11,7 @@
 **A free, open-source Pterodactyl theme with a live Design Studio, per-server banners, Liquid Glass navigation, a redesigned console and an optional Minecraft catalog.**
 
 [![Package checks](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml/badge.svg)](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml)
-[![Source version](https://img.shields.io/badge/source-3.1.0-ff7a1a)](CHANGELOG.md)
+[![Source version](https://img.shields.io/badge/source-3.1.1-ff7a1a)](CHANGELOG.md)
 [![Pterodactyl](https://img.shields.io/badge/Pterodactyl-1.15.1-242429)](#compatibility)
 [![MIT License](https://img.shields.io/badge/license-MIT-242429)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/vinuspanel)
@@ -100,10 +100,10 @@ Profile names and avatars are local to the browser. They do not change Pterodact
 
 | Component | Requirement / tested scope |
 | --- | --- |
-| VinusPanel | Source version **3.1.0**. |
+| VinusPanel | Source version **3.1.1**. |
 | Pterodactyl Panel | **1.15.1**. Other versions and forks are not validated. |
 | Blueprint | Optional for the theme; **beta-2026-06** is the validated integration. Required for Vinus Catalog. |
-| Vinus Catalog | Extension **1.2.0**, included in this repository. |
+| Vinus Catalog | Extension **1.2.1**, included in this repository. Update the Blueprint extension separately to receive its rate-limit fix. |
 | Node.js | Installer requires **22+**; builds were validated on Node 22. Later major versions are not automatically certified. |
 | Yarn | **1.x**. |
 | PHP | Validated on **8.3**. Keep the PHP requirements of your panel and Blueprint installation. |

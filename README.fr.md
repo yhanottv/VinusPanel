@@ -13,7 +13,7 @@
 **Un thème open source pour Pterodactyl avec menu Design en direct, bannières par serveur, navigation Liquid Glass et console repensée.**
 
 [![Validation du paquet](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml/badge.svg)](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml)
-[![Version des sources](https://img.shields.io/badge/sources-3.1.0-ff7a1a)](CHANGELOG.md)
+[![Version des sources](https://img.shields.io/badge/sources-3.1.1-ff7a1a)](CHANGELOG.md)
 [![Pterodactyl](https://img.shields.io/badge/Pterodactyl-1.15.1-242429)](#compatibilité-du-panel)
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-242429)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Rejoindre-5865F2?logo=discord&logoColor=white)](https://discord.gg/vinuspanel)
@@ -73,7 +73,7 @@ Les noms de serveurs, fichiers, journaux de jeu, messages des services externes 
 
 ## ✨ Ce qui a changé
 
-La version **3.1.0** ajoute l’aperçu en direct au menu Design. Le [changelog](CHANGELOG.md) conserve le détail par version.
+La version **3.1.1** corrige la limite de requêtes du catalogue Blueprint : parcourir les mods ne bloque plus leur installation. Le [changelog](CHANGELOG.md) conserve le détail par version.
 
 | Espace | Fonctionnement actuel |
 | --- | --- |
@@ -136,10 +136,10 @@ La navigation inclut des indications de focus, un lien d’accès direct au cont
 
 | Composant | Version ou condition |
 | --- | --- |
-| VinusPanel | Sources **3.1.0**. |
+| VinusPanel | Sources **3.1.1**. |
 | Pterodactyl Panel | **1.15.1**, version validée pour cette surcouche. |
 | Blueprint | Optionnel pour le thème ; intégration validée pour **beta-2026-06** uniquement. Requis pour Vinus Catalog. |
-| Vinus Catalog | Extension **1.2.0**, incluse dans ce dépôt. |
+| Vinus Catalog | Extension **1.2.1**, incluse dans ce dépôt. Mettez l’extension Blueprint à jour séparément pour appliquer ce correctif. |
 | Node.js | L’installateur exige **22 minimum** ; compilation validée avec Node 22. Les versions majeures suivantes ne sont pas automatiquement certifiées. |
 | Yarn | **1.x** pour la chaîne de compilation utilisée. |
 | PHP | Environnement validé avec **8.3** ; conserver les prérequis PHP du panel et de Blueprint. |

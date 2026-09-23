@@ -1,5 +1,10 @@
 # VinusPanel changelog
 
+## 3.1.1 — Catalog rate-limit fix
+
+- separated Vinus Catalog's browsing and installation rate-limit counters. Browsing or preparing a mod no longer exhausts the five-installs-per-minute allowance;
+- updated the optional Blueprint extension to 1.2.1 and added a regression test for the request sequence that caused HTTP 429.
+
 ## 3.1.0 — Live Design Studio
 
 - moved the administrator-only Design Studio into the client navigation with an immediate visual preview;

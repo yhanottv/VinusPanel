@@ -2,7 +2,7 @@
 
 Catalogue Modrinth pour Pterodactyl 1.15.1 et Blueprint **beta-2026-06**. Il fonctionne indépendamment du thème ; VinusPanel ajoute son entrée dans la navigation latérale.
 
-La version **1.2.0** traduit les commandes du catalogue en français ou en anglais selon la langue active du panel. Les descriptions Modrinth, noms de fichiers et messages du service conservent leur langue d’origine. Les ressources de traduction sont incluses dans l’extension : le thème VinusPanel n’est pas requis.
+La version **1.2.1** sépare les compteurs de limitation des recherches et des installations : parcourir le catalogue ne consomme plus la limite de cinq installations par minute. Les commandes du catalogue sont disponibles en français ou en anglais selon la langue active du panel. Les descriptions Modrinth, noms de fichiers et messages du service conservent leur langue d’origine. Les ressources de traduction sont incluses dans l’extension : le thème VinusPanel n’est pas requis.
 
 ## Installation
 
@@ -53,3 +53,5 @@ Les aperçus sont liés au compte et au serveur, revalidés sous verrou et conso
 `php tests/run.php /chemin/du/panel` vérifie la détection et les fichiers acceptés/refusés.
 
 `php tests/install.php /chemin/du/panel` vérifie les permissions, le refus sur serveur en marche, les collisions, l’installation, l’expiration du jeton et la restauration après erreur. Ce test utilise uniquement l’autoload Composer ; son cache, son serveur Wings et ses téléchargements sont simulés en mémoire, sans connexion à la base ou aux serveurs de jeu. Son dossier temporaire est supprimé à la fin d’un test réussi.
+
+`php tests/rate-limit.php /chemin/du/panel` vérifie que les recherches n’épuisent pas la limite d’installation et que la sixième installation de la minute est refusée.
