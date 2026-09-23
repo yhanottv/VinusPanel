@@ -22,6 +22,14 @@
     align-items: center;
     gap: 24px;
 }
+.heading_banner {
+    min-height: 176px;
+    padding: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    background-size: cover;
+    background-position: center;
+}
 .identity {
     min-width: 0;
 }
@@ -362,6 +370,10 @@
     .heading_row {
         flex-direction: column;
         gap: 18px;
+    }
+    .heading_banner {
+        min-height: 164px;
+        padding: 20px;
     }
     .back {
         margin-bottom: 20px;

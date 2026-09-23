@@ -1,4 +1,4 @@
-# Installer et personnaliser VinusPanel 3.0.0 sur un VPS
+# Installer et personnaliser VinusPanel 3.1.0 sur un VPS
 
 Ce guide s'adresse à l'administrateur d'un panel Pterodactyl **déjà installé**. Le téléchargement contient le code source du thème, l'installeur, un désinstalleur et la documentation. Il ne contient ni Pterodactyl, ni Wings, ni les données de vos serveurs.
 
@@ -30,12 +30,12 @@ Connectez-vous au VPS, puis exécutez :
 cd /tmp
 git clone https://github.com/yhanottv/VinusPanel.git vinuspanel
 cd vinuspanel
-git checkout v3.0.0
+git checkout v3.1.0
 ```
 
 Si vous avez téléchargé le ZIP gratuit sur BuiltByBit, décompressez-le sur le VPS et placez-vous dans le dossier contenant `install.sh`. Le contenu est identique à la version GitHub correspondante.
 
-Si une ancienne copie du dépôt existe déjà, utilisez `git fetch --tags`, `git checkout v3.0.0` dans cette copie. Conservez vos propres changements dans une branche ou une sauvegarde avant de changer de version.
+Si une ancienne copie du dépôt existe déjà, utilisez `git fetch --tags`, `git checkout v3.1.0` dans cette copie. Conservez vos propres changements dans une branche ou une sauvegarde avant de changer de version.
 
 ## 4. Vérifier puis installer
 
@@ -44,7 +44,7 @@ sudo bash install.sh --check
 sudo bash install.sh
 ```
 
-`--check` examine la version du panel, Node, Yarn, PHP et la structure du paquet sans modifier Pterodactyl. L'installation active temporairement le mode maintenance, copie les fichiers, compile les assets et vide les caches. Attendez le message final « VinusPanel 3.0.0 est installé » avant de rouvrir le panel. L'installeur affiche le chemin de la sauvegarde de cette opération ; notez-le.
+`--check` examine la version du panel, Node, Yarn, PHP et la structure du paquet sans modifier Pterodactyl. L'installation active temporairement le mode maintenance, copie les fichiers, compile les assets et vide les caches. Attendez le message final « VinusPanel 3.1.0 est installé » avant de rouvrir le panel. L'installeur affiche le chemin de la sauvegarde de cette opération ; notez-le.
 
 Pour un panel situé ailleurs :
 
@@ -57,13 +57,13 @@ L'installeur est conçu pour être relancé pour une mise à jour. Il conserve l
 
 ## 5. Configurer le menu Design
 
-Connectez-vous à Pterodactyl avec un **compte administrateur**. Ouvrez **Administration → Design** dans la barre latérale.
+Connectez-vous à Pterodactyl avec un **compte administrateur**. Ouvrez **Design** dans la barre latérale de l'interface client. La page apparaît hors de l'administration classique et affiche un aperçu qui réagit pendant l'édition.
 
-Dans **Panel appearance**, vous pouvez définir le nom du panel, la couleur d'accent, la couleur du fond, la couleur des surfaces, la couleur par défaut des cartes de serveurs, la couleur du texte, le logo et une image de fond. Les images acceptées sont PNG, JPEG et WebP ; 4 Mo maximum pour le logo, 8 Mo pour le fond. Vous pouvez rétablir le logo initial ou retirer l'image de fond avec les cases prévues.
+Dans **Panel**, vous pouvez définir le nom du panel, la couleur d'accent, la couleur du fond, la couleur des surfaces, la couleur par défaut des cartes de serveurs, la couleur du texte, le logo et une image de fond. Cliquez sur le carré de couleur ou saisissez une valeur hexadécimale. Les images acceptées sont PNG, JPEG et WebP ; 4 Mo maximum pour le logo, 8 Mo pour le fond. Les miniatures montrent immédiatement l'image choisie ; le bouton de suppression rétablit le logo initial ou retire l'image de fond.
 
-Dans **Individual servers**, choisissez un serveur puis définissez sa couleur et téléversez une bannière. La couleur apparaît sur sa carte et son en-tête. La bannière apparaît sur la carte, dans la navigation du serveur et dans son en-tête. Pour que le texte reste lisible, VinusPanel ajoute automatiquement un voile sombre sur la bannière. Un format d'environ 3:1 est recommandé, avec 8 Mo maximum. Vous pouvez retirer une bannière depuis le même écran.
+Dans **Serveurs**, choisissez un serveur puis définissez sa couleur et téléversez une bannière. La couleur apparaît sur sa carte et son en-tête. La bannière apparaît sur la carte, dans la navigation du serveur et dans son en-tête. Pour que le texte reste lisible, VinusPanel ajoute automatiquement un voile sombre sur la bannière. Un format d'environ 3:1 est recommandé, avec 8 Mo maximum. Vous pouvez retirer une bannière depuis le même écran.
 
-Cliquez sur le bouton de sauvegarde de chaque section, puis rechargez l'interface client. Ces réglages sont globaux pour tous les visiteurs du panel ; seul l'administrateur peut les modifier. Les couleurs et bannières de chaque serveur ne sont envoyées qu'aux utilisateurs qui ont accès à ce serveur.
+L'aperçu réagit avant l'enregistrement. Cliquez sur **Enregistrer** pour appliquer les changements, ou sur **Annuler** pour les abandonner. La page avertit avant de quitter avec des modifications non enregistrées. Ces réglages sont globaux pour tous les visiteurs du panel ; seul l'administrateur peut les modifier. Les couleurs et bannières de chaque serveur ne sont envoyées qu'aux utilisateurs qui ont accès à ce serveur.
 
 Le menu couvre les principaux réglages visuels demandés. Puisque le projet est open source, les composants React et les styles restent modifiables dans `overlay/resources/scripts` pour des changements plus avancés ; une modification du code nécessite de relancer `sudo bash install.sh` pour recompiler les assets.
 
@@ -72,7 +72,7 @@ Le menu couvre les principaux réglages visuels demandés. Puisque le projet est
 1. Ouvrez la page de connexion : le logo et le nom doivent correspondre à vos choix.
 2. Connectez-vous : vérifiez le fond, les couleurs, les cartes de serveurs et la navigation.
 3. Ouvrez un serveur : vérifiez sa couleur et sa bannière.
-4. Connectez-vous avec un compte non administrateur ayant accès à ce serveur : il doit voir le résultat sans pouvoir accéder à **Administration → Design**.
+4. Connectez-vous avec un compte non administrateur ayant accès à ce serveur : il doit voir le résultat sans pouvoir accéder à **Design**.
 
 En cas de page inchangée, faites un rechargement forcé du navigateur et vérifiez que l'installation s'est terminée sans erreur. Les fichiers statiques du panel peuvent être mis en cache par un proxy ou un CDN ; invalidez ce cache si nécessaire.
 

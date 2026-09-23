@@ -8,6 +8,7 @@ Route::get('/', [Admin\BaseController::class, 'index'])->name('admin.index');
 
 // VinusPanel design studio (the /admin route group already requires root admin and 2FA).
 Route::get('/vinus-design', [Admin\VinusDesignController::class, 'index'])->name('admin.vinus-design');
+Route::get('/vinus-design/data', [Admin\VinusDesignController::class, 'data'])->name('admin.vinus-design.data');
 Route::post('/vinus-design', [Admin\VinusDesignController::class, 'update'])->name('admin.vinus-design.update');
 Route::post('/vinus-design/servers/{server:uuid}', [Admin\VinusDesignController::class, 'updateServer'])->name('admin.vinus-design.server');
 

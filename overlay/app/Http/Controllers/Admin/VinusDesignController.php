@@ -3,25 +3,30 @@
 namespace Pterodactyl\Http\Controllers\Admin;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
-use Illuminate\View\View;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Services\VinusDesign;
 
 class VinusDesignController extends Controller
 {
-    public function index(): View
+    public function index(): RedirectResponse
     {
-        return view('admin.design', [
+        return redirect('/design');
+    }
+
+    public function data(): JsonResponse
+    {
+        return response()->json([
             'design' => VinusDesign::read(),
             'servers' => Server::query()->orderBy('name')->get(['uuid', 'name']),
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(Request $request): RedirectResponse|JsonResponse
     {
         $input = $request->validate([
             'brand_name' => ['required', 'string', 'max:40'],
@@ -55,10 +60,13 @@ class VinusDesignController extends Controller
         }
 
         VinusDesign::write($design);
+        if ($request->expectsJson()) {
+            return response()->json(['design' => VinusDesign::read()]);
+        }
         return redirect()->route('admin.vinus-design')->with('success', 'Design settings saved. Refresh the client panel to see your changes.');
     }
 
-    public function updateServer(Request $request, Server $server): RedirectResponse
+    public function updateServer(Request $request, Server $server): RedirectResponse|JsonResponse
     {
         $input = $request->validate([
             'color' => ['nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
@@ -79,6 +87,9 @@ class VinusDesignController extends Controller
         $design['servers'][$server->uuid] = $entry;
         VinusDesign::write($design);
 
+        if ($request->expectsJson()) {
+            return response()->json(['design' => VinusDesign::read()]);
+        }
         return redirect()->route('admin.vinus-design')->with('success', 'Server design saved.');
     }
 

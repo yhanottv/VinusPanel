@@ -1,10 +1,10 @@
 import { vt } from '@/locales/translate';
 import DiscordButton from '@/components/elements/DiscordButton';
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCogs, faServer, faSignOutAlt, faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCogs, faPalette, faServer, faSignOutAlt, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import SearchContainer from '@/components/dashboard/search/SearchContainer';
@@ -171,6 +171,15 @@ export default () => {
     const user = useStoreState((state: ApplicationStore) => state.user.data!);
     const { appearance } = useProfileAppearance(user.uuid);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [brand, setBrand] = useState({ name: VINUS.name, logo: VINUS.logo });
+    useEffect(() => {
+        const update = (event: Event) => {
+            const detail = (event as CustomEvent<{ name: string; logo: string }>).detail;
+            if (detail) setBrand(detail);
+        };
+        window.addEventListener('vinus:design-preview', update);
+        return () => window.removeEventListener('vinus:design-preview', update);
+    }, []);
 
     const onTriggerLogout = () => {
         setIsLoggingOut(true);
@@ -186,10 +195,10 @@ export default () => {
             <NavigationInner>
                 <Brand to={'/'}>
                     <BrandMark>
-                        <img src={VINUS.logo} alt={''} aria-hidden={'true'} />
+                        <img src={brand.logo} alt={''} aria-hidden={'true'} />
                     </BrandMark>
                     <BrandCopy>
-                        <strong>{VINUS.name}</strong>
+                        <strong>{brand.name}</strong>
                         <small>{vt("Panel de gestion")}</small>
                     </BrandCopy>
                 </Brand>
@@ -203,6 +212,12 @@ export default () => {
                         <FontAwesomeIcon icon={faUserCircle} fixedWidth />
                         <span>{vt("Compte")}</span>
                     </NavLink>
+                    {user.rootAdmin && (
+                        <NavLink to={'/design'} aria-label={vt("Design")}>
+                            <FontAwesomeIcon icon={faPalette} fixedWidth />
+                            <span>{vt("Design")}</span>
+                        </NavLink>
+                    )}
                     {user.rootAdmin && (
                         <a href={'/admin'} aria-label={'Administration'}>
                             <FontAwesomeIcon icon={faCogs} fixedWidth />

@@ -43,6 +43,7 @@ import ConflictStateRenderer from '@/components/server/ConflictStateRenderer';
 import routes from '@/routers/routes';
 import ServerShellHeader from '@/components/server/ServerShellHeader';
 import { VINUS } from '@/theme';
+import { serverDesign } from '@/vinusDesign';
 import { ip } from '@/lib/formatters';
 
 const navigationIcons: Record<string, IconDefinition> = {
@@ -86,6 +87,7 @@ export default () => {
   const getServer = ServerContext.useStoreActions((actions) => actions.server.getServer);
   const clearServerState = ServerContext.useStoreActions((actions) => actions.clearServerState);
   const allocation = server?.allocations.find((item) => item.isDefault);
+  const appearance = uuid ? serverDesign(uuid) : {};
 
   const to = (value: string, url = false) => {
     if (value === '/') return url ? match.url : match.path;
@@ -157,7 +159,12 @@ export default () => {
                   </Link>
                 </div>
 
-                <div className={'server-sidebar-current'}>
+                <div className={'server-sidebar-current'} style={appearance.banner ? {
+                  backgroundImage: `linear-gradient(90deg, rgba(4,4,6,.9), rgba(4,4,6,.62)), url(${appearance.banner})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  borderColor: appearance.color || undefined,
+                } : { borderColor: appearance.color || undefined }}>
                   <div className={'server-sidebar-server-icon'}>
                     <FontAwesomeIcon icon={faServer} />
                   </div>

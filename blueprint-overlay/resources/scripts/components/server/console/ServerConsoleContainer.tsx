@@ -23,10 +23,12 @@ import ServerDetailsBlock from '@/components/server/console/ServerDetailsBlock';
 import PowerButtons from '@/components/server/console/PowerButtons';
 import { Alert } from '@/components/elements/alert';
 import { ip } from '@/lib/formatters';
+import { serverDesign } from '@/vinusDesign';
 import styles from './workspace.module.css';
 
 const ServerConsoleContainer = () => {
   const server = ServerContext.useStoreState((state) => state.server.data!);
+  const appearance = serverDesign(server.uuid);
   const status = ServerContext.useStoreState((state) => state.status.value);
   const connected = ServerContext.useStoreState((state) => state.socket.connected);
   const isInstalling = ServerContext.useStoreState((state) => state.server.isInstalling);
@@ -49,7 +51,10 @@ const ServerConsoleContainer = () => {
       <header className={styles.heading}>
         <Link to={'/'} className={styles.back}>
           <FontAwesomeIcon icon={faArrowLeft} />{vt(" Serveurs")}</Link>
-        <div className={styles.heading_row}>
+        <div className={`${styles.heading_row} ${appearance.banner ? styles.heading_banner : ''}`} style={appearance.banner ? {
+          backgroundImage: `linear-gradient(90deg, rgba(4,4,6,.88), rgba(4,4,6,.48)), url(${appearance.banner})`,
+          borderColor: appearance.color || undefined,
+        } : undefined}>
           <div className={styles.identity}>
             <p className={styles.eyebrow}>{vt("ESPACE SERVEUR ")}<span>/</span> CONSOLE
             </p>

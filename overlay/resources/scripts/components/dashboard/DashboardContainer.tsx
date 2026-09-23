@@ -25,6 +25,7 @@ import Pagination from '@/components/elements/Pagination';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import useProfileAppearance from '@/components/dashboard/profile/useProfileAppearance';
+import { VinusDesignSettings } from '@/vinusDesign';
 
 const DashboardHero = styled.header`
     ${tw`relative mb-7 pt-1`};
@@ -107,7 +108,7 @@ const ServerGrid = styled.div<{ $view: 'grid' | 'list' }>`
     ${({ $view }) => $view === 'grid' && tw`xl:grid-cols-2`};
 `;
 
-export default () => {
+export default ({ preview = false, design }: { preview?: boolean; design?: VinusDesignSettings }) => {
     const { search } = useLocation();
     const defaultPage = Number(new URLSearchParams(search).get('page') || '1');
 
@@ -157,8 +158,9 @@ export default () => {
     }, [servers?.pagination.currentPage]);
 
     useEffect(() => {
+        if (preview) return;
         window.history.replaceState(null, document.title, `/${page <= 1 ? '' : `?page=${page}`}`);
-    }, [page]);
+    }, [page, preview]);
 
     useEffect(() => {
         if (error) clearAndAddHttpError({ key: 'dashboard', error });
@@ -166,7 +168,7 @@ export default () => {
     }, [error]);
 
     return (
-        <PageContentBlock title={vt("VinusPanel — Serveurs")} showFlashKey={'dashboard'}>
+        <PageContentBlock title={vt(preview ? "VinusPanel — Design" : "VinusPanel — Serveurs")} showFlashKey={'dashboard'}>
             <DashboardHero>
                 <HeroContent>
                     <p css={tw`mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-400`}>{vt("Vue d’ensemble")}</p>
@@ -267,6 +269,7 @@ export default () => {
                                         server={server}
                                         view={currentDisplayMode}
                                         onStatusChange={onServerStatusChange}
+                                        design={design}
                                     />
                                 ))}
                             </ServerGrid>

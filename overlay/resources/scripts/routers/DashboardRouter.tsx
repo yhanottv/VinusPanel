@@ -15,6 +15,9 @@ import DashboardContainer from '@/components/dashboard/DashboardContainer';
 import { NotFound } from '@/components/elements/ScreenBlock';
 import TransitionRouter from '@/TransitionRouter';
 import Spinner from '@/components/elements/Spinner';
+import DesignStudio from '@/components/dashboard/design/DesignStudio';
+import { useStoreState } from 'easy-peasy';
+import { ApplicationStore } from '@/state';
 import routes from '@/routers/routes';
 import styled from 'styled-components/macro';
 import tw from 'twin.macro';
@@ -64,6 +67,7 @@ const accountIcons: Record<string, any> = {
 
 export default () => {
     const location = useLocation();
+    const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data!.rootAdmin);
 
     return (
         <Shell className={'app-shell'}>
@@ -87,6 +91,9 @@ export default () => {
                         <Switch location={location}>
                             <Route path={'/'} exact>
                                 <DashboardContainer />
+                            </Route>
+                            <Route path={'/design'} exact>
+                                {rootAdmin ? <DesignStudio /> : <NotFound />}
                             </Route>
                             {routes.account.map(({ path, component: Component }) => (
                                 <Route key={path} path={`/account/${path}`.replace('//', '/')} exact>

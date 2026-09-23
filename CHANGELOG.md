@@ -1,5 +1,17 @@
 # VinusPanel changelog
 
+## 3.1.0 — Live Design Studio
+
+- moved the administrator-only Design Studio into the client navigation with an immediate visual preview;
+- replaced native file fields with image thumbnails and clear upload buttons, and stretched color bars with compact swatches and hex fields;
+- kept changes as a draft until Save, with discard and unsaved-change protection;
+- redirected the legacy admin Design URL to the client studio.
+- included the client route and navigation in the Blueprint overlay so `/design` works on panels with Blueprint installed.
+- replaced the illustrative mock with the real dashboard and real server card in the live preview;
+- carried saved design tokens and images into Blueprint pages, including server cards and server navigation.
+- fixed a global background rule that hid uploaded background images on the real dashboard after saving;
+- displayed each saved server banner prominently in its console header.
+
 ## 3.0.0 — Design Studio
 
 - added an administrator-only Design page for the panel name, accent, background, surface, text, logo and background image;

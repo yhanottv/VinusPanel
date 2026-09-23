@@ -7,6 +7,8 @@ import blueprintRoutes from '@blueprint/extends/routers/routes';
 import { useStoreState } from 'easy-peasy';
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import DesignStudio from '@/components/dashboard/design/DesignStudio';
+import { NotFound } from '@/components/elements/ScreenBlock';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faFingerprint,
@@ -95,7 +97,9 @@ export default () => {
             <AfterSubNavigation />
           </AccountNavigation>
         )}
-        <NavigationRouter />
+        {location.pathname.replace(/\/$/, '') === '/design'
+          ? (rootAdmin ? <DesignStudio /> : <NotFound />)
+          : <NavigationRouter />}
       </Workspace>
     </Shell>
   );

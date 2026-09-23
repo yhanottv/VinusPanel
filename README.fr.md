@@ -10,17 +10,17 @@
 
 **Français** · [English](README.md)
 
-**Un thème open source pour Pterodactyl avec menu Design administrateur, bannières par serveur, navigation Liquid Glass et console repensée.**
+**Un thème open source pour Pterodactyl avec menu Design en direct, bannières par serveur, navigation Liquid Glass et console repensée.**
 
 [![Validation du paquet](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml/badge.svg)](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml)
-[![Version des sources](https://img.shields.io/badge/sources-3.0.0-ff7a1a)](CHANGELOG.md)
+[![Version des sources](https://img.shields.io/badge/sources-3.1.0-ff7a1a)](CHANGELOG.md)
 [![Pterodactyl](https://img.shields.io/badge/Pterodactyl-1.15.1-242429)](#compatibilité-du-panel)
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-242429)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Rejoindre-5865F2?logo=discord&logoColor=white)](https://discord.gg/vinuspanel)
 
 [Captures](#captures) · [Installation](#installation) · [Appareils](#appareils-et-navigateurs) · [Catalogue](#catalogue-minecraft-optionnel) · [Support](#aide-et-signalement-de-bugs)
 
-**Nouveau en 3.0 :** ouvrez **Administration → Design** pour changer les couleurs, le nom, le logo et le fond du panel, puis personnaliser la couleur et la bannière de chaque serveur. Les réglages restent en place lors des mises à jour. Consultez le [guide complet d’installation sur VPS et de personnalisation](INSTALLATION.fr.md).
+**Nouveau en 3.1 :** ouvrez **Design** dans la barre latérale du panel pour changer les couleurs, le nom, le logo et le fond, puis personnaliser chaque serveur. Le vrai tableau de bord et la carte serveur réagissent avant l’enregistrement. Les réglages restent en place lors des mises à jour. Consultez le [guide complet d’installation sur VPS et de personnalisation](INSTALLATION.fr.md).
 
 </div>
 
@@ -73,11 +73,11 @@ Les noms de serveurs, fichiers, journaux de jeu, messages des services externes 
 
 ## ✨ Ce qui a changé
 
-La version **3.0.0** ajoute le menu Design. Le [changelog](CHANGELOG.md) conserve le détail par version, y compris les anciens designs remplacés depuis.
+La version **3.1.0** ajoute l’aperçu en direct au menu Design. Le [changelog](CHANGELOG.md) conserve le détail par version.
 
 | Espace | Fonctionnement actuel |
 | --- | --- |
-| Design | Menu d'administration pour les couleurs, le nom, le logo et le fond du panel, ainsi que les couleurs et bannières des serveurs. |
+| Design | Menu dans l’interface client, réservé aux administrateurs, avec aperçu en direct des couleurs, du nom, du logo, du fond et des bannières de serveurs. |
 | Interface | Fonds noirs, surfaces de lecture sobres, boutons compacts et accents orange. |
 | Navigation | Effet **Liquid Glass limité à la navigation** : transparence sombre, flou et reflets discrets. |
 | Tableau de bord | Liste des serveurs, états en direct, recherche et choix entre grille et liste. |
@@ -136,7 +136,7 @@ La navigation inclut des indications de focus, un lien d’accès direct au cont
 
 | Composant | Version ou condition |
 | --- | --- |
-| VinusPanel | Sources **3.0.0**. |
+| VinusPanel | Sources **3.1.0**. |
 | Pterodactyl Panel | **1.15.1**, version validée pour cette surcouche. |
 | Blueprint | Optionnel pour le thème ; intégration validée pour **beta-2026-06** uniquement. Requis pour Vinus Catalog. |
 | Vinus Catalog | Extension **1.2.0**, incluse dans ce dépôt. |
@@ -248,7 +248,7 @@ Les eggs personnalisés ou renommés peuvent nécessiter une correspondance admi
 
 ## 🎨 Personnalisation
 
-Les principaux réglages se font directement dans **Administration → Design**, sans recompilation. Le [guide VPS](INSTALLATION.fr.md) explique le menu, les images, les mises à jour et le retour arrière. Pour des modifications de code plus avancées, les valeurs et composants se trouvent dans [`overlay/resources/scripts/theme.ts`](overlay/resources/scripts/theme.ts) et les autres fichiers de `overlay/resources/scripts`.
+Les principaux réglages se font directement dans **Design**, dans l’interface client, sans recompilation. Le [guide VPS](INSTALLATION.fr.md) explique le menu, les images, les mises à jour et le retour arrière. Pour des modifications de code plus avancées, les valeurs et composants se trouvent dans [`overlay/resources/scripts/theme.ts`](overlay/resources/scripts/theme.ts) et les autres fichiers de `overlay/resources/scripts`.
 
 | Réglage | Rôle |
 | --- | --- |
@@ -259,7 +259,7 @@ Les principaux réglages se font directement dans **Administration → Design**,
 
 L’invitation par défaut est **https://discord.gg/vinuspanel**. Pour votre propre communauté, utiliser une URL HTTPS `discord.gg/...` ou `discord.com/invite/...`. Une valeur vide masque l’annonce et désactive le bouton. Le texte du bandeau se trouve dans [`DiscordButton.tsx`](overlay/resources/scripts/components/elements/DiscordButton.tsx).
 
-Les réglages du menu Design prennent effet après actualisation de la page. Les modifications du code source nécessitent une recompilation : modifiez la surcouche puis relancez l’installateur. Conservez vos personnalisations dans une branche ou un fork, car une réinstallation recopie les fichiers du thème.
+L’aperçu réagit pendant la modification ; les réglages enregistrés s’appliquent aux autres pages après actualisation. Les modifications du code source nécessitent une recompilation : modifiez la surcouche puis relancez l’installateur. Conservez vos personnalisations dans une branche ou un fork, car une réinstallation recopie les fichiers du thème.
 
 ## 🔄 Mise à jour et désinstallation
 
@@ -325,6 +325,8 @@ Pour un signalement exploitable, indiquer les versions de VinusPanel, Pterodacty
 ## 🧪 Validation et contribution
 
 **L’installation complète sur une instance Pterodactyl vierge et séparée reste à valider.** Les compilations préparées à part et les tests du catalogue avec Wings simulé ne remplacent pas ce scénario. La prochaine étape recommandée est de tester installation, mise à jour, désinstallation et restauration dans un environnement jetable, sans Blueprint puis avec sa version compatible.
+
+Pour la version **3.1.0**, le manifeste, la syntaxe Bash et PHP, les quatre routes Design, les vues Blade, le contrôle TypeScript, la compilation de production et les **89 tests frontend répartis en 9 suites** passent. Le studio a été vérifié sur le panel Pterodactyl 1.15.1 avec Blueprint : le fond enregistré apparaît sur le vrai tableau de bord, et la bannière apparaît dans l’aperçu ainsi que dans la console du serveur. Les images de test ont ensuite été retirées.
 
 Pour la version **3.0.0**, la validation du paquet, la syntaxe PHP, la compilation des vues Blade, les trois routes Design, la persistance des réglages, le contrôle TypeScript, la compilation de production et les **89 tests frontend répartis en 9 suites** passent. La version a été installée sur le VPS existant et la page de connexion répond HTTP 200 après la fin de la maintenance.
 

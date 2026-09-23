@@ -87,11 +87,6 @@
                                 <i class="fa fa-wrench"></i> <span>Settings</span>
                             </a>
                         </li>
-                        <li class="{{ Route::currentRouteName() !== 'admin.vinus-design' ?: 'active' }}">
-                            <a href="{{ route('admin.vinus-design') }}">
-                                <i class="fa fa-paint-brush"></i> <span>Design</span>
-                            </a>
-                        </li>
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.api') ?: 'active' }}">
                             <a href="{{ route('admin.api.index')}}">
                                 <i class="fa fa-gamepad"></i> <span>Application API</span>

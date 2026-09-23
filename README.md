@@ -8,10 +8,10 @@
 
 # VinusPanel — Pterodactyl Theme
 
-**A free, open-source Pterodactyl theme with an administrator Design Studio, per-server banners, Liquid Glass navigation, a redesigned console and an optional Minecraft catalog.**
+**A free, open-source Pterodactyl theme with a live Design Studio, per-server banners, Liquid Glass navigation, a redesigned console and an optional Minecraft catalog.**
 
 [![Package checks](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml/badge.svg)](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml)
-[![Source version](https://img.shields.io/badge/source-3.0.0-ff7a1a)](CHANGELOG.md)
+[![Source version](https://img.shields.io/badge/source-3.1.0-ff7a1a)](CHANGELOG.md)
 [![Pterodactyl](https://img.shields.io/badge/Pterodactyl-1.15.1-242429)](#compatibility)
 [![MIT License](https://img.shields.io/badge/license-MIT-242429)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/vinuspanel)
@@ -20,7 +20,7 @@
 
 [Screenshots](#screenshots) · [Features](#features) · [Installation](#installation) · [Compatibility](#compatibility) · [Minecraft catalog](#minecraft-catalog) · [Support](#support)
 
-**New in 3.0:** open **Administration → Design** to change colors, the panel name, logo and background, plus colors and banners for individual servers. Settings and uploaded images persist across theme upgrades. See the [complete French VPS installation and Design guide](INSTALLATION.fr.md).
+**New in 3.1:** open **Design** in the client sidebar to change colors, the panel name, logo and background, plus colors and banners for individual servers. The real dashboard and server card respond before you save. Settings and uploaded images persist across theme upgrades. See the [complete French VPS installation and Design guide](INSTALLATION.fr.md).
 
 </div>
 
@@ -100,7 +100,7 @@ Profile names and avatars are local to the browser. They do not change Pterodact
 
 | Component | Requirement / tested scope |
 | --- | --- |
-| VinusPanel | Source version **3.0.0**. |
+| VinusPanel | Source version **3.1.0**. |
 | Pterodactyl Panel | **1.15.1**. Other versions and forks are not validated. |
 | Blueprint | Optional for the theme; **beta-2026-06** is the validated integration. Required for Vinus Catalog. |
 | Vinus Catalog | Extension **1.2.0**, included in this repository. |
@@ -208,7 +208,7 @@ Detection uses declared software, the selected JAR name and the egg name, with n
 
 ## 🎨 Customization
 
-Use **Administration → Design** for the panel name, colors, logo, background and per-server colors and banners. These settings apply on page refresh without rebuilding. The [French VPS guide](INSTALLATION.fr.md) covers the menu and installation. For advanced source changes, edit [`overlay/resources/scripts/theme.ts`](overlay/resources/scripts/theme.ts) and other components in the overlay.
+Use **Design** in the client sidebar (administrator accounts only) for the panel name, colors, logo, background and per-server colors and banners. The live preview responds before you save; saved settings apply without rebuilding. The [French VPS guide](INSTALLATION.fr.md) covers the menu and installation. For advanced source changes, edit [`overlay/resources/scripts/theme.ts`](overlay/resources/scripts/theme.ts) and other components in the overlay.
 
 | Setting | Purpose |
 | --- | --- |
@@ -281,6 +281,8 @@ Include versions of VinusPanel, Pterodactyl and Blueprint, browser/device detail
 **If VinusPanel is useful to you, consider giving the repository a ⭐.** Bug reports, installation feedback and contributions help improve the project for other server owners.
 
 ## 🧪 Testing and contributions
+
+For **3.1.0**, the package manifest, shell and PHP syntax, four Design routes, Blade views, TypeScript and production build passed. All **89 frontend tests across 9 suites** passed. The Design Studio was checked on the installed Pterodactyl 1.15.1 panel with Blueprint: a background upload appeared in the real dashboard after saving, and a server banner appeared in the live preview and server console. Test images were removed afterward.
 
 For **3.0.0**, the package and PHP syntax checks passed, Blade views compiled, the three Design routes registered, design settings passed a persistence smoke test, TypeScript and production builds passed, and all **89 frontend tests across 9 suites** passed. The version was installed on the existing VPS panel and the sign-in page returned HTTP 200 after maintenance ended.
 

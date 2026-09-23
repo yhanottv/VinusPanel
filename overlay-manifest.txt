@@ -14,6 +14,8 @@ resources/scripts/components/auth/LoginContainer.tsx
 resources/scripts/components/auth/LoginFormContainer.tsx
 resources/scripts/components/auth/ResetPasswordContainer.tsx
 resources/scripts/components/dashboard/AccountOverviewContainer.tsx
+resources/scripts/components/dashboard/design/DesignStudio.tsx
+resources/scripts/components/dashboard/design/style.module.css
 resources/scripts/components/dashboard/DashboardContainer.tsx
 resources/scripts/components/dashboard/ServerRow.tsx
 resources/scripts/components/dashboard/activity/ActivityLogContainer.tsx
@@ -79,7 +81,6 @@ resources/scripts/routers/ServerRouter.tsx
 resources/scripts/routers/routes.ts
 resources/scripts/theme.ts
 resources/scripts/vinusDesign.ts
-resources/views/admin/design.blade.php
 resources/views/layouts/admin.blade.php
 resources/views/layouts/scripts.blade.php
 resources/views/templates/wrapper.blade.php

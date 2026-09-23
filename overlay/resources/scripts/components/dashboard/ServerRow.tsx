@@ -9,7 +9,7 @@ import { bytesToString, ip, mbToBytes } from '@/lib/formatters';
 import tw from 'twin.macro';
 import GreyRowBox from '@/components/elements/GreyRowBox';
 import styled from 'styled-components/macro';
-import { serverDesign, vinusDesign } from '@/vinusDesign';
+import { serverDesign, vinusDesign, VinusDesignSettings } from '@/vinusDesign';
 
 // Determines if the current value is in an alarm threshold so we can show it in red rather
 // than the more faded default style.
@@ -27,6 +27,7 @@ const ServerCard = styled(GreyRowBox)<{
     $view: 'grid' | 'list';
     $color: string;
     $banner: string;
+    $defaultColor: string;
 }>`
     ${tw`relative grid min-h-[14rem] gap-4 overflow-hidden rounded-xl border p-5 no-underline`};
     grid-template-columns: minmax(0, 1fr);
@@ -35,7 +36,7 @@ const ServerCard = styled(GreyRowBox)<{
         ? `linear-gradient(90deg, rgba(4,4,6,.91), rgba(4,4,6,.62)), url(${$banner}) center / cover, ${$color}`
         : $color};
     border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: inset 3px 0 0 ${({ $color }) => $color === vinusDesign.server_card ? 'var(--vinus-accent)' : $color};
+    box-shadow: inset 3px 0 0 ${({ $color, $defaultColor }) => $color === $defaultColor ? 'var(--vinus-accent)' : $color};
     transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 
     &::before {
@@ -244,11 +245,13 @@ export default ({
     className,
     view = 'grid',
     onStatusChange,
+    design,
 }: {
     server: Server;
     className?: string;
     view?: 'grid' | 'list';
     onStatusChange?: (uuid: string, status: ServerDisplayState) => void;
+    design?: VinusDesignSettings;
 }) => {
     const interval = useRef<Timer>(null) as React.MutableRefObject<Timer>;
     const [isSuspended, setIsSuspended] = useState(server.status === 'suspended');
@@ -289,7 +292,8 @@ export default ({
     const cpuLimit = server.limits.cpu !== 0 ? server.limits.cpu + ' %' : vt("Illimité");
 
     const displayStatus = getDisplayStatus(stats, server, isSuspended);
-    const appearance = serverDesign(server.uuid);
+    const appearance = design ? (design.servers[server.uuid] || {}) : serverDesign(server.uuid);
+    const defaultColor = design?.server_card || vinusDesign.server_card;
     const allocation = server.allocations.find((item) => item.isDefault);
     const cpuUsage = stats ? percent(stats.cpuUsagePercent, server.limits.cpu) : 0;
     const memoryUsage = stats ? percent(stats.memoryUsageInBytes, mbToBytes(server.limits.memory)) : 0;
@@ -306,8 +310,9 @@ export default ({
             className={className}
             $status={displayStatus.key}
             $view={view}
-            $color={appearance.color || vinusDesign.server_card}
+            $color={appearance.color || defaultColor}
             $banner={appearance.banner || ''}
+            $defaultColor={defaultColor}
         >
             <ServerIdentity>
                 <ServerIcon $status={displayStatus.key}>

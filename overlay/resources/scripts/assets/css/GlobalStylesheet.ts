@@ -218,9 +218,14 @@ export default createGlobalStyle`
         background-color: #0c0c0e !important;
     }
 
-    .bg-neutral-800,
-    .bg-gray-800 {
+    .bg-neutral-800:not(body),
+    .bg-gray-800:not(body) {
         background: var(--vinus-glass) !important;
+    }
+
+    body {
+        background-color: var(--vinus-bg) !important;
+        background-image: var(--vinus-background-image, none) !important;
     }
 
     .bg-neutral-700,
