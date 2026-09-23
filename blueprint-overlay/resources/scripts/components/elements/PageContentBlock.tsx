@@ -32,7 +32,7 @@ const PageContentBlock: React.FC<PageContentBlockProps> = ({ title, showFlashKey
                     {showFlashKey && <FlashMessageRender byKey={showFlashKey} css={tw`mb-4`} />}
                     <BeforeSection />{children}<AfterSection />
                 </ContentContainer>
-                <ContentContainer css={tw`mb-4`}>
+                <ContentContainer className="vinus-page-footer" css={tw`mb-4`}>
                     <p css={tw`text-center text-xs text-neutral-500`}>{vt("Propulsé par ")}<a
                             rel={'noopener nofollow noreferrer'}
                             href={'https://pterodactyl.io'}
