@@ -17,11 +17,11 @@ export interface VinusDesignSettings {
 
 const defaults: VinusDesignSettings = {
     brand_name: 'VinusPanel',
-    accent: '#ff7a1a',
-    background: '#08080a',
-    surface: '#101012',
-    server_card: '#101012',
-    text: '#e5e5e9',
+    accent: '#49a6e9',
+    background: '#0b0d12',
+    surface: '#101319',
+    server_card: '#101319',
+    text: '#e2e8f0',
     logo: '/assets/images/vinus/eagle.png',
     background_image: '',
     servers: {},

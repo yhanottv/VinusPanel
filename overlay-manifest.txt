@@ -6,6 +6,7 @@ resources/scripts/api/errorMessage.spec.ts
 resources/scripts/api/errorMessage.ts
 resources/scripts/api/http.ts
 resources/scripts/assets/css/GlobalStylesheet.ts
+resources/scripts/assets/fonts/montserrat-latin-wght-normal.woff2
 resources/scripts/components/Avatar.tsx
 resources/scripts/components/NavigationBar.tsx
 resources/scripts/components/auth/ForgotPasswordContainer.tsx
@@ -14,11 +15,15 @@ resources/scripts/components/auth/LoginContainer.tsx
 resources/scripts/components/auth/LoginFormContainer.tsx
 resources/scripts/components/auth/ResetPasswordContainer.tsx
 resources/scripts/components/dashboard/AccountOverviewContainer.tsx
-resources/scripts/components/dashboard/design/DesignStudio.tsx
-resources/scripts/components/dashboard/design/style.module.css
 resources/scripts/components/dashboard/DashboardContainer.tsx
+resources/scripts/components/dashboard/DashboardIcon.tsx
+resources/scripts/components/dashboard/DashboardShell.tsx
+resources/scripts/components/dashboard/ServerRow.spec.tsx
 resources/scripts/components/dashboard/ServerRow.tsx
 resources/scripts/components/dashboard/activity/ActivityLogContainer.tsx
+resources/scripts/components/dashboard/dashboard.module.css
+resources/scripts/components/dashboard/design/DesignStudio.tsx
+resources/scripts/components/dashboard/design/style.module.css
 resources/scripts/components/dashboard/forms/ConfigureTwoFactorForm.tsx
 resources/scripts/components/dashboard/forms/UpdateEmailAddressForm.tsx
 resources/scripts/components/dashboard/forms/UpdatePasswordForm.tsx

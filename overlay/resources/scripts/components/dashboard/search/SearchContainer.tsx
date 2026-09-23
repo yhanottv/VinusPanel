@@ -11,7 +11,7 @@ export default () => {
 
     useEventListener('keydown', (e: KeyboardEvent) => {
         if (['input', 'textarea'].indexOf(((e.target as HTMLElement).tagName || 'input').toLowerCase()) < 0) {
-            if (!visible && e.metaKey && e.key.toLowerCase() === '/') {
+            if (!visible && (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === '/') {
                 setVisible(true);
             }
         }
@@ -28,7 +28,7 @@ export default () => {
                     onClick={() => setVisible(true)}
                 >
                     <FontAwesomeIcon icon={faSearch} />
-                    <span>{vt("Rechercher")}</span>
+                    <span>{vt("Rechercher des serveurs")}</span>
                 </button>
             </Tooltip>
         </>
