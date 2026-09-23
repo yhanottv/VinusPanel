@@ -1,252 +1,112 @@
-import { vt } from '@/locales/translate';
-import CommandRow from '@blueprint/components/Server/Terminal/CommandRow';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ITerminalOptions, Terminal } from 'xterm';
+import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import { SearchAddon } from 'xterm-addon-search';
-import { SearchBarAddon } from 'xterm-addon-search-bar';
 import { WebLinksAddon } from 'xterm-addon-web-links';
 import { Unicode11Addon } from 'xterm-addon-unicode11';
-import { ScrollDownHelperAddon } from '@/plugins/XtermScrollDownHelperAddon';
-import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import { ServerContext } from '@/state/server';
 import { usePermissions } from '@/plugins/usePermissions';
-import { theme as th } from 'twin.macro';
-import useEventListener from '@/plugins/useEventListener';
-import { debounce } from 'debounce';
-import { createConsoleIntro } from './intro';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
-import classNames from 'classnames';
-import { ChevronDoubleRightIcon } from '@heroicons/react/solid';
-
+import { vt } from '@/locales/translate';
+import { LogLevel, logLevel, matchesLog, stripAnsi } from './logs';
 import 'xterm/css/xterm.css';
-import styles from './style.module.css';
+import styles from './terminal.module.css';
+import CommandRow from '@blueprint/components/Server/Terminal/CommandRow';
 
-const theme = {
-    background: '#08080a',
-    cursor: 'transparent',
-    black: th`colors.black`.toString(),
-    red: '#E54B4B',
-    green: '#9ECE58',
-    yellow: '#FAED70',
-    blue: '#396FE2',
-    magenta: '#BB80B3',
-    cyan: '#2DDAFD',
-    white: '#d0d0d0',
-    brightBlack: 'rgba(255, 255, 255, 0.2)',
-    brightRed: '#FF5370',
-    brightGreen: '#C3E88D',
-    brightYellow: '#FFCB6B',
-    brightBlue: '#82AAFF',
-    brightMagenta: '#C792EA',
-    brightCyan: '#89DDFF',
-    brightWhite: '#ffffff',
-    selection: 'rgba(255, 122, 26, 0.3)',
-};
-
-const terminalProps: ITerminalOptions = {
-    disableStdin: true,
-    cursorStyle: 'underline',
-    allowTransparency: true,
-    fontSize: 13,
-    fontFamily: th('fontFamily.mono'),
-    lineHeight: 1.18,
-    rows: 24,
-    theme: theme,
-};
-
-export default () => {
-    const TERMINAL_PRELUDE = '\u001b[1m\u001b[33mcontainer@pterodactyl~ \u001b[0m';
-    const ref = useRef<HTMLDivElement>(null);
-    const terminal = useMemo(() => new Terminal({ ...terminalProps }), []);
-    const intro = useMemo(() => createConsoleIntro(terminal), [terminal]);
-    const fitAddon = useMemo(() => new FitAddon(), []);
-    const searchAddon = new SearchAddon();
-    const searchBar = new SearchBarAddon({ searchAddon });
-    const webLinksAddon = new WebLinksAddon();
-    const unicode11Addon = new Unicode11Addon();
-    const scrollDownHelperAddon = new ScrollDownHelperAddon();
-    const { connected, instance } = ServerContext.useStoreState((state) => state.socket);
-    const [canSendCommands] = usePermissions(['control.console']);
-    const serverId = ServerContext.useStoreState((state) => state.server.data!.id);
+export default function Console() {
+    const host = useRef<HTMLDivElement>(null);
+    const command = useRef<HTMLInputElement>(null);
+    const lines = useRef<string[]>([]);
+    const frame = useRef<number | null>(null);
+    const [revision, setRevision] = useState(0);
+    const [filter, setFilter] = useState<LogLevel>('all');
+    const [search, setSearch] = useState('');
+    const [fontSize, setFontSize] = useState(12);
+    const [showFilter, setShowFilter] = useState(false);
+    const [showHistory, setShowHistory] = useState(false);
     const [history, setHistory] = useState<string[]>([]);
-    const serverStatus = ServerContext.useStoreState((state) => state.status.value);
-    useEffect(() => {
-        setHistory([]);
-        try { localStorage.removeItem(`${serverId}:command_history`); } catch { /* Storage can be disabled. */ }
-    }, [serverId]);
     const [historyIndex, setHistoryIndex] = useState(-1);
-    // SearchBarAddon has hardcoded z-index: 999 :(
-    const zIndex = `
-    .xterm-search-bar__addon {
-        z-index: 10;
-    }`;
-
-    const handleConsoleOutput = (line: string, prelude = false) =>
-        intro.writeln((prelude ? TERMINAL_PRELUDE : '') + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m');
-
-    const handleTransferStatus = (status: string) => {
-        switch (status) {
-            // Sent by either the source or target node if a failure occurs.
-            case 'failure':
-                intro.writeln(TERMINAL_PRELUDE + vt("Transfert interrompu côté hébergement. Contactez un administrateur avant de réessayer.\u001b[0m"));
-                return;
+    const filterRef = useRef({ filter, search }); filterRef.current = { filter, search };
+    const { connected, instance } = ServerContext.useStoreState(s => s.socket);
+    const status = ServerContext.useStoreState(s => s.status.value);
+    const id = ServerContext.useStoreState(s => s.server.data!.id);
+    const blocked = ServerContext.useStoreState(s => s.server.inConflictState);
+    const [canSend] = usePermissions(['control.console']);
+    const terminal = useMemo(() => new Terminal({ disableStdin: true, cursorBlink: false, cursorStyle: 'underline', fontSize: 12, fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', lineHeight: 1.25, scrollback: 5000, theme: { background: '#101319', foreground: '#d4dbe6', cursor: 'transparent', selection: '#49a6e950' } }), []);
+    const fit = useMemo(() => new FitAddon(), []);
+    const finder = useMemo(() => new SearchAddon(), []);
+    const redraw = () => {
+        terminal.clear(); terminal.reset();
+        const { filter, search } = filterRef.current;
+        lines.current.filter(line => matchesLog(line, filter, search)).forEach(line => terminal.writeln(line));
+    };
+    useEffect(() => {
+        if (!host.current) return;
+        terminal.loadAddon(fit); terminal.loadAddon(finder); terminal.loadAddon(new WebLinksAddon()); terminal.loadAddon(new Unicode11Addon());
+        terminal.open(host.current); terminal.unicode.activeVersion = '11'; fit.fit();
+        terminal.attachCustomKeyEventHandler(event => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 'f') { event.preventDefault(); setShowFilter(true); return false; }
+            return true;
+        });
+        const observer = new ResizeObserver(() => { if (host.current?.clientWidth) fit.fit(); });
+        observer.observe(host.current);
+        return () => { observer.disconnect(); if (frame.current !== null) cancelAnimationFrame(frame.current); terminal.dispose(); };
+    }, [terminal, fit, finder]);
+    useEffect(() => { terminal.options.fontSize = fontSize; if (terminal.element) fit.fit(); }, [fontSize, terminal, fit]);
+    useEffect(() => { if (terminal.element) redraw(); }, [filter, search, terminal]);
+    useEffect(() => {
+        if (!connected || !instance) return;
+        // SEND_LOGS replays the tail on reconnect. Start a fresh buffer to avoid duplicate lines.
+        lines.current = []; terminal.reset(); setRevision(n => n + 1);
+        const append = (raw: string) => {
+            const incoming = raw.replace(/\r\n/g, '\n').replace(/\n$/, '').split('\n');
+            for (const line of incoming) {
+                lines.current.push(line);
+                if (matchesLog(line, filterRef.current.filter, filterRef.current.search)) terminal.writeln(line + '\x1b[0m');
+            }
+            if (lines.current.length > 5000) lines.current.splice(0, lines.current.length - 5000);
+            if (frame.current === null) frame.current = requestAnimationFrame(() => { frame.current = null; setRevision(n => n + 1); });
+        };
+        const events = [SocketEvent.CONSOLE_OUTPUT, SocketEvent.INSTALL_OUTPUT, SocketEvent.TRANSFER_LOGS, SocketEvent.DAEMON_MESSAGE, SocketEvent.DAEMON_ERROR];
+        events.forEach(event => instance.addListener(event, append)); instance.send(SocketRequest.SEND_LOGS);
+        return () => events.forEach(event => instance.removeListener(event, append));
+    }, [connected, instance, terminal]);
+    const counts = useMemo(() => ({ all: lines.current.length, warning: lines.current.filter(l => logLevel(l) === 'warning').length, error: lines.current.filter(l => logLevel(l) === 'error').length }), [revision]);
+    const shown = lines.current.filter(line => matchesLog(line, filter, search));
+    const submit = () => {
+        const value = command.current?.value || '';
+        if (!value.trim() || !canSend || !connected || !instance || blocked || status === 'offline') return;
+        instance.send('send command', value);
+        setHistory(items => [value, ...items].slice(0, 32)); setHistoryIndex(-1);
+        if (command.current) command.current.value = '';
+    };
+    const keyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') { event.preventDefault(); submit(); }
+        if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+            event.preventDefault(); const next = event.key === 'ArrowUp' ? Math.min(historyIndex + 1, history.length - 1) : Math.max(historyIndex - 1, -1);
+            setHistoryIndex(next); event.currentTarget.value = history[next] || '';
         }
     };
-
-    const handleDaemonErrorOutput = (line: string) =>
-        intro.writeln(
-            TERMINAL_PRELUDE + vt("[Wings — erreur du service de gestion] ") + '\u001b[1m\u001b[41m' + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m'
-        );
-
-    const handlePowerChangeEvent = (state: string) => intro.status(state);
-
-    const handleCommandKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'ArrowUp') {
-            const newIndex = Math.min(historyIndex + 1, history!.length - 1);
-
-            setHistoryIndex(newIndex);
-            e.currentTarget.value = history![newIndex] || '';
-
-            // By default up arrow will also bring the cursor to the start of the line,
-            // so we'll preventDefault to keep it at the end.
-            e.preventDefault();
-        }
-
-        if (e.key === 'ArrowDown') {
-            const newIndex = Math.max(historyIndex - 1, -1);
-
-            setHistoryIndex(newIndex);
-            e.currentTarget.value = history![newIndex] || '';
-        }
-
-        const command = e.currentTarget.value;
-        if (e.key === 'Enter' && command.trim().length > 0 && canSendCommands && connected && instance) {
-            setHistory((prevHistory) => [command, ...prevHistory!].slice(0, 32));
-            setHistoryIndex(-1);
-
-            instance && instance.send('send command', command);
-            e.currentTarget.value = '';
-        }
+    const download = () => {
+        const blob = new Blob([shown.map(stripAnsi).join('\n')], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob); const anchor = document.createElement('a');
+        anchor.href = url; anchor.download = `server-${id}-${new Date().toISOString().slice(0, 10)}.log`; anchor.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
     };
-
-    useEffect(() => {
-        if (connected && ref.current && !terminal.element) {
-            terminal.loadAddon(fitAddon);
-            terminal.loadAddon(searchAddon);
-            terminal.loadAddon(searchBar);
-            terminal.loadAddon(webLinksAddon);
-            terminal.loadAddon(unicode11Addon);
-            terminal.loadAddon(scrollDownHelperAddon);
-
-            terminal.open(ref.current);
-
-            // Activate Unicode 11 for proper emoji and special character width handling
-            terminal.unicode.activeVersion = '11';
-
-            fitAddon.fit();
-            searchBar.addNewStyle(zIndex);
-
-            // Add support for capturing keys
-            terminal.attachCustomKeyEventHandler((e: KeyboardEvent) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
-                    document.execCommand('copy');
-                    return false;
-                } else if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-                    e.preventDefault();
-                    searchBar.show();
-                    return false;
-                } else if (e.key === 'Escape') {
-                    searchBar.hidden();
-                }
-                return true;
-            });
-        }
-    }, [terminal, connected]);
-
-    useEffect(() => {
-        if (!ref.current || !terminal.element) return;
-        const observer = new ResizeObserver(() => fitAddon.fit());
-        observer.observe(ref.current);
-        return () => observer.disconnect();
-    }, [terminal, fitAddon, connected]);
-
-    useEffect(() => {
-        // Socket status may arrive before this console mounts; cover both paths.
-        if (connected && terminal.element) intro.status(serverStatus);
-    }, [connected, serverStatus, intro, terminal]);
-
-    useEffect(() => () => { intro.dispose(); terminal.dispose(); }, [terminal, intro]);
-
-    useEventListener(
-        'resize',
-        debounce(() => {
-            if (terminal.element) {
-                fitAddon.fit();
-            }
-        }, 100)
-    );
-
-    useEffect(() => {
-        const listeners: Record<string, (s: string) => void> = {
-            [SocketEvent.STATUS]: handlePowerChangeEvent,
-            [SocketEvent.CONSOLE_OUTPUT]: handleConsoleOutput,
-            [SocketEvent.INSTALL_OUTPUT]: handleConsoleOutput,
-            [SocketEvent.TRANSFER_LOGS]: handleConsoleOutput,
-            [SocketEvent.TRANSFER_STATUS]: handleTransferStatus,
-            [SocketEvent.DAEMON_MESSAGE]: (line) => handleConsoleOutput(line, true),
-            [SocketEvent.DAEMON_ERROR]: handleDaemonErrorOutput,
-        };
-
-        if (connected && instance) {
-            Object.keys(listeners).forEach((key: string) => {
-                instance.addListener(key, listeners[key]);
-            });
-            instance.send(SocketRequest.SEND_LOGS);
-        }
-
-        return () => {
-            if (instance) {
-                Object.keys(listeners).forEach((key: string) => {
-                    instance.removeListener(key, listeners[key]);
-                });
-            }
-        };
-    }, [connected, instance]);
-
-    return (
-        <div className={classNames(styles.terminal, 'relative')}>
-            <SpinnerOverlay visible={!connected} size={'large'} />
-            <div className={classNames(styles.container, styles.overflows_container)}>
-                <div className={'w-full min-w-0 h-full'}>
-                    <div id={styles.terminal} ref={ref} />
-                </div>
-            </div>
-            {canSendCommands && (
-                <div className={classNames('relative', styles.overflows_container)}><CommandRow />
-                    <input
-                        className={classNames('peer', styles.command_input)}
-                        type={'text'}
-                        placeholder={vt("Commande…")}
-                        title={vt("↑ / ↓ : historique · Entrée : envoyer")}
-                        aria-label={vt("Commande à envoyer au serveur")}
-                        disabled={!instance || !connected}
-                        onKeyDown={handleCommandKeyDown}
-                        autoComplete={'off'}
-                        spellCheck={false}
-                        autoCorrect={'off'}
-                        autoCapitalize={'none'}
-                    />
-                    <div
-                        className={classNames(
-                            'text-gray-100 peer-focus:text-gray-50 peer-focus:animate-pulse',
-                            styles.command_icon
-                        )}
-                    >
-                        <ChevronDoubleRightIcon className={'w-4 h-4'} />
-                    </div>
-                </div>
-            )}
+    return <div className={styles.wrapper}>
+        <div className={styles.toolbar}><div className={styles.tabs} role="group" aria-label={vt('Filtrer la sortie de la console')}>{(['all','warning','error'] as LogLevel[]).map(level => <button type="button" key={level} aria-pressed={filter === level} onClick={() => setFilter(level)}>{vt(level === 'all' ? 'Tout' : level === 'warning' ? 'Avertissements' : 'Erreurs')} <small>{counts[level]}</small></button>)}</div>
+            <button type="button" className={styles.download} disabled={!shown.length} onClick={download}>{vt('Télécharger le journal')} ↓</button>
         </div>
-    );
-};
+        {showFilter && <div className={styles.search}><input autoFocus aria-label={vt('Filtrer le journal')} value={search} onChange={e => setSearch(e.target.value)} placeholder={vt('Rechercher dans le journal…')} /><button type="button" aria-label={vt('Fermer le filtre')} onClick={() => { setShowFilter(false); setSearch(''); }}>×</button></div>}
+        <div className={styles.terminal}>
+            <div className={styles.fontControls}><button type="button" disabled={fontSize <= 10} aria-label={vt('Réduire le texte de la console')} onClick={() => setFontSize(n => n - 1)}>−</button><button type="button" title={vt('Revenir à 12 pixels')} onClick={() => setFontSize(12)}>{fontSize}</button><button type="button" disabled={fontSize >= 20} aria-label={vt('Agrandir le texte de la console')} onClick={() => setFontSize(n => n + 1)}>+</button></div>
+            <div className={styles.output} ref={host} />
+            {!lines.current.length && <div className={styles.empty}><span>⏻</span><strong>{!connected ? vt('Connexion à la console…') : status === 'offline' ? vt('Serveur hors ligne') : vt('En attente de journaux')}</strong><p>{status === 'offline' && connected ? vt('Démarrez le serveur pour recevoir sa sortie ici.') : vt('Les messages du serveur apparaîtront ici.')}</p></div>}
+            {!!lines.current.length && !shown.length && <div className={styles.empty}><strong>{vt('Aucun message pour ce filtre.')}</strong></div>}
+        </div>
+        {canSend && <div className={styles.command}><span aria-hidden="true">›_</span><input ref={command} type="text" aria-label={vt('Commande à envoyer au serveur')} placeholder={vt('Commande…')} disabled={!connected || !instance || blocked || status === 'offline'} onKeyDown={keyDown} autoComplete="off" spellCheck={false} autoCorrect="off" autoCapitalize="none" /><button type="button" disabled={!connected || blocked || status === 'offline'} onClick={submit}>{vt('Envoyer')}</button></div>}
+        <CommandRow />
+        <div className={styles.options}><label><input type="checkbox" checked={showFilter} onChange={e => { setShowFilter(e.target.checked); if (!e.target.checked) setSearch(''); }} />{vt('Filtrer la sortie')}</label><label><input type="checkbox" checked={showHistory} onChange={e => setShowHistory(e.target.checked)} />{vt('Historique des commandes')}</label><span>{connected ? vt('Connectée') : vt('Déconnectée')}</span></div>
+        {showHistory && <div className={styles.history}>{history.length ? history.map((value,index) => <button type="button" key={index} onClick={() => { if (command.current) { command.current.value = value; command.current.focus(); } }}>{value}</button>) : <p>{vt('Aucune commande envoyée pendant cette session.')}</p>}</div>}
+    </div>;
+}

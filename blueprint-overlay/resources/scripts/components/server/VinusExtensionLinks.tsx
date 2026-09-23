@@ -6,6 +6,7 @@ import { faPuzzlePiece } from '@fortawesome/free-solid-svg-icons';
 import { ServerContext } from '@/state/server';
 import Can from '@/components/elements/Can';
 import http from '@/api/http';
+import dash from '@/components/dashboard/dashboard.module.css';
 import routes from '@blueprint/extends/routers/routes';
 
 export default () => {
@@ -32,7 +33,7 @@ export default () => {
     };
   }, []);
   return (
-    <div className={'server-sidebar-section'}><p>EXTENSIONS</p><div>
+    <div><p className={dash.sectionToggle}>EXTENSIONS</p><div>
       {routes.server
         .filter(
           (route) =>

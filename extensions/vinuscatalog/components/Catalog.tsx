@@ -22,7 +22,7 @@ const ProjectIcon = ({ project }: { project: Project }) => {
         : <span aria-hidden={'true'}>{project.title.slice(0, 2).toUpperCase()}</span>}</div>;
 };
 
-export default () => {
+export default ({ initialKind, embedded = false }: { initialKind?: Kind; embedded?: boolean } = {}) => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const status = ServerContext.useStoreState((state) => state.status.value);
     const connected = ServerContext.useStoreState((state) => state.socket.connected);
@@ -55,11 +55,11 @@ export default () => {
         http.get(`${endpoint}/profile`).then(({ data }) => {
             if (!active) return;
             setProfile(data.profile); setVersions(data.versions); setInstalled(data.installed);
-            setKind(Object.keys(data.profile.categories)[0] as Kind || 'mods');
+            setKind(initialKind && data.profile.categories[initialKind] ? initialKind : Object.keys(data.profile.categories)[0] as Kind || 'mods');
             setVersion(data.profile.game_version || '');
         }).catch((err) => active && setError(vt("Catalogue — ") + httpErrorToHuman(err))).finally(() => active && setLoading(false));
         return () => { active = false; requestId.current++; };
-    }, [endpoint]);
+    }, [endpoint, initialKind]);
 
     useEffect(() => {
         const id = ++requestId.current;
@@ -92,7 +92,7 @@ export default () => {
     const displayed = view === 'installed' ? installed.filter((item) => item.kind === kind) : hits;
     const stopped = connected && status === 'offline';
 
-    return <PageContentBlock title={vt("Catalogue Minecraft")} className={styles.page}>
+    const content = <>
         <div className={styles.heading}>
             <div><p className={styles.eyebrow}>{vt("CATALOGUE MINECRAFT")}</p><h1>{categories.length === 1 ? kind === 'mods' ? 'Mods' : 'Plugins' : vt("Mods et plugins")}</h1>
                 <p>{vt("Des extensions choisies pour votre serveur. Catalogue Modrinth.")}</p></div>
@@ -138,5 +138,6 @@ export default () => {
                 <button type={'button'} disabled={!stopped || !!busy} onClick={install}>{busy === 'install' ? vt("Téléchargement et vérification…") : vt("Confirmer l’installation")}</button>
             </div>}
         </Dialog>
-    </PageContentBlock>;
+    </>;
+    return embedded ? <div>{content}</div> : <PageContentBlock title={vt("Catalogue Minecraft")} className={styles.page}>{content}</PageContentBlock>;
 };

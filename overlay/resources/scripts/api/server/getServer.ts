@@ -13,7 +13,6 @@ export interface Allocation {
 }
 
 export interface Server {
-    BlueprintFramework: { eggId: number };
     /**
      * This value is determined by the presence of the `PTERODACTYL_USE_SERVER_IDENTIFIERS` environment
      * variable which changes what the API can respond with. It will eventually be removed and referenced
@@ -66,7 +65,6 @@ export interface Server {
 }
 
 export const rawDataToServerObject = ({ attributes: data }: FractalResponseData): Server => ({
-    BlueprintFramework: { eggId: data.BlueprintFramework?.egg_id },
   id: data.identifier,
     identifier: data.server_identifier,
     internalId: data.internal_id,
