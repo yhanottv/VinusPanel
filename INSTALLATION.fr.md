@@ -46,7 +46,7 @@ sudo bash install.sh
 
 `--check` examine la version du panel, Node, Yarn, PHP et la structure du paquet sans modifier Pterodactyl. L'installation active temporairement le mode maintenance, copie les fichiers, compile les assets et vide les caches. Attendez le message final « VinusPanel 3.2.0 est installé » avant de rouvrir le panel. L'installeur affiche le chemin de la sauvegarde de cette opération ; notez-le.
 
-Si vous utilisez le catalogue de mods, mettez aussi à jour **Vinus Catalog 1.3.0** avec les instructions de [`extensions/vinuscatalog/README.md`](extensions/vinuscatalog/README.md). L’installeur du thème ne met pas à jour cette extension Blueprint. La version 1.3.0 corrige le refus HTTP 429 après quelques recherches dans le catalogue.
+Si vous utilisez le catalogue de mods, mettez aussi à jour **Vinus Catalog 1.3.0** avec les instructions de [`extensions/vinuscatalog/README.md`](extensions/vinuscatalog/README.md). L’installeur du thème ne met pas à jour cette extension Blueprint. La version 1.3.0 ajoute les catalogues pris en charge et les outils logiciels, modpacks, mondes et BlueMap.
 
 Pour un panel situé ailleurs :
 

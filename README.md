@@ -20,7 +20,7 @@
 
 [Screenshots](#screenshots) · [Features](#features) · [Installation](#installation) · [Compatibility](#compatibility) · [Minecraft catalog](#minecraft-catalog) · [Support](#support)
 
-**New in 3.2:** responsive full-width dashboard, software logos, redesigned server management and optional Minecraft installation tools.  open **Design** in the client sidebar to change colors, the panel name, logo and background, plus colors and banners for individual servers. The real dashboard and server card respond before you save. Settings and uploaded images persist across theme upgrades. See the [complete French VPS installation and Design guide](INSTALLATION.fr.md).
+**New in 3.2:** responsive full-width dashboard, software logos, redesigned server management and optional Minecraft installation tools. Open **Design** in the client sidebar to change colors, the panel name, logo and background, plus colors and banners for individual servers. The real dashboard and server card respond before you save. Settings and uploaded images persist across theme upgrades. See the [complete French VPS installation and Design guide](INSTALLATION.fr.md).
 
 </div>
 
