@@ -286,3 +286,84 @@
     .sidebar[data-open='true'] .nav { position: absolute; z-index: 80; left: 8px; top: 64px; width: calc(100% - 16px); max-height: calc(100dvh - 80px); padding: 12px; border: 1px solid var(--dash-border, #ffffff14); border-radius: 14px; background: var(--dash-surface, #101319); box-shadow: 0 16px 40px #0006; }
     .sidebar[data-open='true'] .profile, .shell .sidebar[data-open='true'] .standaloneLogout { display: none; }
 }
+
+/* Live studio settings: the same selectors apply in the preview and published panel. */
+.shell { --dash-raised:var(--vinus-raised,#171b23); --dash-muted:var(--vinus-muted,#9ba3b1); font-family:var(--vinus-body-font); font-size:var(--vinus-font-size); background-image:var(--vinus-background-image); background-size:cover; background-attachment:fixed; }
+.shell[data-theme='light'] { --dash-bg:var(--vinus-light-bg); --dash-surface:var(--vinus-light-surface); --dash-text:var(--vinus-light-text); --dash-muted:var(--vinus-light-muted); }
+.shell :is(h1,h2,h3) { font-family:var(--vinus-heading-font); }
+.shell :is(svg[viewBox='0 0 20 20']) { stroke-width:var(--vinus-icon-weight); }
+:global(html[data-vinus-icon-style='sharp']) .shell svg { stroke-linecap:butt; stroke-linejoin:miter; }
+.workspace { background:color-mix(in srgb,var(--dash-bg) calc(var(--vinus-page-alpha)*100%),transparent); }
+.quickCard,.activity,.announcement,.serverRow,.serverCard { border-radius:var(--vinus-radius); }
+.quickCard:not(.featured),.activity { background:color-mix(in srgb,var(--dash-surface) calc(var(--vinus-card-alpha)*100%),transparent); }
+.primaryButton { color:var(--vinus-button-text); }
+:global(html[data-vinus-border='none']) .shell { --dash-border:transparent; }
+:global(html[data-vinus-border='strong']) .shell { --dash-border:#8997aa55; }
+:global(html[data-vinus-border='accent']) .shell { --dash-border:var(--dash-accent); }
+:global(html[data-vinus-input-border='false']) .shell :is(input,select,textarea) { border-color:transparent!important; }
+:global(html[data-vinus-shadow='soft']) :is(.quickCard,.activity,.announcement) { box-shadow:0 8px 24px #0002; }
+:global(html[data-vinus-shadow='deep']) :is(.quickCard,.activity,.announcement) { box-shadow:0 18px 42px #0006; }
+:global(html[data-vinus-logo-mode='text']) .brand img { display:none!important; }
+:global(html[data-vinus-logo-mode='art']) .brand strong { display:none; }
+:global(html[data-vinus-logo-mode='art']) .brand img { width:auto; max-width:100%; max-height:42px; }
+:global(.vinus-brand-light),:global(.vinus-brand-square) { display:none; }
+.shell[data-theme='light'] :global(.vinus-brand-dark) { display:none; }
+.shell[data-theme='light'] :global(.vinus-brand-light) { display:block; }
+:global(html[data-vinus-account-block='false']) .profile { display:none; }
+:global(html[data-vinus-topbar-search='false']) .search { visibility:hidden; }
+:global(html[data-vinus-search-style='pill']) .search>button { border-radius:999px; }
+:global(html[data-vinus-search-style='full']) .search { flex:1; width:auto; }
+:global(html[data-vinus-language-picker='false']) .language { display:none; }
+:global(html[data-vinus-palette-picker='false']) .popover:has([aria-controls='dashboard-palette']) { display:none; }
+:global(html[data-vinus-account-links='false']) :global(#account-navigation), :global(html[data-vinus-account-links='false']) [aria-controls='account-navigation'] { display:none; }
+:global(html[data-vinus-community-links='false']) :global(#links-navigation), :global(html[data-vinus-community-links='false']) [aria-controls='links-navigation'] { display:none; }
+:global(html[data-vinus-quick-cards='false']) .quickGrid { display:none; }
+:global(html[data-vinus-recent-activity='false']) .activity { display:none; }
+:global(html[data-vinus-notice-style='edge']) .announcement { background:var(--dash-surface); border-left:3px solid var(--dash-accent); }
+:global(html[data-vinus-notice-style='outline']) .announcement { background:transparent; border:1px solid var(--dash-accent); }
+:global(html[data-vinus-notice-style='plain']) .announcement { background:transparent; border-color:transparent; }
+:global(html[data-vinus-solid-sidebar='true']) .sidebar { background:var(--dash-surface); }
+:global(html[data-vinus-active-link='edge']) .nav :global(a.active) { background:transparent; border-left:3px solid var(--dash-accent); border-radius:0; }
+:global(html[data-vinus-active-link='glow']) .nav :global(a.active) { box-shadow:0 0 20px rgba(var(--dash-accent-rgb),.25); }
+:global(html[data-vinus-active-link='underline']) .nav :global(a.active) { background:transparent; border-bottom:2px solid var(--dash-accent); border-radius:0; }
+:global(html[data-vinus-active-link='solid']) .nav :global(a.active) { background:var(--dash-accent); color:var(--vinus-button-text); }
+:global(html[data-vinus-active-link='dot']) .nav :global(a.active)::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--dash-accent); }
+:global(html[data-vinus-active-link='fade']) .nav :global(a.active) { background:linear-gradient(90deg,rgba(var(--dash-accent-rgb),.3),transparent); }
+@media(min-width:901px) {
+ :global(html[data-vinus-content-width='contained']) .content { max-width:1200px!important; margin-left:auto!important; margin-right:auto!important; padding-left:24px; padding-right:24px; }
+ :global(html[data-vinus-content-width='wide']) .content { max-width:1600px!important; margin-left:auto!important; margin-right:auto!important; padding-left:24px; padding-right:24px; }
+ :global(html[data-vinus-sidebar-style='floating']) .sidebar { margin:12px; top:12px; height:calc(100vh - 24px); border:1px solid var(--dash-border); border-radius:var(--vinus-radius); }
+ :global(html[data-vinus-sidebar-style='bordered']) .sidebar { border-right:1px solid var(--dash-accent); }
+ :global(html[data-vinus-sidebar-style='compact']) .sidebar { width:205px; flex-basis:205px; }
+ :global(html[data-vinus-sidebar-style='compact']) .nav a { min-height:32px; font-size:11px; }
+ :global(html[data-vinus-sidebar-style='rail']) .sidebar { width:72px; flex-basis:72px; padding-left:8px; padding-right:8px; }
+ :global(html[data-vinus-sidebar-style='rail']) .sidebar .brand strong, :global(html[data-vinus-sidebar-style='rail']) .sidebar .nav a span, :global(html[data-vinus-sidebar-style='rail']) .sidebar .sectionToggle, :global(html[data-vinus-sidebar-style='rail']) .sidebar .profile>span:last-child { display:none; }
+ :global(html[data-vinus-sidebar-style='rail']) .sidebar .brand img { display:none; }
+ :global(html[data-vinus-sidebar-style='rail']) .sidebar .brand :global(.vinus-brand-square) { display:block; width:32px; }
+ :global(html[data-vinus-sidebar-style='rail']) .nav a { justify-content:center; }
+}
+:global(html[data-vinus-button-motion='press']) .shell button:active { transform:scale(.96); }
+:global(html[data-vinus-button-motion='lift']) .shell button:hover { transform:translateY(-2px); }
+:global(html[data-vinus-button-motion='grow']) .shell button:hover { transform:scale(1.04); }
+:global(html[data-vinus-button-motion='glint']) .shell button:hover { filter:brightness(1.2); }
+:global(html[data-vinus-button-motion='pulse']) .shell button:hover { animation:vinus-pulse .8s infinite alternate; }
+.shell button { transition:transform var(--vinus-motion-duration),filter var(--vinus-motion-duration); }
+.content { animation:vinus-fade var(--vinus-motion-duration) ease both; }
+:global(html[data-vinus-page-motion='none']) .content { animation:none; }
+:global(html[data-vinus-page-motion='rise']) .content { animation-name:vinus-rise; }
+:global(html[data-vinus-page-motion='slide']) .content { animation-name:vinus-slide; }
+:global(html[data-vinus-page-motion='scale']) .content { animation-name:vinus-scale; }
+@keyframes vinus-fade { from { opacity:0 } to { opacity:1 } }
+@keyframes vinus-rise { from { opacity:0;transform:translateY(10px) } to { opacity:1;transform:none } }
+@keyframes vinus-slide { from { opacity:0;transform:translateX(12px) } to { opacity:1;transform:none } }
+@keyframes vinus-scale { from { opacity:0;transform:scale(.98) } to { opacity:1;transform:none } }
+@keyframes vinus-pulse { to { box-shadow:0 0 0 4px rgba(var(--dash-accent-rgb),.15) } }
+@media(prefers-reduced-motion:reduce) { .shell *, .content { animation:none!important; transition:none!important; } }
+
+.shell .nav a { font-size:calc(var(--vinus-font-size) - 2px); }
+.shell .hero h1 { font-size:calc(var(--vinus-font-size) + 10px); }
+
+:global(html[data-vinus-solid-sidebar='false']) .sidebar { background:color-mix(in srgb,var(--dash-surface) calc(var(--vinus-card-alpha)*100%),transparent); }
+.sidebar { font-family:var(--vinus-body-font); }
+
+@media(max-width:900px) { .shell>.sidebar:has(+.sidebar) { display:none; } }

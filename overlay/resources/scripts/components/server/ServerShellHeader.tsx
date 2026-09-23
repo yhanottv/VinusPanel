@@ -1,3 +1,4 @@
+import { useDesign } from '@/designRuntime';
 import PrivateValue from '@/components/elements/PrivateValue';
 import React from 'react';
 import { ServerContext } from '@/state/server';
@@ -10,11 +11,12 @@ import { serverDesign } from '@/vinusDesign';
 import { vt } from '@/locales/translate';
 import styles from './server.module.css';
 export default () => {
+    const design = useDesign();
     const server = ServerContext.useStoreState(s => s.server.data!);
     const status = ServerContext.useStoreState(s => s.status.value);
     const connected = ServerContext.useStoreState(s => s.socket.connected);
     const allocation = server.allocations.find(a => a.isDefault);
-    const appearance = serverDesign(server.uuid);
+    const appearance = design.servers[server.uuid] || {};
     const address = allocation ? `${allocation.alias || ip(allocation.ip)}:${allocation.port}` : '';
     const label = !connected || !status ? vt('Connexion…') : status === 'running' ? vt('En ligne') : status === 'starting' ? vt('Démarrage') : status === 'stopping' ? vt('Arrêt en cours') : vt('Hors ligne');
     return <header className={styles.header} style={appearance.banner ? { backgroundImage: `linear-gradient(90deg, rgba(9,12,17,.90), rgba(9,12,17,.70)), url(${JSON.stringify(appearance.banner)})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}>

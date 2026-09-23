@@ -1,3 +1,4 @@
+import NavLink from '@/components/dashboard/design/DesignNavLink';
 import BeforeNavigation from '@blueprint/components/Navigation/NavigationBar/BeforeNavigation';
 import AdditionalItems from '@blueprint/components/Navigation/NavigationBar/AdditionalItems';
 import AfterNavigation from '@blueprint/components/Navigation/NavigationBar/AfterNavigation';
@@ -5,8 +6,9 @@ import BeforeSubNavigation from '@blueprint/components/Navigation/SubNavigation/
 import AdditionalAccountItems from '@blueprint/components/Navigation/SubNavigation/AdditionalAccountItems';
 import AfterSubNavigation from '@blueprint/components/Navigation/SubNavigation/AfterSubNavigation';
 import blueprintRoutes from '@blueprint/extends/routers/routes';
+import { useDesign } from '@/designRuntime';
 import React, { useEffect, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
 import Avatar from '@/components/Avatar';
 import useProfileAppearance from '@/components/dashboard/profile/useProfileAppearance';
@@ -17,6 +19,7 @@ import Icon from '@/components/dashboard/DashboardIcon';
 import styles from '@/components/dashboard/dashboard.module.css';
 
 export default function NavigationBar() {
+    const design = useDesign();
     const user = useStoreState(state => state.user.data!);
     const { appearance } = useProfileAppearance(user.uuid);
     const location = useLocation();
@@ -25,16 +28,8 @@ export default function NavigationBar() {
     const [links, setLinks] = useState(true);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
-    const [brand, setBrand] = useState({ name: VINUS.name, logo: VINUS.logo });
+    const brand = { name: design.brand_name, logo: design.logo };
     useEffect(() => { setMobile(false); }, [location.pathname]);
-    useEffect(() => {
-        const update = (event: Event) => {
-            const detail = (event as CustomEvent<{name: string; logo: string}>).detail;
-            if (detail) setBrand(detail);
-        };
-        window.addEventListener('vinus:design-preview', update);
-        return () => window.removeEventListener('vinus:design-preview', update);
-    }, []);
     const logout = async () => {
         setBusy(true); setError('');
         try { await http.post('/auth/logout'); window.location.assign('/auth/login'); }
@@ -42,7 +37,7 @@ export default function NavigationBar() {
     };
     return <aside className={styles.sidebar} data-open={mobile}>
         <BeforeNavigation />
-        <Link className={styles.brand} to="/" aria-label={brand.name}><img src={brand.logo} alt="" /><strong>{brand.name}</strong></Link>
+        <Link className={styles.brand} to="/" aria-label={brand.name}><img className="vinus-brand-dark" src={brand.logo} alt={design.options.logo_alt} /><img className="vinus-brand-light" src={design.options.logo_light || brand.logo} alt={design.options.logo_alt} /><img className="vinus-brand-square" src={design.options.logo_square || brand.logo} alt={design.options.logo_alt} /><strong>{brand.name}</strong></Link>
         <button className={styles.mobileToggle} type="button" aria-label={vt(mobile ? 'Fermer le menu' : 'Ouvrir le menu')} aria-expanded={mobile} aria-controls="panel-navigation" onClick={() => setMobile(!mobile)}><Icon name={mobile ? 'close' : 'menu'} /></button>
         <nav className={styles.nav} id="panel-navigation" aria-label={vt('Navigation principale')}>
             <NavLink to="/" exact><Icon name="grid" /><span>{vt('Tableau de bord')}</span></NavLink>

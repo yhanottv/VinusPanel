@@ -1,6 +1,8 @@
+import NavLink from '@/components/dashboard/design/DesignNavLink';
+import { useDesign } from '@/designRuntime';
 import PrivateValue from '@/components/elements/PrivateValue';
 import React, { useEffect, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
 import { ServerContext } from '@/state/server';
 import Can from '@/components/elements/Can';
@@ -44,6 +46,7 @@ const sections = [
     ] },
 ];
 export default function ServerNavigation({ before, after, extensions }: { before?: React.ReactNode; after?: React.ReactNode; extensions?: React.ReactNode }) {
+    const design = useDesign();
     const server = ServerContext.useStoreState(s => s.server.data!);
     const admin = useStoreState(s => s.user.data!.rootAdmin);
     const [mobile, setMobile] = useState(false);
@@ -59,7 +62,7 @@ export default function ServerNavigation({ before, after, extensions }: { before
         document.addEventListener('keydown', escape); return () => document.removeEventListener('keydown', escape);
     }, []);
     return <aside className={dash.sidebar} data-open={mobile}>
-        <Link className={dash.brand} to="/" aria-label={VINUS.name}><img src={VINUS.logo} alt="" /><strong>{VINUS.name}</strong></Link>
+        <Link className={dash.brand} to="/" aria-label={design.brand_name}><img className="vinus-brand-dark" src={design.logo} alt={design.options.logo_alt} /><img className="vinus-brand-light" src={design.options.logo_light || design.logo} alt={design.options.logo_alt} /><img className="vinus-brand-square" src={design.options.logo_square || design.logo} alt={design.options.logo_alt} /><strong>{design.brand_name}</strong></Link>
         <button className={dash.mobileToggle} type="button" aria-label={vt(mobile ? 'Fermer le menu' : 'Ouvrir le menu')} aria-expanded={mobile} aria-controls="server-navigation" onClick={() => setMobile(!mobile)}><Icon name={mobile ? 'close' : 'menu'} /></button>
         <nav className={dash.nav} id="server-navigation" aria-label={vt('Sections du serveur')}>
             <Link to="/" className={styles.backLink}>‹ {vt('Tableau de bord')}</Link>

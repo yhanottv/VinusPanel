@@ -1,5 +1,6 @@
 import BeforeContent from '@blueprint/components/Dashboard/Serverlist/BeforeContent';
 import AfterContent from '@blueprint/components/Dashboard/Serverlist/AfterContent';
+import { useDesign, designPreview } from '@/designRuntime';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
@@ -36,6 +37,9 @@ const activityLabel = (entry: ActivityLog) => {
 };
 
 export default function DashboardContainer({ preview = false, design }: { preview?: boolean; design?: VinusDesignSettings }) {
+    const liveDesign = useDesign();
+    design = design || liveDesign;
+    const o = design.options;
     const location = useLocation();
     const defaultPage = Number(new URLSearchParams(location.search).get('page') || '1');
     const [page, setPage] = useState(Number.isSafeInteger(defaultPage) && defaultPage > 0 ? defaultPage : 1);
@@ -44,9 +48,9 @@ export default function DashboardContainer({ preview = false, design }: { previe
     const { appearance } = useProfileAppearance(user.uuid);
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const [admin, setAdmin] = usePersistedState(`${user.uuid}:show_all_servers`, false);
-    const [view, setView] = usePersistedState<'grid' | 'list'>(`${user.uuid}:vinus_display_v3`, 'list');
+    const [view, setView] = usePersistedState<'grid' | 'list'>(`${user.uuid}:vinus_display_v3`, o.server_view as 'grid' | 'list');
     const [dismissed, setDismissed] = usePersistedState(`${user.uuid}:dashboard:welcome`, false);
-    const display = view === 'grid' ? 'grid' : 'list';
+    const display = (designPreview ? o.server_view : view) === 'grid' ? 'grid' : 'list';
     const { data: servers, error, mutate } = useSWR<PaginatedResult<Server>>(
         ['vinus-dashboard', user.uuid, admin && user.rootAdmin, page],
         () => getServers({ page, type: admin && user.rootAdmin ? 'admin' : undefined })
@@ -74,16 +78,18 @@ export default function DashboardContainer({ preview = false, design }: { previe
             <div><h1>{vt('Bon retour, ')}{appearance.displayName || user.username}</h1><p>{vt('Gérez toutes vos instances ici.')}</p></div>
             {user.rootAdmin && <a className={styles.primaryButton} href="/admin/servers/new" aria-label={vt('Créer un serveur')}><Icon name="plus" /><span>{vt('Créer un serveur')}</span><span className={styles.count}>{servers?.pagination.total ?? '—'}</span></a>}
         </header>
-        {!dismissed && <section className={styles.announcement} aria-label={vt('Bienvenue sur VinusPanel')}>
-            <Icon name="info" /><div><strong>{vt('Bienvenue sur VinusPanel !')}</strong><p>{vt('Votre panel open source. Tous vos serveurs, au même endroit.')}</p></div>
+        {o.welcome_notice && (!dismissed || designPreview) && <section className={styles.announcement} aria-label={vt('Bienvenue sur VinusPanel')}>
+            <Icon name="info" /><div><strong>{o.notice_title || vt('Bienvenue sur VinusPanel !')}</strong><p>{o.notice_message || vt('Votre panel open source. Tous vos serveurs, au même endroit.')}</p></div>
             <a className={styles.primaryButton} href="https://github.com/yhanottv/VinusPanel" target="_blank" rel="noreferrer">GitHub<Icon name="external" /></a>
             <button type="button" className={styles.dismiss} aria-label={vt('Ignorer')} onClick={() => setDismissed(true)}><Icon name="close" /></button>
         </section>}
         <div className={styles.quickGrid}>
+            {design.cards.length ? design.cards.filter(card => card.visible).map((card,index) => <a className={`${styles.quickCard} ${card.featured ? styles.featured : ''}`} key={index} href={card.url}><span>{card.description}</span><strong>{card.label}</strong>{visit}</a>) : <>
             <Link className={`${styles.quickCard} ${styles.featured}`} to="/account/profile"><span>{vt('Votre identité, vos préférences.')}</span><strong>{vt('Mon compte')}</strong>{visit}</Link>
             <a className={styles.quickCard} href={VINUS.discordInvite || 'https://github.com/yhanottv/VinusPanel#support'} target="_blank" rel="noreferrer"><span><Icon name="discord" />{vt('Échangez avec la communauté.')}</span><strong>{VINUS.discordInvite ? 'Discord' : vt('Assistance')}</strong>{visit}</a>
             <a className={styles.quickCard} href="https://github.com/yhanottv/VinusPanel" target="_blank" rel="noreferrer"><span><Icon name="globe" />{vt('Le projet, les nouveautés et le code.')}</span><strong>VinusPanel</strong>{visit}</a>
             <a className={styles.quickCard} href="https://github.com/yhanottv/VinusPanel/issues" target="_blank" rel="noreferrer"><span><Icon name="help" />{vt('Une question ? Besoin d’aide ?')}</span><strong>{vt('Contacter le support')}</strong>{visit}</a>
+        </>}
         </div>
         <section aria-labelledby="servers-heading">
             <div className={styles.sectionHeader}>

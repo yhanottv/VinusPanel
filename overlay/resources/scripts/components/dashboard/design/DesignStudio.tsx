@@ -1,12 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Prompt } from 'react-router-dom';
+import { Prompt, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faCloudUploadAlt, faImage, faPalette, faRedo, faServer, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { vt } from '@/locales/translate';
 import { VinusDesignSettings, ServerDesign, vinusDesign } from '@/vinusDesign';
-import DashboardContainer from '@/components/dashboard/DashboardContainer';
-import ServerRow from '@/components/dashboard/ServerRow';
-import getServer, { Server } from '@/api/server/getServer';
 import styles from './style.module.css';
 
 interface StudioServer { uuid: string; name: string }
@@ -80,71 +77,69 @@ const colorFields: { key: ColorKey; label: string }[] = [
     { key: 'text', label: 'Texte principal' },
 ];
 
+import { designFields, DesignOptions } from '@/designOptions';
+import { normalizeDesign, publishDesign, safeDesignUrl, validCssRule } from '@/designRuntime';
+import { DesignLink } from '@/vinusDesign';
+import Icon, { DashboardIconName } from '@/components/dashboard/DashboardIcon';
+import LivePreview from './LivePreview';
+import { navigationCatalog } from './navigationCatalog';
+
+const categories: {id:string;label:string;icon:DashboardIconName}[] = [
+ {id:'brand',label:'Identité',icon:'info'},{id:'colour',label:'Couleurs',icon:'palette'},{id:'type',label:'Typographie',icon:'menu'},
+ {id:'language',label:'Langue',icon:'globe'},{id:'icons',label:'Icônes',icon:'grid'},{id:'surface',label:'Surfaces',icon:'sun'},
+ {id:'layout',label:'Disposition',icon:'controls'},{id:'navigation',label:'Navigation',icon:'list'},{id:'signin',label:'Connexion',icon:'logout'},
+ {id:'dashboard',label:'Dashboard',icon:'grid'},{id:'server',label:'Serveurs',icon:'server'},{id:'css',label:'CSS personnalisé',icon:'brush'},
+ {id:'console',label:'Console',icon:'terminal'},{id:'motion',label:'Animations',icon:'activity'},{id:'seo',label:'Référencement',icon:'search'},
+ {id:'addons',label:'Modules',icon:'plus'}
+];
+function LinkEditor({items,onChange,title}:{items:DesignLink[];onChange:(items:DesignLink[])=>void;title:string}) {
+ const update=(index:number,patch:Partial<DesignLink>)=>onChange(items.map((item,i)=>i===index?{...item,...patch}:item));
+ return <section className={styles.listEditor}><h3>{title}</h3>{items.map((item,index)=><fieldset key={index}><legend>{index+1}. {item.label}</legend>
+ <label>Libellé<input value={item.label} maxLength={80} onChange={e=>update(index,{label:e.target.value})}/></label>
+ <label>Adresse<input value={item.url} placeholder="https://… ou /account" aria-invalid={!safeDesignUrl(item.url)} onChange={e=>update(index,{url:e.target.value})}/></label>
+ <label>Description<input value={item.description} maxLength={300} onChange={e=>update(index,{description:e.target.value})}/></label>
+ <label className={styles.toggle}><input type="checkbox" checked={item.visible} onChange={e=>update(index,{visible:e.target.checked})}/>Visible</label>
+ <label className={styles.toggle}><input type="checkbox" checked={item.featured} onChange={e=>update(index,{featured:e.target.checked})}/>Mise en avant</label>
+ <div className={styles.rowActions}><button type="button" disabled={!index} onClick={()=>{const next=[...items];[next[index-1],next[index]]=[next[index],next[index-1]];onChange(next);}}>↑ Monter</button><button type="button" onClick={()=>onChange(items.filter((_,i)=>i!==index))}>Supprimer</button></div>
+ </fieldset>)}<button type="button" className={styles.secondaryButton} onClick={()=>onChange([...items,{label:'Nouveau lien',url:'/account',description:'',featured:false,visible:true}])}>+ Ajouter</button></section>;
+}
 export default function DesignStudio() {
     const [saved, setSaved] = useState<VinusDesignSettings | null>(null);
     const [draft, setDraft] = useState<VinusDesignSettings | null>(null);
     const [servers, setServers] = useState<StudioServer[]>([]);
     const [selected, setSelected] = useState('');
-    const [tab, setTab] = useState<'panel' | 'server'>('panel');
+    useEffect(()=>{const picked=(event:MessageEvent)=>{if(event.origin!==window.location.origin || event.source!==document.querySelector('iframe')?.contentWindow || event.data?.type!=='vinus:studio-picked' || typeof event.data.selector!=='string')return;setDraft(current=>current?{...current,css_rules:[...current.css_rules,{selector:event.data.selector.slice(0,300),declarations:'',enabled:true}]}:current);};window.addEventListener('message',picked);return()=>window.removeEventListener('message',picked);},[]);
+    const [category,setCategory]=useState('brand');
+    const [query,setQuery]=useState('');
+    const [device,setDevice]=useState(1600);
+    const [light,setLight]=useState(false);
+    const [previewPage,setPreviewPage]=useState('dashboard');
+    const [optionFiles,setOptionFiles]=useState<Record<string,File>>({});
+    const [optionPreviews,setOptionPreviews]=useState<Record<string,string>>({});
+    const objectUrls=useRef<string[]>([]);
+    useEffect(()=>()=>objectUrls.current.forEach(url=>URL.revokeObjectURL(url)),[]);
     const [logoFile, setLogoFile] = useState<File>();
     const [backgroundFile, setBackgroundFile] = useState<File>();
     const [bannerFiles, setBannerFiles] = useState<Record<string, File>>({});
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
-    const [previewServer, setPreviewServer] = useState<Server | null>(null);
-    const [previewError, setPreviewError] = useState('');
-    const originalStyles = useRef<Record<string, string>>({});
 
     useEffect(() => {
         const controller = new AbortController();
-        const root = document.documentElement;
-        const keys = ['--vinus-accent', '--vinus-accent-rgb', '--vinus-bg', '--vinus-glass', '--vinus-surface', '--vinus-server-card', '--vinus-text', '--vinus-background-image'];
-        keys.forEach(key => { originalStyles.current[key] = root.style.getPropertyValue(key); });
         fetch('/admin/vinus-design/data', { credentials: 'same-origin', headers: { Accept: 'application/json' }, signal: controller.signal })
             .then(async response => { if (!response.ok) throw new Error(vt("Impossible de charger les réglages.")); return response.json() as Promise<StudioData>; })
-            .then(data => { setSaved(data.design); setDraft(data.design); setServers(data.servers); setSelected(data.servers[0]?.uuid || ''); })
+            .then(data => { setSaved(normalizeDesign(data.design)); setDraft(normalizeDesign(data.design)); setServers(data.servers); setSelected(data.servers[0]?.uuid || ''); })
             .catch(e => { if (e.name !== 'AbortError') setError(e.message); });
-        return () => { controller.abort(); keys.forEach(key => {
-            const original = originalStyles.current[key];
-            if (original) root.style.setProperty(key, original); else root.style.removeProperty(key);
-        }); window.dispatchEvent(new CustomEvent('vinus:design-preview', { detail: { name: vinusDesign.brand_name, logo: vinusDesign.logo } })); };
+        return () => controller.abort();
     }, []);
 
-    const selectedServer = servers.find(server => server.uuid === selected);
     const serverDraft: ServerDesign = draft?.servers[selected] || {};
     const bannerFile = bannerFiles[selected];
     const logoPreview = useImagePreview(logoFile);
     const backgroundPreview = useImagePreview(backgroundFile);
     const bannerPreview = useImagePreview(bannerFile);
-    const changed = !!(saved && draft && (JSON.stringify(saved) !== JSON.stringify(draft) || logoFile || backgroundFile || Object.keys(bannerFiles).length));
-
-    useEffect(() => {
-        if (tab !== 'server' || !selected) return;
-        let active = true;
-        setPreviewServer(null);
-        setPreviewError('');
-        getServer(selected.slice(0, 8))
-            .then(([server]) => { if (active) setPreviewServer(server); })
-            .catch(() => { if (active) setPreviewError(vt("Impossible de charger ce serveur pour l’aperçu.")); });
-        return () => { active = false; };
-    }, [tab, selected]);
-
-    useEffect(() => {
-        if (!draft) return;
-        const root = document.documentElement;
-        const rgb = draft.accent.match(/[0-9a-fA-F]{2}/g)?.map(value => parseInt(value, 16)).join(', ') || '255, 122, 26';
-        root.style.setProperty('--vinus-accent', draft.accent);
-        root.style.setProperty('--vinus-accent-rgb', rgb);
-        root.style.setProperty('--vinus-bg', draft.background);
-        root.style.setProperty('--vinus-glass', draft.surface);
-        root.style.setProperty('--vinus-surface', draft.surface);
-        root.style.setProperty('--vinus-server-card', draft.server_card);
-        root.style.setProperty('--vinus-text', draft.text);
-        const image = backgroundPreview || draft.background_image;
-        root.style.setProperty('--vinus-background-image', image ? `url("${image.replace(/"/g, '%22')}")` : 'none');
-        window.dispatchEvent(new CustomEvent('vinus:design-preview', { detail: { name: draft.brand_name, logo: logoPreview || draft.logo } }));
-    }, [draft, logoPreview, backgroundPreview]);
+    const changed = !!(saved && draft && (JSON.stringify(saved) !== JSON.stringify(draft) || logoFile || backgroundFile || Object.keys(bannerFiles).length || Object.keys(optionFiles).length));
 
     useEffect(() => {
         const onBeforeUnload = (event: BeforeUnloadEvent) => { if (changed) { event.preventDefault(); event.returnValue = ''; } };
@@ -161,7 +156,7 @@ export default function DesignStudio() {
         setMessage('');
     };
     const reset = () => {
-        setDraft(saved); setLogoFile(undefined); setBackgroundFile(undefined); setBannerFiles({}); setError(''); setMessage('');
+        setDraft(saved); setLogoFile(undefined); setBackgroundFile(undefined); setBannerFiles({}); setOptionFiles({}); setOptionPreviews({}); setError(''); setMessage('');
     };
     const post = async (url: string, form: FormData): Promise<VinusDesignSettings> => {
         const token = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '';
@@ -175,13 +170,17 @@ export default function DesignStudio() {
     const save = async () => {
         if (!saved || !draft || busy) return;
         if (!draft.brand_name.trim()) { setError(vt("Indiquez un nom pour le panel.")); return; }
+        if ([...draft.links,...draft.cards].some(link=>!link.label.trim() || !link.url || !safeDesignUrl(link.url))) { setError('Vérifiez les libellés et adresses des liens.'); return; }
+        if (draft.css_rules.some(rule=>!validCssRule(rule.selector,rule.declarations))) { setError('Une règle CSS contient une syntaxe non autorisée.'); return; }
         setBusy(true); setError(''); setMessage('');
         try {
             let latest = saved;
             const globalFields: (ColorKey | 'brand_name' | 'logo' | 'background_image')[] = ['brand_name', 'accent', 'background', 'surface', 'server_card', 'text', 'logo', 'background_image'];
-            const globalChanged = globalFields.some(key => saved[key] !== draft[key]) || !!logoFile || !!backgroundFile;
+            const globalChanged = JSON.stringify(saved.options)!==JSON.stringify(draft.options) || JSON.stringify(saved.navigation)!==JSON.stringify(draft.navigation) || JSON.stringify(saved.console_rules)!==JSON.stringify(draft.console_rules) || JSON.stringify(saved.links)!==JSON.stringify(draft.links) || JSON.stringify(saved.cards)!==JSON.stringify(draft.cards) || JSON.stringify(saved.css_rules)!==JSON.stringify(draft.css_rules) || Object.keys(optionFiles).length>0 || globalFields.some(key => saved[key] !== draft[key]) || !!logoFile || !!backgroundFile;
             if (globalChanged) {
                 const form = new FormData();
+                form.append('studio',JSON.stringify({options:draft.options,navigation:draft.navigation,console_rules:draft.console_rules,links:draft.links,cards:draft.cards,css_rules:draft.css_rules}));
+                Object.entries(optionFiles).forEach(([key,file])=>form.append(`option_images[${key}]`,file));
                 (['brand_name', 'accent', 'background', 'surface', 'server_card', 'text'] as const).forEach(key => form.append(key, draft[key]));
                 if (logoFile) form.append('logo_file', logoFile);
                 else if (saved.logo !== draft.logo && draft.logo === defaultLogo) form.append('remove_logo', '1');
@@ -201,93 +200,63 @@ export default function DesignStudio() {
                 else if (before.banner && !after.banner) form.append('remove_banner', '1');
                 latest = await post(`/admin/vinus-design/servers/${encodeURIComponent(uuid)}`, form);
             }
-            Object.assign(vinusDesign, latest);
+            latest=normalizeDesign(latest);
+            publishDesign(latest);
             setSaved(latest); setDraft(latest); setLogoFile(undefined); setBackgroundFile(undefined); setBannerFiles({});
+            setOptionFiles({}); setOptionPreviews({});
             setMessage(vt("Modifications enregistrées."));
-            const root = document.documentElement;
-            const rgb = latest.accent.match(/[0-9a-fA-F]{2}/g)?.map(value => parseInt(value, 16)).join(', ') || '255, 122, 26';
-            const persistedStyles: Record<string, string> = {
-                '--vinus-accent': latest.accent, '--vinus-accent-rgb': rgb, '--vinus-bg': latest.background,
-                '--vinus-glass': latest.surface, '--vinus-surface': latest.surface,
-                '--vinus-server-card': latest.server_card, '--vinus-text': latest.text,
-                '--vinus-background-image': latest.background_image ? `url("${latest.background_image}")` : 'none',
-            };
-            Object.entries(persistedStyles).forEach(([key, value]) => { root.style.setProperty(key, value); originalStyles.current[key] = value; });
         } catch (e) {
             setError(e instanceof Error ? e.message : vt("L’enregistrement a échoué."));
         } finally { setBusy(false); }
     };
 
-    if (!draft) return <div className={styles.loading}>{error || vt("Chargement du studio Design…")}</div>;
-    const previewBackground = backgroundPreview || draft.background_image;
-    const previewBanner = bannerPreview || serverDraft.banner;
-    const previewDesign: VinusDesignSettings = {
-        ...draft,
-        logo: logoPreview || draft.logo,
-        background_image: previewBackground,
-        servers: previewBanner && selected ? {
-            ...draft.servers,
-            [selected]: { ...serverDraft, banner: previewBanner },
-        } : draft.servers,
-    };
+
+    if (!draft) return <div className={styles.loading}>{error || vt('Chargement du studio Design…')}</div>;
+    const choose=(id:string)=>{setCategory(id);setQuery('');if(id==='signin')setPreviewPage('login');else if(id==='console')setPreviewPage('console');else if(id==='server')setPreviewPage('overview');else setPreviewPage('dashboard');};
+    const option=(key:keyof DesignOptions,value:string|number|boolean)=>{setDraft({...draft,options:{...draft.options,[key]:value}});setMessage('');};
+    const previewDesign:VinusDesignSettings={...draft,logo:logoPreview||draft.logo,background_image:backgroundPreview||draft.background_image,options:{...draft.options,...optionPreviews},servers:{...draft.servers,...(selected?{[selected]:{...serverDraft,banner:bannerPreview||serverDraft.banner}}:{})}};
+    const previewPath=previewPage==='login'?'/design/preview/login':(previewPage==='console'||previewPage==='overview')&&selected?`/server/${selected.slice(0,8)}${previewPage==='overview'?'/overview':''}`:'/';
+    const fields=designFields.filter(field=>query?field.label.toLowerCase().includes(query.toLowerCase()):field.category===category);
+    const title=categories.find(item=>item.id===category)?.label;
     return <div className={styles.studio}>
-        <Prompt when={changed} message={vt("Des modifications ne sont pas enregistrées. Quitter cette page ?")} />
-        <header className={styles.pageHeader}>
-            <div><span className={styles.eyebrow}><FontAwesomeIcon icon={faPalette} /> VINUSPANEL / STUDIO</span>
-                <h1>{vt("Design")}</h1><p>{vt("Personnalisez votre panel et voyez le résultat immédiatement.")}</p></div>
-            <div className={styles.headerActions}>
-                {changed && <span className={styles.unsaved}>{vt("Modifications non enregistrées")}</span>}
-                <button type="button" className={styles.secondaryButton} onClick={reset} disabled={!changed || busy}><FontAwesomeIcon icon={faRedo} /> {vt("Annuler")}</button>
-                <button type="button" className={styles.primaryButton} onClick={save} disabled={!changed || busy}><FontAwesomeIcon icon={faCheck} /> {busy ? vt("Enregistrement…") : vt("Enregistrer")}</button>
+        <Prompt when={changed} message={vt('Des modifications ne sont pas enregistrées. Quitter cette page ?')} />
+        <nav className={styles.rail} aria-label="Catégories de personnalisation">
+            <span className={styles.railMark}><Icon name="brush" /></span>
+            {categories.map(item=><button type="button" key={item.id} title={item.label} aria-label={item.label} aria-pressed={category===item.id&&!query} onClick={()=>choose(item.id)}><Icon name={item.icon}/></button>)}
+            <Link to="/" className={styles.exit} title="Fermer le studio" aria-label="Fermer le studio"><Icon name="close"/></Link>
+        </nav>
+        <aside className={styles.controls}>
+            <header className={styles.controlsHeader}><small>VINUSPANEL / DESIGN</small><h1>{query?'Recherche':title}</h1><input aria-label="Rechercher un réglage" placeholder="Rechercher un réglage…" value={query} onChange={e=>setQuery(e.target.value)}/></header>
+            <div className={styles.controlsBody}>
+                {category==='brand'&&!query&&<><label className={styles.textLabel}>Nom du panel<input className={styles.textInput} value={draft.brand_name} maxLength={40} onChange={e=>setField('brand_name',e.target.value)}/></label><ImageControl id="design-logo" title="Logo du panel" hint="PNG, JPG ou WebP · 4 Mo max" src={draft.logo} preview={logoPreview} file={logoFile} maxMb={4} onFile={setLogoFile} onRemove={()=>{setLogoFile(undefined);setField('logo',defaultLogo);}}/></>}
+                {category==='colour'&&!query&&<div className={styles.colorGrid}>{colorFields.map(field=><ColorControl key={field.key} id={field.key} label={field.label} value={draft[field.key]} onChange={value=>setField(field.key,value)}/>)}</div>}
+                {fields.map(field=><div className={styles.option} key={field.key}>
+                    {field.kind==='toggle'?<label className={styles.toggle}><span>{field.label}</span><input type="checkbox" role="switch" checked={Boolean(draft.options[field.key])} onChange={e=>option(field.key,e.target.checked)}/></label>:
+                    field.kind==='color'?<ColorControl id={field.key} label={field.label} value={String(draft.options[field.key])} onChange={value=>option(field.key,value)}/>:
+                    field.kind==='select'?<fieldset><legend>{field.label}</legend><div className={styles.choices}>{field.choices?.map(choice=><button type="button" key={choice.value} aria-pressed={draft.options[field.key]===choice.value} onClick={()=>option(field.key,choice.value)}>{choice.label}</button>)}</div></fieldset>:
+                    field.kind==='range'?<label className={styles.range}><span>{field.label}<output>{String(draft.options[field.key])}</output></span><input aria-label={field.label} type="range" min={field.min} max={field.max} value={Number(draft.options[field.key])} onChange={e=>option(field.key,Number(e.target.value))}/></label>:
+                    <label className={styles.textLabel}>{field.label}{field.kind==='textarea'?<textarea value={String(draft.options[field.key])} maxLength={2000} onChange={e=>option(field.key,e.target.value)}/>:<input className={styles.textInput} value={String(draft.options[field.key])} maxLength={2000} onChange={e=>option(field.key,e.target.value)}/>}</label>}
+                    {field.kind==='image'&&<ImageControl id={field.key+'-upload'} title="Importer une image" hint="PNG, JPG ou WebP · 4 Mo max" src={String(draft.options[field.key])} preview={optionPreviews[field.key]} file={optionFiles[field.key]} maxMb={4} onFile={file=>{const url=URL.createObjectURL(file);objectUrls.current.push(url);setOptionFiles({...optionFiles,[field.key]:file});setOptionPreviews({...optionPreviews,[field.key]:url});}} onRemove={()=>{const files={...optionFiles},previews={...optionPreviews};delete files[field.key];delete previews[field.key];setOptionFiles(files);setOptionPreviews(previews);option(field.key,'');}}/>}
+                </div>)}
+                {category==='surface'&&!query&&<ImageControl id="design-background" title="Image de fond" hint="PNG, JPG ou WebP · 8 Mo max" src={draft.background_image} preview={backgroundPreview} file={backgroundFile} maxMb={8} onFile={setBackgroundFile} onRemove={()=>{setBackgroundFile(undefined);setField('background_image','');}}/>}
+                {category==='navigation'&&!query&&<section className={styles.listEditor}><h3>Pages du panel et du serveur</h3><p className={styles.hint}>Les destinations et permissions restent celles du panel.</p>{navigationCatalog.map(base=>{const rule=draft.navigation.find(item=>item.path===base.path)||base;const update=(patch:Partial<typeof rule>)=>setDraft({...draft,navigation:[...draft.navigation.filter(item=>item.path!==base.path),{...rule,...patch}]});return <details key={base.path}><summary>{rule.label||base.label}</summary><label>Libellé<input value={rule.label} onChange={e=>update({label:e.target.value})}/></label><label className={styles.toggle}>Visible<input type="checkbox" checked={rule.visible} onChange={e=>update({visible:e.target.checked})}/></label><label>Position dans le groupe<input type="number" min={0} max={100} value={rule.order} onChange={e=>update({order:Number(e.target.value)})}/></label></details>;})}</section>}
+                {category==='console'&&!query&&<section className={styles.listEditor}><h3>Réécriture des journaux</h3><p className={styles.hint}>Remplacements de texte à l’affichage uniquement. Les fichiers du serveur restent intacts.</p>{draft.console_rules.map((rule,index)=><fieldset key={index}><label>Texte à remplacer<input value={rule.search} maxLength={200} onChange={e=>setDraft({...draft,console_rules:draft.console_rules.map((r,i)=>i===index?{...r,search:e.target.value}:r)})}/></label><label>Remplacement<textarea value={rule.replacement} maxLength={1000} onChange={e=>setDraft({...draft,console_rules:draft.console_rules.map((r,i)=>i===index?{...r,replacement:e.target.value}:r)})}/></label><button onClick={()=>setDraft({...draft,console_rules:draft.console_rules.filter((_,i)=>i!==index)})}>Supprimer</button></fieldset>)}<button className={styles.secondaryButton} onClick={()=>setDraft({...draft,console_rules:[...draft.console_rules,{search:'Texte',replacement:''}]})}>+ Ajouter une règle</button></section>}
+                {category==='navigation'&&!query&&<LinkEditor title="Liens personnalisés" items={draft.links} onChange={links=>setDraft({...draft,links})}/>}
+                {category==='dashboard'&&!query&&<><p className={styles.hint}>Une liste vide conserve les quatre raccourcis par défaut.</p><LinkEditor title="Cartes de raccourcis" items={draft.cards} onChange={cards=>setDraft({...draft,cards})}/></>}
+                {category==='server'&&!query&&<section className={styles.listEditor}><h3>Identité du serveur</h3>{servers.length?<><label className={styles.textLabel}>Serveur<select value={selected} onChange={e=>setSelected(e.target.value)}>{servers.map(server=><option key={server.uuid} value={server.uuid}>{server.name}</option>)}</select></label><ColorControl id="server-color" label="Couleur de la carte" value={serverDraft.color||draft.server_card} onChange={color=>setServer(selected,{color})}/><button className={styles.textButton} onClick={()=>setServer(selected,{color:''})}>Couleur par défaut</button><ImageControl id="design-banner" title="Bannière du serveur" hint="PNG, JPG ou WebP · 8 Mo max" src={serverDraft.banner||''} preview={bannerPreview} file={bannerFile} maxMb={8} onFile={file=>setBannerFiles({...bannerFiles,[selected]:file})} onRemove={()=>{const next={...bannerFiles};delete next[selected];setBannerFiles(next);setServer(selected,{banner:''});}}/></>:<p>Aucun serveur disponible.</p>}</section>}
+                {category==='css'&&!query&&<section className={styles.listEditor}><button type="button" className={styles.secondaryButton} onClick={()=>window.dispatchEvent(new Event('vinus:pick-start'))}>Sélectionner un élément dans l’aperçu</button><p className={styles.hint}>Règles appliquées au panel et à son aperçu. Les imports, URL et scripts sont refusés.</p>{draft.css_rules.map((rule,index)=><fieldset key={index}><legend>Règle {index+1}</legend><label>Sélecteur<input value={rule.selector} placeholder=".app-shell h1" onChange={e=>setDraft({...draft,css_rules:draft.css_rules.map((r,i)=>i===index?{...r,selector:e.target.value}:r)})}/></label><label>Déclarations<textarea value={rule.declarations} placeholder="letter-spacing: -0.03em;" onChange={e=>setDraft({...draft,css_rules:draft.css_rules.map((r,i)=>i===index?{...r,declarations:e.target.value}:r)})}/></label><label className={styles.toggle}>Activée<input type="checkbox" checked={rule.enabled} onChange={e=>setDraft({...draft,css_rules:draft.css_rules.map((r,i)=>i===index?{...r,enabled:e.target.checked}:r)})}/></label><button type="button" onClick={()=>setDraft({...draft,css_rules:draft.css_rules.filter((_,i)=>i!==index)})}>Supprimer</button></fieldset>)}<button className={styles.secondaryButton} onClick={()=>setDraft({...draft,css_rules:[...draft.css_rules,{selector:'.app-shell h1',declarations:'',enabled:true}]})}>+ Ajouter une règle</button></section>}
+                {category==='addons'&&!query&&<><h3>Modules du projet</h3><p className={styles.hint}>Les intégrations Blueprint existantes sont conservées. Les outils Minecraft apparaissent selon le logiciel du serveur et ses permissions.</p>{['Plugins et mods','Modpacks','Versions Minecraft','Joueurs','Propriétés','Mondes et World Viewer'].map(name=><div className={styles.addon} key={name}><Icon name="check"/>{name}</div>)}</>}
+                {query&&!fields.length&&<p>Aucun réglage trouvé.</p>}
             </div>
-        </header>
-        {(message || error) && <div className={error ? styles.error : styles.success} role="status">{error || message}</div>}
-        <div className={styles.workbench}>
-            <section className={styles.controls} aria-label={vt("Réglages du design")}>
-                <div className={styles.tabs} role="tablist" aria-label={vt("Zone à personnaliser")}>
-                    <button type="button" role="tab" aria-selected={tab === 'panel'} className={tab === 'panel' ? styles.activeTab : ''} onClick={() => setTab('panel')}><FontAwesomeIcon icon={faPalette} /> {vt("Panel")}</button>
-                    <button type="button" role="tab" aria-selected={tab === 'server'} className={tab === 'server' ? styles.activeTab : ''} onClick={() => setTab('server')}><FontAwesomeIcon icon={faServer} /> {vt("Serveurs")}</button>
-                </div>
-                <div className={styles.controlsBody}>
-                    {tab === 'panel' ? <>
-                        <div className={styles.sectionIntro}><span>01 / {vt("Identité")}</span><h2>{vt("Votre panel, votre marque")}</h2><p>{vt("Nom, logo et arrière-plan visibles par vos utilisateurs.")}</p></div>
-                        <label className={styles.textLabel} htmlFor="brand-name">{vt("Nom du panel")}</label>
-                        <input id="brand-name" className={styles.textInput} value={draft.brand_name} maxLength={40} onChange={e => setField('brand_name', e.target.value)} />
-                        <ImageControl id="design-logo" title="Logo du panel" hint="PNG, JPG ou WebP · 4 Mo max" src={draft.logo} preview={logoPreview} file={logoFile} maxMb={4}
-                            onFile={file => { setLogoFile(file); setMessage(''); }} onRemove={() => { setLogoFile(undefined); setField('logo', defaultLogo); }} />
-                        <ImageControl id="design-background" title="Image de fond" hint="PNG, JPG ou WebP · 8 Mo max" src={draft.background_image} preview={backgroundPreview} file={backgroundFile} maxMb={8}
-                            onFile={file => { setBackgroundFile(file); setMessage(''); }} onRemove={() => { setBackgroundFile(undefined); setField('background_image', ''); }} />
-                        <div className={styles.sectionIntro}><span>02 / {vt("Couleurs")}</span><h2>{vt("Une palette à votre image")}</h2><p>{vt("Touchez le carré pour ouvrir le nuancier, ou saisissez un code hexadécimal.")}</p></div>
-                        <div className={styles.colorGrid}>{colorFields.map(field => <ColorControl key={field.key} id={field.key} label={field.label} value={draft[field.key]} onChange={value => setField(field.key, value)} />)}</div>
-                    </> : <>
-                        <div className={styles.sectionIntro}><span>03 / {vt("Serveurs")}</span><h2>{vt("Une identité par serveur")}</h2><p>{vt("Choisissez un serveur pour adapter sa carte et sa bannière.")}</p></div>
-                        {servers.length ? <>
-                            <label className={styles.textLabel} htmlFor="design-server">{vt("Serveur à personnaliser")}</label>
-                            <select id="design-server" className={styles.textInput} value={selected} onChange={e => setSelected(e.target.value)}>{servers.map(server => <option key={server.uuid} value={server.uuid}>{server.name}</option>)}</select>
-                            <ColorControl id="server-color" label="Couleur de la carte" value={serverDraft.color || draft.server_card} onChange={value => setServer(selected, { color: value })} />
-                            {!!serverDraft.color && <button type="button" className={styles.textButton} onClick={() => setServer(selected, { color: '' })}>{vt("Utiliser la couleur par défaut")}</button>}
-                            <ImageControl id="design-banner" title="Bannière du serveur" hint="PNG, JPG ou WebP · 8 Mo max · format 3:1 conseillé" src={serverDraft.banner || ''} preview={bannerPreview} file={bannerFile} maxMb={8}
-                                onFile={file => { setBannerFiles(current => ({ ...current, [selected]: file })); setMessage(''); }}
-                                onRemove={() => { setBannerFiles(current => { const next = { ...current }; delete next[selected]; return next; }); setServer(selected, { banner: '' }); }} />
-                        </> : <p className={styles.empty}>{vt("Aucun serveur disponible.")}</p>}
-                    </>}
-                </div>
-            </section>
-            <section className={styles.previewArea} aria-label={vt("Aperçu direct")}>
-                <div className={styles.previewHeading}><div><span className={styles.liveDot} /> <strong>{vt("Aperçu réel")}</strong><span>{vt("Modifications visibles avant l’enregistrement.")}</span></div><span className={styles.previewTag}>{tab === 'panel' ? vt("Tableau de bord") : selectedServer?.name || vt("Serveur")}</span></div>
-                <div className={styles.realPreview} style={{ backgroundColor: draft.background, backgroundImage: previewBackground ? `url("${previewBackground.replace(/"/g, '%22')}")` : undefined }}>
-                    <div className={styles.realPreviewContent}>
-                        {tab === 'panel' ? <DashboardContainer preview design={previewDesign} /> : (
-                            <div className={styles.realPreviewServer}>
-                                <span className={styles.previewEyebrow}>{vt("CARTE RÉELLE DU SERVEUR")}</span>
-                                <h2>{selectedServer?.name || vt("Serveur")}</h2>
-                                {previewServer ? <ServerRow server={previewServer} view="grid" design={previewDesign} /> : <p>{previewError || vt("Chargement du serveur…")}</p>}
-                            </div>
-                        )}
-                    </div>
-                </div>
-                <p className={styles.previewNote}>{vt("Vrais composants et vraies données du panel. Enregistrez pour appliquer à tous les utilisateurs.")}</p>
-            </section>
-        </div>
+            <footer className={styles.saveBar}>
+                <p role="status" className={error?styles.error:styles.hint}>{error||message||(changed?'Modifications non enregistrées':'Toutes les modifications sont enregistrées')}</p>
+                <div><button type="button" className={styles.secondaryButton} onClick={reset} disabled={!changed||busy}>Annuler</button><button type="button" className={styles.primaryButton} onClick={save} disabled={!changed||busy}>{busy?'Enregistrement…':'Enregistrer'}</button></div>
+            </footer>
+        </aside>
+        <main className={styles.previewArea}>
+            <header className={styles.previewToolbar}><div className={styles.deviceTabs}>{[[1600,'Ordinateur'],[768,'Tablette'],[390,'Mobile']].map(([width,label])=><button type="button" key={width} aria-pressed={device===width} onClick={()=>setDevice(Number(width))}>{label}</button>)}<small>{device} px</small></div><div className={styles.previewSelectors}><select aria-label="Page de l’aperçu" value={previewPage} onChange={e=>setPreviewPage(e.target.value)}><option value="dashboard">Dashboard</option><option value="overview">Aperçu serveur</option><option value="console">Console</option><option value="login">Connexion</option></select>{(previewPage==='console'||previewPage==='overview')&&<select aria-label="Serveur de l’aperçu" value={selected} onChange={e=>setSelected(e.target.value)}>{servers.map(server=><option key={server.uuid} value={server.uuid}>{server.name}</option>)}</select>}{previewPage!=='login'&&<button type="button" aria-pressed={light} onClick={()=>setLight(!light)}>{light?'Clair':'Sombre'}</button>}</div></header>
+            <LivePreview design={previewDesign} path={previewPath} device={device} light={light}/>
+            <p className={styles.previewNote}><span className={styles.liveDot}/> Aperçu en direct · Les actions du serveur sont désactivées dans l’aperçu.</p>
+        </main>
     </div>;
 }

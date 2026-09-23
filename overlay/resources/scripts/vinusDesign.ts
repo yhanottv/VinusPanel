@@ -1,9 +1,20 @@
+import { DesignOptions, optionDefaults } from './designOptions';
 export interface ServerDesign {
     color?: string;
     banner?: string;
 }
 
+export interface DesignLink { label: string; url: string; description: string; featured: boolean; visible: boolean }
+export interface NavigationRule { path: string; label: string; visible: boolean; order: number }
+export interface ConsoleRule { search: string; replacement: string }
+export interface CssRule { selector: string; declarations: string; enabled: boolean }
 export interface VinusDesignSettings {
+    options: DesignOptions;
+    navigation: NavigationRule[];
+    console_rules: ConsoleRule[];
+    links: DesignLink[];
+    cards: DesignLink[];
+    css_rules: CssRule[];
     brand_name: string;
     accent: string;
     background: string;
@@ -15,7 +26,8 @@ export interface VinusDesignSettings {
     servers: Record<string, ServerDesign>;
 }
 
-const defaults: VinusDesignSettings = {
+export const designDefaults: VinusDesignSettings = {
+    options: optionDefaults, navigation: [], console_rules: [], links: [], cards: [], css_rules: [],
     brand_name: 'VinusPanel',
     accent: '#ff9b52',
     background: '#0b0d12',
@@ -27,7 +39,7 @@ const defaults: VinusDesignSettings = {
     servers: {},
 };
 
-const fromPage = (window as Window & { VinusDesign?: Partial<VinusDesignSettings> }).VinusDesign;
-export const vinusDesign: VinusDesignSettings = { ...defaults, ...fromPage, servers: fromPage?.servers || {} };
+const fromPage = typeof window === 'undefined' ? undefined : (window as Window & { VinusDesign?: Partial<VinusDesignSettings> }).VinusDesign;
+export const vinusDesign: VinusDesignSettings = { ...designDefaults, ...fromPage, options: { ...optionDefaults, ...fromPage?.options }, navigation: fromPage?.navigation || [], console_rules: fromPage?.console_rules || [], links: fromPage?.links || [], cards: fromPage?.cards || [], css_rules: fromPage?.css_rules || [], servers: fromPage?.servers || {} };
 
 export const serverDesign = (uuid: string): ServerDesign => vinusDesign.servers[uuid] || {};

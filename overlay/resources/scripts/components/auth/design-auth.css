@@ -1,0 +1,25 @@
+
+.vinus-auth-stage { color:var(--vinus-text); background:var(--vinus-bg)!important; font-family:var(--vinus-body-font); }
+.vinus-auth-panel { border-radius:var(--vinus-radius)!important; max-width:var(--vinus-login-width)!important; }
+.vinus-auth-editorial h1,.vinus-auth-panel h2 { font-family:var(--vinus-heading-font); }
+html[data-vinus-login-layout='left'] .vinus-auth-panel { order:-1; }
+html[data-vinus-login-layout='center'] .vinus-auth-shell form { display:flex; flex-direction:column; }
+html[data-vinus-login-layout='center'] .vinus-auth-editorial { display:none; }
+html[data-vinus-login-layout='top'] .vinus-auth-shell form { display:flex; flex-direction:column; gap:30px; }
+html[data-vinus-login-layout='top'] .vinus-auth-editorial { display:block; text-align:center; }
+html[data-vinus-login-align='center'] .vinus-auth-panel { text-align:center; }
+html[data-vinus-login-surface='none'] .vinus-auth-panel { background:transparent; box-shadow:none; border:0; }
+html[data-vinus-login-surface='glass'] .vinus-auth-panel { background:#8793a612; backdrop-filter:blur(20px); }
+html[data-vinus-login-surface='outline'] .vinus-auth-panel { background:transparent; box-shadow:none; border-color:var(--vinus-accent); }
+html[data-vinus-login-surface='raised'] .vinus-auth-panel { box-shadow:0 30px 90px #0009; }
+html[data-vinus-login-backdrop='image'] .vinus-auth-stage { background:var(--vinus-background-image) center/cover!important; }
+html[data-vinus-login-backdrop='gradient'] .vinus-auth-stage { background:linear-gradient(125deg,var(--vinus-bg),var(--vinus-surface),var(--vinus-accent))!important; }
+html[data-vinus-login-backdrop='aurora'] .vinus-auth-stage { background:radial-gradient(ellipse at 20% 20%,rgba(var(--vinus-accent-rgb),.35),transparent 55%),var(--vinus-bg)!important; }
+html[data-vinus-login-backdrop='grid'] .vinus-auth-stage { background:linear-gradient(#8881 1px,transparent 1px),linear-gradient(90deg,#8881 1px,transparent 1px),var(--vinus-bg)!important; background-size:40px 40px!important; }
+html[data-vinus-login-logo='false'] .vinus-auth-brand>img { display:none; }
+html[data-vinus-login-pitch='false'] .vinus-auth-editorial { display:none; }
+html[data-vinus-language-picker='false'] .vinus-auth-brand>div { display:none; }
+.vinus-login-preview-field { display:block; width:100%; border:1px solid #8883; border-radius:8px; padding:12px; margin:10px 0 20px; background:var(--vinus-bg); }
+.vinus-login-preview-button { width:100%; padding:12px; background:var(--vinus-accent); color:var(--vinus-button-text); border-radius:8px; }
+html[data-vinus-footer-credit='false'] .vinus-footer-credit { display:none; }
+.vinus-footer-custom { text-align:center; font-size:11px; color:var(--vinus-muted); padding:5px; }

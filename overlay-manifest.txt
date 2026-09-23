@@ -1,6 +1,8 @@
 app/Http/Controllers/Admin/VinusDesignController.php
+app/Http/Middleware/SetSecurityHeaders.php
 app/Services/VinusDesign.php
 app/Services/VinusSoftware.php
+app/Services/vinus-design-options.json
 app/Transformers/Api/Client/ServerTransformer.php
 public/assets/css/vinus-admin.css
 public/assets/images/vinus/eagle.png
@@ -52,6 +54,7 @@ resources/scripts/components/auth/LoginCheckpointContainer.tsx
 resources/scripts/components/auth/LoginContainer.tsx
 resources/scripts/components/auth/LoginFormContainer.tsx
 resources/scripts/components/auth/ResetPasswordContainer.tsx
+resources/scripts/components/auth/design-auth.css
 resources/scripts/components/dashboard/AccountOverviewContainer.tsx
 resources/scripts/components/dashboard/DashboardContainer.tsx
 resources/scripts/components/dashboard/DashboardIcon.tsx
@@ -60,7 +63,11 @@ resources/scripts/components/dashboard/ServerRow.spec.tsx
 resources/scripts/components/dashboard/ServerRow.tsx
 resources/scripts/components/dashboard/activity/ActivityLogContainer.tsx
 resources/scripts/components/dashboard/dashboard.module.css
+resources/scripts/components/dashboard/design/DesignNavLink.tsx
 resources/scripts/components/dashboard/design/DesignStudio.tsx
+resources/scripts/components/dashboard/design/LivePreview.tsx
+resources/scripts/components/dashboard/design/LoginPreview.tsx
+resources/scripts/components/dashboard/design/navigationCatalog.ts
 resources/scripts/components/dashboard/design/style.module.css
 resources/scripts/components/dashboard/forms/ConfigureTwoFactorForm.tsx
 resources/scripts/components/dashboard/forms/UpdateEmailAddressForm.tsx
@@ -146,6 +153,9 @@ resources/scripts/components/server/useServerOperation.ts
 resources/scripts/components/server/useServerTelemetry.ts
 resources/scripts/components/server/viewer.module.css
 resources/scripts/components/server/worlds.module.css
+resources/scripts/designOptions.ts
+resources/scripts/designRuntime.test.ts
+resources/scripts/designRuntime.ts
 resources/scripts/i18n.ts
 resources/scripts/locales/en.ts
 resources/scripts/locales/preferences.ts

@@ -3,13 +3,18 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ServerContext } from '@/state/server';
 import { SocketEvent } from '@/components/server/events';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
-import { Line } from 'react-chartjs-2';
+import { Chart } from 'react-chartjs-2';
+import { Chart as ChartJS, BarElement, BarController, LineController } from 'chart.js';
+import { useDesign } from '@/designRuntime';
+ChartJS.register(BarElement, BarController, LineController);
 import { useChart, useChartTickLabel, formatChartValue, formatChartBytes } from '@/components/server/console/chart';
 import { hexToRgba } from '@/lib/helpers';
 import ChartBlock from '@/components/server/console/ChartBlock';
 import { faBolt, faExchangeAlt, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 
 export default () => {
+  const design = useDesign();
+  const chartType = design.options.chart_shape === 'bar' ? 'bar' : 'line';
   const status = ServerContext.useStoreState((state) => state.status.value);
   const limits = ServerContext.useStoreState((state) => state.server.data!.limits);
   const previous = useRef<{ tx: number; rx: number; at: number } | null>(null);
@@ -96,7 +101,7 @@ export default () => {
         meta={limits.cpu > 0 ? vt('Limite : {{value}}', { value: formatChartValue(limits.cpu, '%', 0) }) : vt("Sans limite CPU")}
         icon={faBolt}
       >
-        <Line {...cpu.props} role={'img'} aria-label={vt("Historique du processeur en pourcentage")} />
+        <Chart<'line' | 'bar'> type={chartType} {...cpu.props} role={'img'} aria-label={vt("Historique du processeur en pourcentage")} />
       </ChartBlock>
       <ChartBlock
         title={vt("Mémoire")}
@@ -104,7 +109,7 @@ export default () => {
         meta={limits.memory > 0 ? vt('sur {{value}}', { value: formatChartBytes(limits.memory * 1024 * 1024) }) : vt("Sans limite mémoire")}
         icon={faLayerGroup}
       >
-        <Line {...memory.props} role={'img'} aria-label={vt("Historique de la mémoire utilisée")} />
+        <Chart<'line' | 'bar'> type={chartType} {...memory.props} role={'img'} aria-label={vt("Historique de la mémoire utilisée")} />
       </ChartBlock>
       <ChartBlock
         title={vt("Réseau")}
@@ -113,7 +118,7 @@ export default () => {
         meta={vt("Entrant")}
         secondaryValue={`${formatChartBytes(current.outbound)}/s`}
       >
-        <Line {...network.props} role={'img'} aria-label={vt("Historique des débits entrant et sortant")} />
+        <Chart<'line' | 'bar'> type={chartType} {...network.props} role={'img'} aria-label={vt("Historique des débits entrant et sortant")} />
       </ChartBlock>
     </>
   );

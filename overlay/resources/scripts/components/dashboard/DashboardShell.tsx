@@ -1,3 +1,4 @@
+import { useDesign, useDesignPreview, designPreview } from '@/designRuntime';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
@@ -12,8 +13,12 @@ import http from '@/api/http';
 import { VINUS } from '@/theme';
 
 export default function DashboardShell({ children, sidebar }: { children: React.ReactNode; sidebar?: React.ReactNode }) {
+    const design = useDesign();
     const user = useStoreState(state => state.user.data!);
+    useDesignPreview(user.rootAdmin);
     const [light, setLight] = usePersistedState(`${user.uuid}:dashboard:light`, false);
+    const [previewLight,setPreviewLight]=useState(false);
+    useEffect(()=>{const update=(e:Event)=>setPreviewLight((e as CustomEvent<boolean>).detail);window.addEventListener('vinus:preview-theme',update);return()=>window.removeEventListener('vinus:preview-theme',update);},[]);
     const [accent, setAccent] = usePersistedState(`${user.uuid}:dashboard:accent`, '');
     const [menu, setMenu] = useState<'help' | 'color' | null>(null);
     const [mobileActions, setMobileActions] = useState(false);
@@ -41,12 +46,12 @@ export default function DashboardShell({ children, sidebar }: { children: React.
         try { await http.post('/auth/logout'); window.location.assign('/auth/login'); }
         catch { setError(vt('Déconnexion impossible. Réessayez.')); setLoggingOut(false); }
     };
-    const validAccent = /^#[\da-f]{6}$/i.test(accent || '') ? accent : '';
+    const validAccent = !designPreview && design.options.palette_picker && /^#[\da-f]{6}$/i.test(accent || '') ? accent : '';
     const colorStyle = validAccent ? {
         '--dash-accent': validAccent,
         '--dash-accent-rgb': [1, 3, 5].map(index => parseInt(validAccent.slice(index, index + 2), 16)).join(','),
     } as React.CSSProperties : undefined;
-    return <div className={`${styles.shell} app-shell`} data-theme={light ? 'light' : 'dark'} style={colorStyle}>
+    return <div className={`${styles.shell} app-shell`} data-theme={(designPreview ? previewLight : light) ? 'light' : 'dark'} style={colorStyle} data-vinus-shell="true">
         <a className="skip-navigation" href="#main-content">{vt('Aller au contenu')}</a>
         {sidebar || <NavigationBar />}
         <main className={`${styles.workspace} app-workspace`} id="main-content" tabIndex={-1}>

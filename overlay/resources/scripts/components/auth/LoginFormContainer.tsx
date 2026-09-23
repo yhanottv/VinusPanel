@@ -1,3 +1,5 @@
+import { useDesign } from '@/designRuntime';
+import './design-auth.css';
 import LanguageSelector from '@/components/elements/LanguageSelector';
 import { vt } from '@/locales/translate';
 import React, { forwardRef } from 'react';
@@ -72,22 +74,25 @@ const Footer = styled.footer`
     }
 `;
 
-export default forwardRef<HTMLFormElement, Props>(({ title, children, ...props }, ref) => (
-    <Stage>
-        <Brand>
-            <img src={VINUS.logo} alt={''} aria-hidden={'true'} />
-            <strong>{VINUS.name}</strong>
+export default forwardRef<HTMLFormElement, Props>(({ title, children, ...props }, ref) => {
+    const design = useDesign();
+    const o = design.options;
+    return (
+    <Stage className="vinus-auth-stage">
+        <Brand className="vinus-auth-brand">
+            <img src={design.logo} alt={''} aria-hidden={'true'} />
+            <strong>{design.brand_name}</strong>
             <div style={{ marginLeft: 'auto' }}><LanguageSelector /></div>
         </Brand>
-        <Shell>
+        <Shell className="vinus-auth-shell">
             <Form {...props} ref={ref}>
-                <Editorial>
+                <Editorial className="vinus-auth-editorial">
                     <span className={'eyebrow'}>{vt("Votre espace, simplement.")}</span>
-                    <h1>{vt("Vos serveurs.")}<br />{vt("Les idées qui vont avec.")}</h1>
-                    <p>{vt("Console, fichiers, sauvegardes. Tout ce qu’il faut pour faire vivre vos projets, au même endroit.")}</p>
+                    <h1>{o.login_heading || <>{vt("Vos serveurs.")}<br />{vt("Les idées qui vont avec.")}</>}</h1>
+                    <p>{o.login_description || vt("Console, fichiers, sauvegardes. Tout ce qu’il faut pour faire vivre vos projets, au même endroit.")}</p>
                 </Editorial>
-                <AuthPanel>
-                    <p className={'auth-label'}>{VINUS.name}{vt(" / Compte")}</p>
+                <AuthPanel className="vinus-auth-panel">
+                    <p className={'auth-label'}>{design.brand_name}{vt(" / Compte")}</p>
                     {title && <h2>{title}</h2>}
                     <p className={'form-caption'}>{vt("Accédez à votre espace de gestion.")}</p>
                     <FlashMessageRender css={tw`mb-4`} />
@@ -95,9 +100,9 @@ export default forwardRef<HTMLFormElement, Props>(({ title, children, ...props }
                 </AuthPanel>
             </Form>
         </Shell>
-        <Footer>
-            <span>{VINUS.name}</span>
+        <Footer className="vinus-auth-footer">
+            <span>{o.login_footnote || design.brand_name}</span>
             <a href={'https://pterodactyl.io'} target={'_blank'} rel={'noopener noreferrer'}>{vt("Propulsé par Pterodactyl")}</a>
         </Footer>
     </Stage>
-));
+); });

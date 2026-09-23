@@ -1,3 +1,4 @@
+import { useDesign } from '@/designRuntime';
 import { vt } from '@/locales/translate';
 import LanguageSelector from '@/components/elements/LanguageSelector';
 import React, { useEffect } from 'react';
@@ -14,11 +15,12 @@ export interface PageContentBlockProps {
 }
 
 const PageContentBlock: React.FC<PageContentBlockProps> = ({ title, showFlashKey, className, children }) => {
+    const design = useDesign();
     useEffect(() => {
         if (title) {
-            document.title = title;
+            document.title = design.options.title_template.replace('{page}', title).replace('{panel}', design.brand_name);
         }
-    }, [title]);
+    }, [title, design.brand_name, design.options.title_template]);
 
     return (
         <CSSTransition timeout={150} classNames={'fade'} appear in>
@@ -30,7 +32,7 @@ const PageContentBlock: React.FC<PageContentBlockProps> = ({ title, showFlashKey
                     {children}
                 </ContentContainer>
                 <ContentContainer className="vinus-page-footer" css={tw`mb-4`}>
-                    <p css={tw`text-center text-xs text-neutral-500`}>{vt("Propulsé par ")}<a
+                    <p className="vinus-footer-credit" css={tw`text-center text-xs text-neutral-500`}>{vt("Propulsé par ")}<a
                             rel={'noopener nofollow noreferrer'}
                             href={'https://pterodactyl.io'}
                             target={'_blank'}
@@ -40,6 +42,8 @@ const PageContentBlock: React.FC<PageContentBlockProps> = ({ title, showFlashKey
                         </a>
                         &nbsp;&middot;&nbsp;2015 - {new Date().getFullYear()}
                     </p>
+                    {design.options.footer_theme && <p className="vinus-footer-custom">VinusPanel</p>}
+                    {design.options.footer_text && <p className="vinus-footer-custom">{design.options.footer_text}</p>}
                 </ContentContainer>
             </>
         </CSSTransition>

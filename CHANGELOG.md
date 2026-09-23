@@ -1,5 +1,12 @@
 # VinusPanel changelog
 
+## Unreleased — Live Design Studio
+
+- Replace the design form with a full-screen categorized editor and isolated responsive previews.
+- Add shared visual settings for the dashboard, navigation, authentication, server overview and console.
+- Preserve legacy identity settings, private server artwork and Blueprint extension hooks.
+- Validate saved options, navigation URLs and CSS; restrict preview framing to same-origin administrator views.
+
 ## 3.2.0 — 2026-09-24
 
 - Use the full available dashboard width on Full HD and ultrawide screens; retain mobile layout.

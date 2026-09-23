@@ -1,3 +1,5 @@
+import NavigationBar from '@/components/NavigationBar';
+import { useDesign } from '@/designRuntime';
 import React, { useEffect, useState } from 'react';
 import { Route, Switch, useRouteMatch, useLocation } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
@@ -20,6 +22,7 @@ import styles from '@/components/server/server.module.css';
 /* BLUEPRINT_IMPORTS */
 
 export default () => {
+    const design = useDesign();
     const match = useRouteMatch<{ id: string }>();
     const location = useLocation();
     const admin = useStoreState(s => s.user.data!.rootAdmin);
@@ -35,8 +38,9 @@ export default () => {
     }, [match.params.id]);
     if (!server) return error ? <ServerError message={error} /> : <Spinner size="large" centered />;
     const consolePath = location.pathname.replace(/\/$/, '') === match.url.replace(/\/$/, '');
-    return <DashboardShell sidebar={<ServerNavigation /* BLUEPRINT_NAV */ />}>
+    return <DashboardShell sidebar={design.options.server_nav === 'replace' ? <ServerNavigation /* BLUEPRINT_NAV */ /> : design.options.server_nav === 'second' ? <><NavigationBar /><ServerNavigation /* BLUEPRINT_NAV */ /></> : <NavigationBar />}>
         <div className={styles.route}>
+            {design.options.server_nav === 'top' && <div className="vinus-server-topnav"><ServerNavigation /></div>}
             <InstallListener /><TransferListener /><WebsocketHandler /><ServerStatusBootstrap />
             <ServerShellHeader />
             {conflict && !(admin && consolePath) ? <ConflictStateRenderer /> : <ErrorBoundary>

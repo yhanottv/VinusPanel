@@ -1,3 +1,4 @@
+import { vinusDesign } from '@/vinusDesign';
 export type PanelLanguage = 'fr' | 'en';
 export const LANGUAGE_STORAGE_KEY = 'vinus:language';
 
@@ -10,7 +11,7 @@ export function readLanguage(): PanelLanguage {
     const requested = validLanguage(new URL(window.location.href).searchParams.get('lang'));
     if (requested) return requested;
     try {
-        return validLanguage(window.localStorage.getItem(LANGUAGE_STORAGE_KEY)) || 'fr';
+        return validLanguage(window.localStorage.getItem(LANGUAGE_STORAGE_KEY)) || validLanguage(vinusDesign.options.default_language) || 'fr';
     } catch {
         return 'fr';
     }
