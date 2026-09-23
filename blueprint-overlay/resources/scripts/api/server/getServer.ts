@@ -34,6 +34,7 @@ export interface Server {
     __deprecatedUuidShort: string;
     uuid: string;
     name: string;
+    softwareProfile?: { software: string | null; game_version: string | null; categories: Partial<Record<'mods' | 'plugins', string[]>> };
     node: string;
     isNodeUnderMaintenance: boolean;
     status: ServerStatus;
@@ -72,6 +73,7 @@ export const rawDataToServerObject = ({ attributes: data }: FractalResponseData)
     __deprecatedUuidShort: data.__deprecated_uuid_short,
     uuid: data.uuid,
     name: data.name,
+    softwareProfile: data.software_profile,
     node: data.node,
     isNodeUnderMaintenance: data.is_node_under_maintenance,
     status: data.status,

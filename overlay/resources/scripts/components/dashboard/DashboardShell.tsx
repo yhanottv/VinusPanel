@@ -11,7 +11,7 @@ import { usePersistedState } from '@/plugins/usePersistedState';
 import http from '@/api/http';
 import { VINUS } from '@/theme';
 
-export default function DashboardShell({ children }: { children: React.ReactNode }) {
+export default function DashboardShell({ children, sidebar }: { children: React.ReactNode; sidebar?: React.ReactNode }) {
     const user = useStoreState(state => state.user.data!);
     const [light, setLight] = usePersistedState(`${user.uuid}:dashboard:light`, false);
     const [accent, setAccent] = usePersistedState(`${user.uuid}:dashboard:accent`, '');
@@ -48,7 +48,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
     } as React.CSSProperties : undefined;
     return <div className={`${styles.shell} app-shell`} data-theme={light ? 'light' : 'dark'} style={colorStyle}>
         <a className="skip-navigation" href="#main-content">{vt('Aller au contenu')}</a>
-        <NavigationBar />
+        {sidebar || <NavigationBar />}
         <main className={`${styles.workspace} app-workspace`} id="main-content" tabIndex={-1}>
             <header className={styles.topbar}>
                 <div className={styles.search}><SearchContainer /></div>

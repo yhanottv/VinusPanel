@@ -107,7 +107,7 @@ export default () => {
         }
 
         connect(uuid);
-    }, [uuid]);
+    }, [uuid, instance]);
 
     return error ? (
         <CSSTransition timeout={150} in appear classNames={'fade'}>

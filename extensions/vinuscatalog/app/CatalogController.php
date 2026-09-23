@@ -25,6 +25,11 @@ final class CatalogController extends Controller
 
     private function detect(Server $server): array
     {
+        $installed = storage_path('app/vinussoftware/'.$server->uuid.'.json');
+        if (is_file($installed)) {
+            $record = json_decode(file_get_contents($installed), true);
+            if (is_array($record) && ($record['startup'] ?? null) === $server->startup && ($record['image'] ?? null) === $server->image && isset($record['profile']['software'], $record['profile']['categories'])) return $record['profile'];
+        }
         $variables = [];
         foreach ($server->variables as $variable) {
             // Only version/loader metadata is consumed; never return environment values.
@@ -63,7 +68,7 @@ final class CatalogController extends Controller
     public function profile(Request $request, Server $server): array
     {
         $this->access($request, $server);
-        return ['profile' => $this->detect($server), 'versions' => $this->catalog->versions(), 'installed' => array_values($this->installed($server))];
+        return ['profile' => $this->detect($server), 'versions' => $this->catalog->versions(), 'installed' => array_values($this->installed($server)), 'sources' => (new CatalogSources())->available()];
     }
 
     public function search(Request $request, Server $server): array
@@ -71,18 +76,32 @@ final class CatalogController extends Controller
         $this->access($request, $server);
         [$profile, $input, $loaders] = $this->selection($request, $server);
         $options = $request->validate(['query' => 'nullable|string|max:120', 'offset' => 'nullable|integer|min:0|max:10000', 'sort' => 'nullable|in:relevance,downloads,updated']);
+        $source = $request->validate(['source' => 'nullable|in:modrinth,spigot,curseforge'])['source'] ?? 'modrinth';
+        if ($source !== 'modrinth') return (new CatalogSources())->search($source, $input['kind'], $options, $input['game_version']);
         // Match every published project type: a project can provide both mod and plugin releases.
         $facets = [['all_project_types:'.($input['kind'] === 'mods' ? 'mod' : 'plugin')], array_map(fn ($loader) => 'categories:'.$loader, $loaders), ['versions:'.$input['game_version']], ['server_side!=unsupported']];
         $result = $this->catalog->get('search', ['query' => $options['query'] ?? '', 'offset' => $options['offset'] ?? 0, 'limit' => 12, 'index' => $options['sort'] ?? 'relevance', 'facets' => json_encode($facets)]);
         return ['hits' => array_map(fn ($hit) => array_merge(array_intersect_key($hit, array_flip(['project_id', 'title', 'description', 'author', 'downloads', 'date_modified'])), ['icon_url' => Modrinth::icon($hit['icon_url'] ?? null)]), $result['hits'] ?? []), 'total' => $result['total_hits'] ?? 0];
     }
 
+    public function versions(Request $request, Server $server): array
+    {
+        $this->access($request, $server);
+        [$profile, $input, $loaders] = $this->selection($request, $server);
+        $data = $request->validate(['source' => 'required|in:modrinth,spigot,curseforge', 'project_id' => 'required|regex:/^[a-zA-Z0-9]{1,12}$/D']);
+        if ($data['source'] !== 'modrinth') return ['versions' => (new CatalogSources())->versions($data['source'], $data['project_id'], $input['game_version'])];
+        $versions = $this->catalog->get('project/'.$data['project_id'].'/version', ['loaders' => json_encode($loaders), 'game_versions' => json_encode([$input['game_version']]), 'include_changelog' => 'false']);
+        return ['versions' => array_values(array_map(fn ($v) => ['id' => $v['id'], 'name' => $v['version_number'], 'date' => $v['date_published'], 'game_versions' => $v['game_versions']], array_filter($versions, fn ($v) => $v['version_type'] === 'release' && ($v['status'] ?? 'listed') === 'listed')))];
+    }
+
     public function plan(Request $request, Server $server): array
     {
         $this->access($request, $server, true);
         [$profile, $input, $loaders] = $this->selection($request, $server);
-        $project = $request->validate(['project_id' => 'required|regex:/^[a-zA-Z0-9]{8}$/D'])['project_id'];
-        $files = $this->catalog->resolve($project, $loaders, $input['game_version']);
+        $selection = $request->validate(['source' => 'nullable|in:modrinth,spigot,curseforge', 'project_id' => 'required|regex:/^[a-zA-Z0-9]{1,12}$/D', 'version_id' => 'nullable|regex:/^[a-zA-Z0-9]{1,12}$/D']);
+        $source = $selection['source'] ?? 'modrinth';
+        $files = $source === 'modrinth' ? $this->catalog->resolve($selection['project_id'], $loaders, $input['game_version'], $selection['version_id'] ?? null)
+            : (new CatalogSources())->resolve($source, $selection['project_id'], $selection['version_id'] ?? '', $input['kind'], $loaders, $input['game_version']);
         $installed = $this->installed($server);
         foreach ($files as &$file) {
             $previous = $installed[$input['kind'].':'.$file['project_id']] ?? null;
@@ -141,6 +160,9 @@ final class CatalogController extends Controller
                 $temp = tmpfile();
                 if (!$temp) throw new HttpException(503, 'Impossible de préparer le téléchargement.');
                 try {
+                    if (($file['source'] ?? 'modrinth') !== 'modrinth') {
+                        $content = (new CatalogSources())->download($file['source'], $file['url']);
+                    } else {
                     $response = Http::withUserAgent('VinusCatalog/1.0 (github.com/yhanottv/VinusPanel)')->timeout(45)->connectTimeout(5)
                         ->withOptions(['allow_redirects' => false, 'sink' => $temp, 'progress' => function ($total, $downloaded) {
                             if ($total > 25 * 1024 * 1024 || $downloaded > 25 * 1024 * 1024) throw new \RuntimeException('Download exceeds size limit.');
@@ -148,6 +170,7 @@ final class CatalogController extends Controller
                     abort_unless($response->successful(), 502, 'Le téléchargement a échoué. Les fichiers actifs sont conservés.');
                     rewind($temp);
                     $content = stream_get_contents($temp, 25 * 1024 * 1024 + 1);
+                    }
                     abort_unless(strlen($content) === $file['size'] && hash_equals($file['sha512'], hash('sha512', $content)), 502, 'L’intégrité du téléchargement ne correspond pas au catalogue.');
                     $repository->putContent('/'.$batch.'/'.$file['filename'], $content);
                     unset($content);
@@ -182,7 +205,7 @@ final class CatalogController extends Controller
                     throw $error;
                 }
                 $committed[] = ['file' => $file, 'moved' => $moved];
-                $installed[$kind.':'.$file['project_id']] = array_merge(array_intersect_key($file, array_flip(['project_id', 'title', 'version_id', 'version', 'filename', 'sha512', 'icon_url'])), ['kind' => $kind, 'game_version' => $plan['selection']['game_version']]);
+                $installed[$kind.':'.$file['project_id']] = array_merge(array_intersect_key($file, array_flip(['project_id', 'title', 'version_id', 'version', 'filename', 'sha512', 'icon_url', 'source', 'page_url'])), ['kind' => $kind, 'game_version' => $plan['selection']['game_version']]);
             }
             if ($prepared) {
                 $temporary = $path.'.'.$token.'.tmp';

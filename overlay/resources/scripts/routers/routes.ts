@@ -1,5 +1,12 @@
+import ServerWorldViewer from '@/components/server/ServerWorldViewer';
 import { vt } from '@/locales/translate';
 import React, { lazy } from 'react';
+import ServerOverview from '@/components/server/ServerOverview';
+import ServerTools from '@/components/server/ServerTools';
+import ServerSoftware from '@/components/server/ServerSoftware';
+import ServerModpacks from '@/components/server/ServerModpacks';
+import ServerWorlds from '@/components/server/ServerWorlds';
+import ServerProperties from '@/components/server/ServerProperties';
 import ServerConsole from '@/components/server/console/ServerConsoleContainer';
 import DatabasesContainer from '@/components/server/databases/DatabasesContainer';
 import ScheduleContainer from '@/components/server/schedules/ScheduleContainer';
@@ -74,6 +81,16 @@ export default {
         },
     ],
     server: [
+        { path: '/overview', permission: null, name: vt('Aperçu'), component: ServerOverview, exact: true },
+        { path: '/support', permission: null, name: vt('Assistance'), component: ServerTools, exact: true },
+        { path: '/players', permission: 'file.read-content', name: vt('Joueurs'), component: ServerTools, exact: true },
+        { path: '/plugins', permission: 'file.read', name: 'Plugins', component: ServerTools, exact: true },
+        { path: '/mods', permission: 'file.read', name: 'Mods', component: ServerTools, exact: true },
+        { path: '/modpacks', permission: 'file.read', name: 'Modpacks', component: ServerModpacks, exact: true },
+        { path: '/world-viewer', permission: 'file.read-content', name: 'World Viewer', component: ServerWorldViewer, exact: true },
+        { path: '/worlds', permission: 'file.read', name: vt('Mondes'), component: ServerWorlds, exact: true },
+        { path: '/version', permission: 'startup.read', name: 'Version', component: ServerSoftware, exact: true },
+        { path: '/properties', permission: 'file.read-content', name: vt('Propriétés'), component: ServerProperties, exact: true },
         {
             path: '/',
             permission: null,

@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/banner.png" alt="VinusPanel banner — orange eagle on a dark background" width="100%" />
+<img src="docs/assets/banner.png" alt="VinusPanel — clean dashboard presentation" width="100%" />
 
 <br />
 
@@ -11,7 +11,7 @@
 **A free, open-source Pterodactyl theme with a live Design Studio, per-server banners, Liquid Glass navigation, a redesigned console and an optional Minecraft catalog.**
 
 [![Package checks](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml/badge.svg)](https://github.com/yhanottv/VinusPanel/actions/workflows/validate.yml)
-[![Source version](https://img.shields.io/badge/source-3.1.1-ff7a1a)](CHANGELOG.md)
+[![Source version](https://img.shields.io/badge/source-3.2.0-ff7a1a)](CHANGELOG.md)
 [![Pterodactyl](https://img.shields.io/badge/Pterodactyl-1.15.1-242429)](#compatibility)
 [![MIT License](https://img.shields.io/badge/license-MIT-242429)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/vinuspanel)
@@ -20,7 +20,7 @@
 
 [Screenshots](#screenshots) · [Features](#features) · [Installation](#installation) · [Compatibility](#compatibility) · [Minecraft catalog](#minecraft-catalog) · [Support](#support)
 
-**New in 3.1:** open **Design** in the client sidebar to change colors, the panel name, logo and background, plus colors and banners for individual servers. The real dashboard and server card respond before you save. Settings and uploaded images persist across theme upgrades. See the [complete French VPS installation and Design guide](INSTALLATION.fr.md).
+**New in 3.2:** responsive full-width dashboard, software logos, redesigned server management and optional Minecraft installation tools. Open **Design** in the client sidebar to change colors, the panel name, logo and background, plus colors and banners for individual servers. The real dashboard and server card respond before you save. Settings and uploaded images persist across theme upgrades. See the [complete French VPS installation and Design guide](INSTALLATION.fr.md).
 
 </div>
 
@@ -34,38 +34,15 @@ This repository contains a **theme overlay and installation tools**, not a compl
 
 ## 📸 Screenshots
 
-Real screenshots of VinusPanel 2.4.0, with English selected. IP addresses are masked. The login form contains unsubmitted demonstration values. Server states and charts use real data; no game server was restarted for these previews. Player logs and personal account details are excluded.
+Screenshots of the actual 3.2 interface with **demonstration data**. No personal server, account, address or private configuration is shown. Marketing layouts use Higgsfield; screenshots remain representative of the implemented UI.
 
-**Sign in — choose French or English before accessing the panel.**
+![Responsive server dashboard](docs/assets/screenshots/servers.png)
 
-![VinusPanel sign-in screen with orange branding and a French/English language selector](docs/assets/screenshots/login.png)
+![Server overview](docs/assets/screenshots/overview.png)
 
-**Your servers — online and offline states at a glance.**
+![Server console](docs/assets/screenshots/console-eagle.png)
 
-![VinusPanel server list showing three servers, one online and two offline](docs/assets/screenshots/servers.png)
-
-**Live resources — CPU, memory and incoming/outgoing network activity.**
-
-![Actual CPU, memory and network history on a running Velocity server](docs/assets/screenshots/live-resources.png)
-
-**Console — the orange eagle inside the terminal, alongside live resources and power controls.**
-
-![VinusPanel console with the orange Unicode eagle in terminal scrollback and the server online](docs/assets/screenshots/console-eagle.png)
-
-<details>
-<summary>Explore the optional Minecraft catalog</summary>
-
-**Mods — search and project icons for the detected loader.**
-
-![Modrinth mod catalog with project icons and a separate Plugins tab](docs/assets/screenshots/catalog-mods.png)
-
-**Plugins — a separate category on supported hybrid servers.**
-
-![Modrinth plugin catalog with project icons on a hybrid server](docs/assets/screenshots/catalog-plugins.png)
-
-The catalog requires the optional Blueprint extension. See [catalog compatibility](#minecraft-catalog) before installing.
-
-</details>
+![Minecraft software management](docs/assets/screenshots/software.png)
 
 <a id="features"></a>
 
@@ -80,7 +57,8 @@ The catalog requires the optional Blueprint extension. See [catalog compatibilit
 | Redesigned console | Live logs, command input, connection diagnostics and state-aware power controls. |
 | Resource charts | CPU, memory and network always visible above the console, with progressive updates and separate incoming/outgoing rates. |
 | Terminal signature | A detailed orange Unicode eagle, centered inside the terminal and retained in normal scrollback. |
-| Minecraft catalog | Optional Blueprint extension with Modrinth search, project icons, compatible categories, dependency previews and tracked updates. |
+| Minecraft catalog | Optional Blueprint extension with Modrinth/SpigotMC, optional CurseForge, dependency previews and tracked updates. |
+| Minecraft workspace | Software/version installer, modpacks, properties/MOTD, world import and authenticated BlueMap viewer. |
 | Account and management | Refreshed file manager, databases, backups, schedules, network, settings, profile and activity pages. |
 | Community links | Discord logo button and help announcement sharing a configurable invitation. |
 
@@ -100,10 +78,10 @@ Profile names and avatars are local to the browser. They do not change Pterodact
 
 | Component | Requirement / tested scope |
 | --- | --- |
-| VinusPanel | Source version **3.1.1**. |
+| VinusPanel | Source version **3.2.0**. |
 | Pterodactyl Panel | **1.15.1**. Other versions and forks are not validated. |
 | Blueprint | Optional for the theme; **beta-2026-06** is the validated integration. Required for Vinus Catalog. |
-| Vinus Catalog | Extension **1.2.1**, included in this repository. Update the Blueprint extension separately to receive its rate-limit fix. |
+| Vinus Catalog | Extension **1.3.0**, included in this repository. Install/update the Blueprint extension separately for Minecraft installation tools. |
 | Node.js | Installer requires **22+**; builds were validated on Node 22. Later major versions are not automatically certified. |
 | Yarn | **1.x**. |
 | PHP | Validated on **8.3**. Keep the PHP requirements of your panel and Blueprint installation. |
@@ -118,7 +96,7 @@ The theme runs in a browser, with no native app required. Layout depends on the 
 
 | Device / viewport | Layout | Validation performed |
 | --- | --- | --- |
-| Desktop and laptop | Sidebar from 1,024 px; wider console and multi-column workspace. | Checked in an embedded Chromium browser, including a 1,440 px viewport. |
+| Desktop and laptop | Sidebar from 1,024 px; wider console and multi-column workspace. | Checked in an embedded Chromium browser, at 1,920 and 3,440 px, without horizontal page overflow. |
 | Tablet / medium window | Horizontal navigation below 1,024 px, with rearranged content. | Checked at 742 px; not certified on every physical tablet. |
 | Phone | Stacked cards on small screens, resized terminal and horizontally scrollable navigation. | Responsive preview checked at 390 px; physical iOS/Android device testing remains pending. |
 
@@ -156,7 +134,7 @@ sudo bash install.sh --panel-dir /path/to/pterodactyl
 
 1. Checks the package, required commands and detectable versions.
 2. Backs up affected files and enters panel maintenance mode.
-3. Installs the **75-file base overlay**, plus Blueprint variants/additional files when applicable.
+3. Installs the **bundled base overlay**, plus Blueprint variants/additional files when applicable.
 4. Installs frontend dependencies if missing and adds the bundled font/test environment dependencies.
 5. Builds production assets, clears Laravel caches and restores expected file ownership.
 6. Records the installed version and exits maintenance mode.
@@ -167,7 +145,7 @@ On failure, the script attempts to restore backed-up files, rebuild and leave ma
 
 ## 📦 Optional Minecraft mod and plugin catalog
 
-**Blueprint is the extension framework. Modrinth is the content source.** Vinus Catalog can work independently of the theme; VinusPanel adds its navigation entry when installed.
+**Blueprint is the extension framework.** Vinus Catalog 1.3.0 provides Modrinth, supported free SpigotMC resources and an optional CurseForge adapter. Its complete software, modpack, world and BlueMap workspace requires VinusPanel 3.2.0.
 
 | Detected server software | Available categories |
 | --- | --- |
@@ -200,7 +178,7 @@ Adapt the panel path if necessary. See the [detailed catalog guide, currently in
 
 Detection uses declared software, the selected JAR name and the egg name, with no hard-coded host-specific numeric egg IDs. Minecraft versions come from egg variables; users must select the installed version when it is missing or set to `latest`. Custom eggs may need local egg/server UUID mappings using the [empty configuration example](extensions/vinuscatalog/config/vinuscatalog.php.example). The panel must reach both Modrinth and Wings.
 
-- **Modrinth only:** private, paid or platform-exclusive projects elsewhere are not included. This is not a universal catalog of every Minecraft mod and plugin.
+- **CurseForge requires your own private API key** and respects author download restrictions. Its live integration remains unverified in this release. Private, paid and unsupported external downloads are excluded.
 - Automatic installation accepts one primary JAR up to **25 MiB**, up to **20 projects / 100 MiB per batch**, and **12 dependency levels**.
 - Optional dependencies and conflicts with manually installed JARs are not resolved automatically.
 - Author-declared compatibility does not guarantee conflict-free operation, especially on hybrid servers.
@@ -256,7 +234,7 @@ The uninstaller restores tracked original files, removes theme-added files, rebu
 
 Pterodactyl permission checks remain in place. Catalog installation previews are bound to the user and server, revalidated under a lock and consumed before downloading. File permissions and stopped-server state are checked before installation.
 
-Catalog downloads are restricted to Modrinth's HTTPS CDN without redirects, with size limits and SHA-512 verification. Unexpected catalog failures are logged server-side and returned with a diagnostic reference. Server-error messages avoid exposing internal traces.
+Catalog downloads enforce source-specific HTTPS host rules, size limits and available integrity checks. Archives are inspected before installation. Unexpected catalog failures are logged server-side and returned with a diagnostic reference. Server-error messages avoid exposing internal traces.
 
 These measures do not replace maintaining Pterodactyl/Wings or reviewing the extensions you install. A matching checksum verifies integrity, not the absence of malicious code. No exhaustive security audit or vulnerability-free guarantee is claimed.
 
@@ -282,17 +260,11 @@ Include versions of VinusPanel, Pterodactyl and Blueprint, browser/device detail
 
 ## 🧪 Testing and contributions
 
-For **3.1.0**, the package manifest, shell and PHP syntax, four Design routes, Blade views, TypeScript and production build passed. All **89 frontend tests across 9 suites** passed. The Design Studio was checked on the installed Pterodactyl 1.15.1 panel with Blueprint: a background upload appeared in the real dashboard after saving, and a server banner appeared in the live preview and server console. Test images were removed afterward.
-
-For **3.0.0**, the package and PHP syntax checks passed, Blade views compiled, the three Design routes registered, design settings passed a persistence smoke test, TypeScript and production builds passed, and all **89 frontend tests across 9 suites** passed. The version was installed on the existing VPS panel and the sign-in page returned HTTP 200 after maintenance ended.
-
-For **2.4.0**, TypeScript checks passed with the theme and Blueprint integration, the production build passed, and all **89 frontend tests across 9 suites** passed. The language selector was checked at desktop, tablet and phone viewport sizes, including persisted navigation and switching back to French.
-
-The **2.3.6** development panel environment passed TypeScript checking, a production build, **85 frontend tests** across 8 suites, **52 catalog detection/artifact checks** and **21 isolated catalog installation checks**. PHP/shell syntax, the file manifest and accidental credential exposure were also checked before publication.
+For **3.2.0**, standard and Blueprint TypeScript checks and production builds passed. **117 frontend checks in 15 suites** and isolated PHP checks cover console state, properties, provider parsing, archives, installation permissions and recovery. Live disposable-server tests covered Paper, Forge, a Fabric modpack, a Spigot plugin, world import and BlueMap rendering. The 28 software choices were checked for metadata/plans; not all were boot-tested. See the [validation details](docs/server-workspace/IMPLEMENTATION.md).
 
 **A complete end-to-end installation on a fresh, separately provisioned Pterodactyl panel has not yet been validated.** Builds were staged separately, and catalog installation tests simulated Wings/downloads; these are not a substitute for a clean-install test. Installation, update, uninstall and recovery should next be exercised on a disposable environment, both without Blueprint and with the supported Blueprint version.
 
-The [GitHub Actions workflow](.github/workflows/validate.yml) checks shell syntax, the manifest, catalog PHP syntax and selected accidental-secret patterns. It does **not** run the full panel build or the 85 frontend tests. Responsive previews are described above; physical-device and cross-browser coverage remain limited.
+The [GitHub Actions workflow](.github/workflows/validate.yml) checks shell syntax, the manifest, catalog PHP syntax and selected accidental-secret patterns. It does **not** run the full panel build or the full frontend tests. Responsive previews are described above; physical-device and cross-browser coverage remain limited.
 
 ```bash
 # Package checks from this repository

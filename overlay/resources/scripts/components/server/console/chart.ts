@@ -118,8 +118,8 @@ function getEmptyData(label: string, sets = 1, callback?: ChartDatasetCallback |
             fill: true,
             label,
             data: Array(30).fill(null),
-            borderColor: '#ff7a1a',
-            backgroundColor: hexToRgba('#ff7a1a', 0.12),
+            borderColor: '#ff9b52',
+            backgroundColor: hexToRgba('#ff9b52', 0.12),
           },
           index
         )

@@ -1,57 +1,60 @@
-# Vinus Catalog — extension Blueprint
+# Vinus Catalog 1.3.0
 
-Catalogue Modrinth pour Pterodactyl 1.15.1 et Blueprint **beta-2026-06**. Il fonctionne indépendamment du thème ; VinusPanel ajoute son entrée dans la navigation latérale.
-
-La version **1.2.1** sépare les compteurs de limitation des recherches et des installations : parcourir le catalogue ne consomme plus la limite de cinq installations par minute. Les commandes du catalogue sont disponibles en français ou en anglais selon la langue active du panel. Les descriptions Modrinth, noms de fichiers et messages du service conservent leur langue d’origine. Les ressources de traduction sont incluses dans l’extension : le thème VinusPanel n’est pas requis.
+Outils Minecraft pour **Pterodactyl 1.15.1**, **Blueprint beta-2026-06** et **VinusPanel 3.2.0**. Le catalogue de mods/plugins inclut ses propres traductions ; les vues Version, Modpacks, Mondes et BlueMap dépendent de l’espace serveur et des services du thème. Installer les deux paquets pour disposer de l’ensemble.
 
 ## Installation
 
-1. Installer Blueprint depuis sa [source officielle](https://blueprint.zip/guides/admin/install), en sauvegardant le panel et sa base.
-2. Pour VinusPanel, appliquer ensuite `install.sh` : il détecte Blueprint et conserve ses points d’extension. Cette intégration est limitée aux versions indiquées ci-dessus.
-3. Depuis ce dossier, créer le paquet : `zip -r vinuscatalog.blueprint conf.yml admin app components routes config tests README.md`.
-4. Copier le paquet dans la racine du panel puis lancer `blueprint -install vinuscatalog`.
+1. Sauvegarder le panel, sa base, sa configuration et les fichiers des serveurs.
+2. Installer la version compatible de [Blueprint](https://blueprint.zip/guides/admin/install).
+3. Appliquer le thème avec `sudo bash install.sh` depuis le dépôt.
+4. Depuis ce dossier, créer le paquet puis l’installer :
 
-Le paquet utilise `ignorePlaceholders` : Blueprint ne doit pas remplacer les expressions JSX comme `{version}`. Aucune clé privée ou donnée propre à un hébergeur n’est nécessaire.
+```bash
+zip -r vinuscatalog.blueprint conf.yml admin app components routes config tests README.md
+sudo cp vinuscatalog.blueprint /var/www/pterodactyl/
+cd /var/www/pterodactyl
+sudo blueprint -install vinuscatalog
+```
 
-## Détection et compatibilité
+Adapter le chemin du panel. Le paquet utilise `ignorePlaceholders` pour conserver les expressions JSX. Le thème n’installe pas automatiquement l’extension. Pour une mise à jour, reconstruire et réinstaller son paquet séparément.
 
-| Logiciel | Catégories proposées |
-| --- | --- |
-| Forge, NeoForge, Fabric, Quilt | Mods compatibles avec ce chargeur |
-| Paper, Purpur, Spigot, Bukkit, Folia, Sponge | Plugins compatibles |
-| Velocity, Bungeecord, Waterfall | Plugins compatibles avec le proxy |
-| Youer, Mohist | Deux onglets Mods et Plugins |
-| Arclight | Deux onglets après identification du chargeur Forge, Fabric ou NeoForge |
-| Vanilla ou egg inconnu | Aucun téléchargement automatique |
+## Sources et configuration locale
 
-La détection prend d’abord en compte le logiciel déclaré (`SOFTWARE` ou `SERVER_TYPE`) et le JAR sélectionné (`SERVER_JARFILE`, `JARFILE`, `SERVER_JAR_PATH`), puis le nom de l’egg. Ainsi `youer.jar` sous un egg « Paper » affiche bien les deux catégories. Aucun numéro d’egg propre à un hébergeur n’est codé en dur. Cela identifie le logiciel déclaré ; un JAR renommé de façon trompeuse ne peut pas être identifié avec certitude.
+- **Modrinth** : mods, plugins et modpacks compatibles, sans clé.
+- **SpigotMC** : plugins gratuits dont le fichier est accessible par les sources prises en charge ; les ressources payantes ou avec téléchargement externe non compatible sont refusées.
+- **CurseForge** : adaptateur pour les catalogues et archives pris en charge, uniquement avec une clé API administrateur. Les restrictions de distribution des auteurs restent applicables. La validation en ligne de cette source reste à effectuer ; les tests actuels utilisent des fixtures.
+- **MCJars** : logiciels, versions et builds pour les 28 choix présentés dans Version. La présence au catalogue ne garantit pas qu’un build existe pour chaque version de Minecraft.
 
-Pour un egg renommé ou personnalisé, copier `config/vinuscatalog.php.example` vers `config/vinuscatalog.php` dans le panel et renseigner `egg_profiles` avec **l’UUID de l’egg** et un profil défini dans `app/Detection.php`. `server_profiles` permet une exception prioritaire avec l’UUID d’un serveur. Exécuter `php artisan config:clear` après modification. Le fichier d’exemple est vide : les correspondances propres à une installation ne doivent pas être publiées.
+Copier `config/vinuscatalog.php.example` vers `config/vinuscatalog.php` **dans le panel**, puis renseigner uniquement les options nécessaires. La clé CurseForge provient de la variable d’environnement indiquée dans l’exemple. Ne jamais publier ce fichier réel ni les clés.
 
-La version Minecraft provient de `MINECRAFT_VERSION`, `MC_VERSION`, `MINECRAFT_VER` ou `MC_VER`. Les valeurs `latest` et les versions du logiciel proxy ne sont jamais devinées. En l’absence de version explicite, l’utilisateur choisit celle réellement installée. Arclight peut préciser `LOADER` ou `MOD_LOADER` ; sinon une correspondance administrative est nécessaire.
+`egg_profiles` utilise les UUID d’eggs personnalisés et `server_profiles` les exceptions par UUID de serveur. Ces correspondances restent propres à chaque installation. Après modification : `php artisan config:clear`.
 
-## Installation et mises à jour
+La détection privilégie ces profils, puis les variables du logiciel/JAR et le nom de l’egg. Aucune valeur d’egg locale n’est codée en dur. Les versions `latest` ne sont pas devinées. Les proxys ne proposent pas les outils réservés aux mondes Minecraft ; les profils hybrides peuvent proposer Mods et Plugins.
 
-La recherche consulte Modrinth et est mise en cache pendant deux minutes. L’aperçu choisit la dernière version stable déclarée compatible et inclut les dépendances requises. Les installations sont manuelles, serveur arrêté, avec les permissions de lecture/création/modification de fichiers de Pterodactyl. Le catalogue ne démarre ni n’arrête un serveur.
+## Installations et récupération
 
-Les téléchargements sont limités au CDN HTTPS de Modrinth, sans redirection, avec vérification de taille et d’empreinte SHA-512. Les anciens JAR gérés sont conservés dans un dossier `/vinus-*`. Un fichier inconnu ou modifié manuellement n’est pas écrasé. Un échec de déplacement entraîne la restauration des changements déjà terminés ; si Wings devient indisponible pendant cette restauration, l’interface indique le dossier à vérifier avant de redémarrer.
+Les aperçus indiquent le contenu, la compatibilité et les changements avant validation. Les installations nécessitent un serveur arrêté et les permissions Pterodactyl appropriées. Les commandes de puissance ne sont pas lancées automatiquement par le catalogue.
 
-Le suivi concerne les fichiers installés par ce catalogue, dans `storage/app/vinuscatalog` du panel. L’onglet « Installés avec ce catalogue » permet de vérifier et appliquer une mise à jour compatible. Les JAR ajoutés auparavant avec le gestionnaire de fichiers ne sont pas automatiquement importés dans ce suivi.
+Les téléchargements sont filtrés par fournisseur/hôte, taille et empreinte disponible. Les archives sont inspectées pour refuser les chemins dangereux, les entrées spéciales et les tailles décompressées excessives. Les transactions sont verrouillées, revalidées et conservent les anciens fichiers dans un dossier `vinus-*`. En cas de restauration incomplète, le serveur peut rester suspendu jusqu’à intervention de l’administrateur ; utiliser le dossier de récupération indiqué.
 
-## Limites explicites
+Le suivi des mises à jour concerne les fichiers installés par le catalogue. Les JAR ajoutés manuellement ne sont pas importés automatiquement. Les dépendances optionnelles et tous les conflits de mods ne sont pas résolus. Une empreinte correcte prouve l’intégrité du fichier, pas l’absence de code malveillant.
 
-- Le catalogue couvre **Modrinth**, pas tous les mods/plugins existants. Les projets exclusifs à d’autres plateformes, privés ou payants restent hors catalogue.
-- CurseForge demanderait une intégration séparée, une clé API et le respect des restrictions de distribution des auteurs. Les plateformes ne permettent pas de garantir un accès universel.
-- L’installation automatique accepte un JAR principal de 25 Mio au maximum, jusqu’à 20 projets et 100 Mio par lot, et 12 niveaux de dépendances. Les fichiers plus grands ou les formats ambigus nécessitent une installation manuelle.
-- Les déclarations de compatibilité des auteurs ne garantissent pas qu’un ensemble de mods/plugins fonctionne sans conflit. C’est particulièrement vrai sur les logiciels hybrides. Les dépendances optionnelles et les conflits avec les JAR installés hors catalogue ne sont pas résolus automatiquement.
-- Les mises à jour de Pterodactyl, Blueprint ou de l’API Modrinth doivent être validées avant de modifier les versions supportées. Les demandes d’installation passent par le serveur du panel, qui doit pouvoir joindre Modrinth et Wings.
+Les opérations logiciel/modpack peuvent durer plusieurs minutes : adapter les limites PHP et du proxy. Après une expiration HTTP, vérifier l’état avant de relancer l’installation.
 
-## Vérification
+## Mondes et BlueMap
 
-Les aperçus sont liés au compte et au serveur, revalidés sous verrou et consommés avant les téléchargements. Un échec exige un nouvel aperçu. Les erreurs inattendues sont enregistrées côté panel avec une référence, sans exposer leur détail interne dans la réponse. Les icônes utilisent uniquement les images matricielles HTTPS du CDN Modrinth, sans référent ; une initiale remplace les images absentes ou refusées. Les empreintes des JAR vérifient leur intégrité, pas l’absence de code malveillant dans une extension.
+L’import ZIP inspecte les métadonnées du monde et propose son activation avec récupération de l’état précédent. L’éditeur de propriétés/MOTD conserve les clés inconnues et détecte les modifications concurrentes avant écriture.
 
-`php tests/run.php /chemin/du/panel` vérifie la détection et les fichiers acceptés/refusés.
+BlueMap exige une version compatible, de l’espace disque et un premier rendu. Le choix d’autoriser le téléchargement des ressources Minecraft appartient à l’administrateur. La visionneuse lit les fichiers par le panel avec autorisation temporaire, dans une iframe isolée ; aucun port web BlueMap public n’est requis. Un serveur arrêté peut afficher les cartes déjà générées.
 
-`php tests/install.php /chemin/du/panel` vérifie les permissions, le refus sur serveur en marche, les collisions, l’installation, l’expiration du jeton et la restauration après erreur. Ce test utilise uniquement l’autoload Composer ; son cache, son serveur Wings et ses téléchargements sont simulés en mémoire, sans connexion à la base ou aux serveurs de jeu. Son dossier temporaire est supprimé à la fin d’un test réussi.
+## Tests et portée
 
-`php tests/rate-limit.php /chemin/du/panel` vérifie que les recherches n’épuisent pas la limite d’installation et que la sixième installation de la minute est refusée.
+Depuis ce dossier, avec les dépendances Composer du panel :
+
+```bash
+for test in tests/*.php; do php "$test" /path/to/pterodactyl; done
+```
+
+`tests/bluemap.php` vérifie aussi le middleware livré avec le thème : fournir en deuxième argument un autre répertoire de sources du panel si nécessaire. Les tests de transactions simulent Wings et les téléchargements. Les tests de métadonnées peuvent consulter les fournisseurs ; consulter leur code avant exécution hors ligne.
+
+Des installations réelles ont été vérifiées sur un serveur jetable : Paper, Forge, un modpack Fabric, un plugin Spigot, un import de monde et BlueMap. Les 28 logiciels n’ont pas tous été démarrés. Voir [la portée complète des vérifications](../../docs/server-workspace/IMPLEMENTATION.md).

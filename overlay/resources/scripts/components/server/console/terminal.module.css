@@ -1,0 +1,35 @@
+.wrapper { min-width: 0; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.tabs { display: flex; align-items: center; padding: 4px; gap: 2px; background: var(--dash-surface); border: 1px solid var(--dash-border); border-radius: 13px; }
+.tabs button { padding: 8px 10px; border-radius: 9px; font-size: 11px; color: var(--dash-muted); }
+.tabs button[aria-pressed='true'] { background: var(--dash-raised); color: var(--dash-text); }
+.tabs small { font-size: 9px; margin-left: 4px; }
+.download { padding: 12px 14px; border-radius: 12px; background: var(--dash-raised); color: var(--dash-text); font-size: 11px; }
+.download:disabled { opacity: .4; }
+.terminal { position: relative; border: 1px solid var(--dash-border); border-radius: 14px; overflow: hidden; background: #101319; }
+.output { height: clamp(390px, 49vh, 600px); padding: 36px 12px 12px; }
+.fontControls { position: absolute; right: 12px; top: 8px; display: flex; z-index: 2; background: #171b23; border-radius: 6px; }
+.fontControls button { width: 26px; height: 24px; color: #9ba3b1; font-size: 11px; }
+.fontControls button:hover { color: #fff; }
+.fontControls button:disabled { opacity: .4; }
+.empty { position: absolute; inset: 50px 20px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; pointer-events: none; color: #9ba3b1; background: #101319; }
+.empty > span { display: grid; place-items: center; width: 56px; height: 56px; background: #1b202a; border-radius: 16px; font-size: 28px; margin-bottom: 8px; }
+.empty strong { font-size: 13px; color: #d4dbe6; }
+.empty p { font-size: 11px; }
+.command { display: flex; align-items: center; gap: 12px; padding: 6px 12px; border: 1px solid var(--dash-border); margin-top: 12px; min-height: 50px; background: var(--dash-surface); border-radius: 14px; }
+.command > span { color: var(--dash-accent); font-size: 16px; }
+.command input { min-width: 0; width: 100%; padding: 10px 0; font-size: 12px; font-family: ui-monospace, monospace !important; background: transparent; border: 0; color: var(--dash-text); box-shadow: none; }
+.command button { font-size: 10px; padding: 8px; color: var(--dash-accent); }
+.command :disabled { opacity: .4; }
+.options { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 12px 2px; font-size: 10px; color: var(--dash-muted); }
+.options label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.options input { width: 13px; height: 13px; accent-color: var(--dash-accent); }
+.options > span { margin-left: auto; }
+.search { display: flex; margin-bottom: 10px; background: var(--dash-raised); border-radius: 10px; overflow: hidden; }
+.search input { min-width: 0; width: 100%; background: transparent; border: 0; color: var(--dash-text); font-size: 12px; padding: 12px; }
+.search button { width: 40px; color: var(--dash-muted); }
+.history { max-height: 180px; overflow-y: auto; border: 1px solid var(--dash-border); border-radius: 10px; padding: 8px; background: var(--dash-surface); }
+.history button { display: block; width: 100%; text-align: left; padding: 8px; font-family: ui-monospace, monospace !important; font-size: 12px; overflow-wrap: anywhere; }
+.history button:hover { background: var(--dash-raised); }
+.history p { font-size: 11px; color: var(--dash-muted); padding: 8px; }
+@media (max-width: 767px) { .toolbar { gap: 8px; } .tabs button { padding: 8px; font-size: 10px; } .download { padding: 10px; font-size: 10px; } .output { height: 390px; padding-left: 8px; padding-right: 8px; } }

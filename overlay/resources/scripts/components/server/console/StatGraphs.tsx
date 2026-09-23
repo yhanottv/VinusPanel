@@ -39,8 +39,8 @@ export default () => {
       return {
         ...opts,
         label: !index ? vt("Trafic entrant") : vt("Trafic sortant"),
-        borderColor: !index ? '#43d6a3' : '#ff7a1a',
-        backgroundColor: hexToRgba(!index ? '#43d6a3' : '#ff7a1a', 0.12),
+        borderColor: !index ? '#43d6a3' : '#ff9b52',
+        backgroundColor: hexToRgba(!index ? '#43d6a3' : '#ff9b52', 0.12),
       };
     },
   });

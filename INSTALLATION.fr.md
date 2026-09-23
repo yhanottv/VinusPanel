@@ -1,4 +1,4 @@
-# Installer et personnaliser VinusPanel 3.1.1 sur un VPS
+# Installer et personnaliser VinusPanel 3.2.0 sur un VPS
 
 Ce guide s'adresse à l'administrateur d'un panel Pterodactyl **déjà installé**. Le téléchargement contient le code source du thème, l'installeur, un désinstalleur et la documentation. Il ne contient ni Pterodactyl, ni Wings, ni les données de vos serveurs.
 
@@ -30,12 +30,12 @@ Connectez-vous au VPS, puis exécutez :
 cd /tmp
 git clone https://github.com/yhanottv/VinusPanel.git vinuspanel
 cd vinuspanel
-git checkout v3.1.1
+git checkout v3.2.0
 ```
 
 Si vous avez téléchargé le ZIP gratuit sur BuiltByBit, décompressez-le sur le VPS et placez-vous dans le dossier contenant `install.sh`. Le contenu est identique à la version GitHub correspondante.
 
-Si une ancienne copie du dépôt existe déjà, utilisez `git fetch origin`, `git checkout v3.1.1` dans cette copie. Conservez vos propres changements dans une branche ou une sauvegarde avant de changer de version.
+Si une ancienne copie du dépôt existe déjà, utilisez `git fetch origin`, `git checkout v3.2.0` dans cette copie. Conservez vos propres changements dans une branche ou une sauvegarde avant de changer de version.
 
 ## 4. Vérifier puis installer
 
@@ -44,9 +44,9 @@ sudo bash install.sh --check
 sudo bash install.sh
 ```
 
-`--check` examine la version du panel, Node, Yarn, PHP et la structure du paquet sans modifier Pterodactyl. L'installation active temporairement le mode maintenance, copie les fichiers, compile les assets et vide les caches. Attendez le message final « VinusPanel 3.1.1 est installé » avant de rouvrir le panel. L'installeur affiche le chemin de la sauvegarde de cette opération ; notez-le.
+`--check` examine la version du panel, Node, Yarn, PHP et la structure du paquet sans modifier Pterodactyl. L'installation active temporairement le mode maintenance, copie les fichiers, compile les assets et vide les caches. Attendez le message final « VinusPanel 3.2.0 est installé » avant de rouvrir le panel. L'installeur affiche le chemin de la sauvegarde de cette opération ; notez-le.
 
-Si vous utilisez le catalogue de mods, mettez aussi à jour **Vinus Catalog 1.2.1** avec les instructions de [`extensions/vinuscatalog/README.md`](extensions/vinuscatalog/README.md). L’installeur du thème ne met pas à jour cette extension Blueprint. La version 1.2.1 corrige le refus HTTP 429 après quelques recherches dans le catalogue.
+Si vous utilisez le catalogue de mods, mettez aussi à jour **Vinus Catalog 1.3.0** avec les instructions de [`extensions/vinuscatalog/README.md`](extensions/vinuscatalog/README.md). L’installeur du thème ne met pas à jour cette extension Blueprint. La version 1.3.0 ajoute les catalogues pris en charge et les outils logiciels, modpacks, mondes et BlueMap.
 
 Pour un panel situé ailleurs :
 

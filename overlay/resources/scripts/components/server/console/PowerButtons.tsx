@@ -5,7 +5,7 @@ import Can from '@/components/elements/Can';
 import { ServerContext, ServerStatus } from '@/state/server';
 import { Dialog } from '@/components/elements/dialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faRedoAlt, faStop } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faRedoAlt, faStop, faPowerOff } from '@fortawesome/free-solid-svg-icons';
 
 import { availablePowerActions } from './powerState';
 
@@ -34,7 +34,7 @@ export default ({
     const blocked = ServerContext.useStoreState((state) => state.server.inConflictState);
     const allowed = availablePowerActions(status, connected, blocked);
     const deck = variant === 'deck';
-    const killable = status === 'stopping';
+    const killable = deck && status === 'stopping';
     const onButtonClick = (
         action: PowerAction | 'kill-confirmed',
         e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -59,7 +59,7 @@ export default ({
     }, [status, connected, blocked]);
 
     return (
-        <div className={className}>
+        <div className={className} data-power-status={status || 'unknown'} data-power-connected={connected} data-power-blocked={blocked}>
             <Dialog.Confirm
                 open={open}
                 hideCloseIcon
@@ -94,6 +94,7 @@ export default ({
                     </Button.Danger>
                 </Can>
             )}
+            {!deck && <Can action="control.stop"><Button.Text className="flex-1" disabled={!allowed.kill} title={vt('Forcer l’arrêt du serveur')} onClick={onButtonClick.bind(this, 'kill')}><FontAwesomeIcon icon={faPowerOff} className="mr-2" />{vt('Tuer')}</Button.Text></Can>}
         </div>
     );
 };

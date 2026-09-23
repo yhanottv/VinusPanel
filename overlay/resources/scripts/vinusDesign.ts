@@ -17,7 +17,7 @@ export interface VinusDesignSettings {
 
 const defaults: VinusDesignSettings = {
     brand_name: 'VinusPanel',
-    accent: '#49a6e9',
+    accent: '#ff9b52',
     background: '#0b0d12',
     surface: '#101319',
     server_card: '#101319',

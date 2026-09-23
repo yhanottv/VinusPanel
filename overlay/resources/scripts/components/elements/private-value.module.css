@@ -1,0 +1,6 @@
+.reveal { display: inline-block; max-width: 100%; vertical-align: middle; border-radius: 4px; }
+.reveal[data-block] { display: block; width: 100%; }
+.value { display: block; filter: blur(5px); transition: filter 140ms ease; overflow-wrap: anywhere; }
+.reveal:hover > .value, .reveal:focus > .value, .reveal:focus-within > .value { filter: none; }
+.reveal:focus-visible { outline: 2px solid var(--dash-accent, #ff9b52); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .value { transition: none; } }
