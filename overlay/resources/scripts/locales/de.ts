@@ -220,5 +220,12 @@ export default {
     "Vert": "Grün",
     "Orange": "Orange",
     "↓ Entrant": "↓ Eingehend",
-    "↑ Sortant": "↑ Ausgehend"
+    "↑ Sortant": "↑ Ausgehend",
+    "Raccourcis du serveur": "Serververknüpfungen",
+    "Commandes et journaux en direct": "Befehle und Live-Protokolle",
+    "Parcourir et modifier les fichiers": "Dateien durchsuchen und bearbeiten",
+    "Créer et restaurer des sauvegardes": "Sicherungen erstellen und wiederherstellen",
+    "Consulter les actions récentes": "Letzte Aktionen ansehen",
+    "Ouvrir la console": "Konsole öffnen",
+    "Gérer les fichiers": "Dateien verwalten"
 };

@@ -220,5 +220,12 @@ export default {
     "Vert": "Yeşil",
     "Orange": "Turuncu",
     "↓ Entrant": "↓ Gelen",
-    "↑ Sortant": "↑ Giden"
+    "↑ Sortant": "↑ Giden",
+    "Raccourcis du serveur": "Sunucu kısayolları",
+    "Commandes et journaux en direct": "Canlı komutlar ve günlükler",
+    "Parcourir et modifier les fichiers": "Dosyaları görüntüle ve düzenle",
+    "Créer et restaurer des sauvegardes": "Yedek oluştur ve geri yükle",
+    "Consulter les actions récentes": "Son işlemleri incele",
+    "Ouvrir la console": "Konsolu aç",
+    "Gérer les fichiers": "Dosyaları yönet"
 };

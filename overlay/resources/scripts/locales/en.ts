@@ -886,5 +886,10 @@ export default {
     "Türkçe": "Türkçe",
     "VINUSPANEL / DESIGN": "VINUSPANEL / DESIGN",
     "Visible": "Visible",
-    "Zoom": "Zoom"
+    "Zoom": "Zoom",
+    "Raccourcis du serveur": "Server shortcuts",
+    "Commandes et journaux en direct": "Live commands and logs",
+    "Parcourir et modifier les fichiers": "Browse and edit files",
+    "Créer et restaurer des sauvegardes": "Create and restore backups",
+    "Consulter les actions récentes": "Review recent actions"
 };

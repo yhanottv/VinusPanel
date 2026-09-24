@@ -11,6 +11,15 @@ import { softwareName } from './SoftwareIcon';
 import ServerResourceCards from './ServerResourceCards';
 import useServerTelemetry from './useServerTelemetry';
 import styles from './server.module.css';
+import Icon, { DashboardIconName } from '@/components/dashboard/DashboardIcon';
+
+function Shortcut({ to, icon, title, description }: { to: string; icon: DashboardIconName; title: string; description: string }) {
+    return <Link to={to} className={styles.shortcut}>
+        <span className={styles.shortcutIcon}><Icon name={icon}/></span>
+        <span className={styles.shortcutText}><strong>{vt(title)}</strong><small>{vt(description)}</small></span>
+        <Icon name="chevron" className={styles.shortcutArrow}/>
+    </Link>;
+}
 
 export default function ServerOverview() {
     const server = ServerContext.useStoreState(s => s.server.data!);
@@ -38,11 +47,11 @@ export default function ServerOverview() {
             </dl></section>
         </div>
         {server.description && <p className={styles.note}>{server.description}</p>}
-        <div className={styles.shortcuts}>
-            <Link to={base}>{vt('Ouvrir la console')} →</Link>
-            <Can action="file.read"><Link to={`${base}/files`}>{vt('Gérer les fichiers')} →</Link></Can>
-            <Can action="backup.read"><Link to={`${base}/backups`}>{vt('Sauvegardes')} →</Link></Can>
-            <Can action="activity.read"><Link to={`${base}/activity`}>{vt('Activité')} →</Link></Can>
-        </div>
+        <nav className={styles.shortcuts} aria-label={vt('Raccourcis du serveur')}>
+            <Shortcut to={base} icon="terminal" title="Ouvrir la console" description="Commandes et journaux en direct"/>
+            <Can action="file.read"><Shortcut to={`${base}/files`} icon="folder" title="Gérer les fichiers" description="Parcourir et modifier les fichiers"/></Can>
+            <Can action="backup.read"><Shortcut to={`${base}/backups`} icon="archive" title="Sauvegardes" description="Créer et restaurer des sauvegardes"/></Can>
+            <Can action="activity.read"><Shortcut to={`${base}/activity`} icon="history" title="Activité" description="Consulter les actions récentes"/></Can>
+        </nav>
     </PageContentBlock>;
 }

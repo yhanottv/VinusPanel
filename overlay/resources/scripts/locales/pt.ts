@@ -220,5 +220,12 @@ export default {
     "Vert": "Verde",
     "Orange": "Laranja",
     "↓ Entrant": "↓ Entrada",
-    "↑ Sortant": "↑ Saída"
+    "↑ Sortant": "↑ Saída",
+    "Raccourcis du serveur": "Atalhos do servidor",
+    "Commandes et journaux en direct": "Comandos e registos em tempo real",
+    "Parcourir et modifier les fichiers": "Explorar e editar ficheiros",
+    "Créer et restaurer des sauvegardes": "Criar e restaurar cópias de segurança",
+    "Consulter les actions récentes": "Consultar ações recentes",
+    "Ouvrir la console": "Abrir consola",
+    "Gérer les fichiers": "Gerir ficheiros"
 };

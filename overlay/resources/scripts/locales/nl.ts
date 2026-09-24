@@ -220,5 +220,12 @@ export default {
     "Vert": "Groen",
     "Orange": "Oranje",
     "↓ Entrant": "↓ Inkomend",
-    "↑ Sortant": "↑ Uitgaand"
+    "↑ Sortant": "↑ Uitgaand",
+    "Raccourcis du serveur": "Serversnelkoppelingen",
+    "Commandes et journaux en direct": "Live opdrachten en logboeken",
+    "Parcourir et modifier les fichiers": "Bestanden bekijken en bewerken",
+    "Créer et restaurer des sauvegardes": "Back-ups maken en herstellen",
+    "Consulter les actions récentes": "Recente acties bekijken",
+    "Ouvrir la console": "Console openen",
+    "Gérer les fichiers": "Bestanden beheren"
 };

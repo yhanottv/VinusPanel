@@ -220,5 +220,12 @@ export default {
     "Vert": "Verde",
     "Orange": "Arancione",
     "↓ Entrant": "↓ In entrata",
-    "↑ Sortant": "↑ In uscita"
+    "↑ Sortant": "↑ In uscita",
+    "Raccourcis du serveur": "Scorciatoie del server",
+    "Commandes et journaux en direct": "Comandi e log in tempo reale",
+    "Parcourir et modifier les fichiers": "Sfoglia e modifica i file",
+    "Créer et restaurer des sauvegardes": "Crea e ripristina backup",
+    "Consulter les actions récentes": "Consulta le azioni recenti",
+    "Ouvrir la console": "Apri console",
+    "Gérer les fichiers": "Gestisci file"
 };
