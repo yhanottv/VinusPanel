@@ -7,7 +7,7 @@ Changes are applied to the preview immediately. **Save** publishes them to all p
 ## Available categories
 
 - Identity: name, logo mode, dark/light artwork, square mark and alternative text.
-- Colours, typography and icons: dark/light surfaces, text, status colours, installed/system font families, icon corners and stroke weight.
+- Colours, typography and icons: dark/light surfaces, text, status colours, installed/system font families, icon corners, stroke weight and size (14–28 px). Dashboard and server navigation support Vinus outlines, Lucide, Tabler and Font Awesome solid icons. The artwork is bundled locally.
 - Surfaces and layout: radii, borders, shadows, opacity, wallpaper, content width, sidebar variants, active links, search and footer.
 - Navigation: rename, hide and order existing items within their groups; add custom links. Existing route permissions still apply.
 - Sign-in: left/right/centred layouts, form surfaces, background effects, width and editorial text.
@@ -19,6 +19,12 @@ Changes are applied to the preview immediately. **Save** publishes them to all p
 - Available project modules. Integrations not included in VinusPanel are not advertised as installed.
 
 Only existing languages, icon artwork and font families are offered. This is an original implementation for VinusPanel; it does not install the commercial reference theme or its additional modules.
+
+Choice cards illustrate layouts, surfaces, typography, icons and motion with scalable miniatures. Motion previews run on selection, hover or keyboard focus; the replay control restarts the dashboard entrance without reloading its data. Both miniatures and page animations respect reduced-motion preferences.
+
+The sign-in preview renders the same `LoginContainer` as the public sign-in page. Preview mode prevents authentication requests and does not load reCAPTCHA. It includes the actual fields, submit button and password recovery link inside the shared authentication layout.
+
+The bundled icon subsets contain 43 symbols each from `lucide-static` 1.47.0 and `@tabler/icons` 3.48.0. Upstream notices are in `licenses/LUCIDE.txt` and `licenses/TABLER.txt`.
 
 ## Storage and access
 

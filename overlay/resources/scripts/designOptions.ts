@@ -21,6 +21,8 @@ export interface DesignOptions {
     font_size: number;
     default_language: string;
     language_picker: boolean;
+    icon_family: string;
+    icon_size: number;
     icon_style: string;
     icon_weight: number;
     radius: number;
@@ -86,6 +88,8 @@ export interface DesignOptions {
 }
 export interface DesignField { category: string; key: keyof DesignOptions; label: string; default: string | number | boolean; kind: string; choices?: {value:string; label:string}[]; min?: number; max?: number }
 export const designFields: DesignField[] = [
+{"category": "icons", "key": "icon_family", "label": "Famille des icônes", "default": "outline", "kind": "select", "choices": [{"value": "outline", "label": "Vinus · contours"}, {"value": "lucide", "label": "Lucide"}, {"value": "tabler", "label": "Tabler"}, {"value": "solid", "label": "Font Awesome · pleines"}]},
+{"category": "icons", "key": "icon_size", "label": "Taille des icônes (px)", "default": 18, "kind": "range", "min": 14, "max": 28},
  { category:"console",key:"chart_shape",label:"Forme des graphiques",default:"line",kind:"select",choices:[{value:"line",label:"Courbes"},{value:"bar",label:"Barres"}] },
   {
     "category": "brand",
@@ -1120,6 +1124,8 @@ export const optionDefaults: DesignOptions = {
   "font_size": 14,
   "default_language": "fr",
   "language_picker": true,
+  "icon_family": "outline",
+  "icon_size": 18,
   "icon_style": "round",
   "icon_weight": 15,
   "radius": 14,

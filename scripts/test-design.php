@@ -15,7 +15,7 @@ $valid = VinusDesign::validateStudio($base);
 $expect($valid['options']['content_width'] === 'full', 'Full-width default must remain intact.');
 $expect($valid['options']['blur_address'] === true, 'Existing address privacy must remain intact.');
 $reject = function ($input) use ($expect) { try { VinusDesign::validateStudio($input); } catch (Illuminate\Validation\ValidationException $e) { $expect(true, 'Validation rejected unsafe input.'); return; } throw new RuntimeException('Unsafe input was accepted.'); };
-foreach ([['radius',-1],['radius',999],['sidebar_style','unknown'],['logo_light','javascript:alert(1)'],['favicon','//example.com/file.png'],['unknown_option',true]] as [$key,$value]) { $input=$base;$input['options'][$key]=$value;$reject($input); }
+foreach ([['radius',-1],['radius',999],['icon_size',13],['icon_size',29],['icon_family','remote-font'],['sidebar_style','unknown'],['logo_light','javascript:alert(1)'],['favicon','//example.com/file.png'],['unknown_option',true]] as [$key,$value]) { $input=$base;$input['options'][$key]=$value;$reject($input); }
 foreach (['background:url(https://example.com)','color:red;</style>','@import test','behavior:test','color:red\\3b','a{color:red}'] as $css) { $input=$base;$input['css_rules']=[['selector'=>'.app-shell h1','declarations'=>$css,'enabled'=>true]];$reject($input); }
 $input=$base;$input['links']=[['label'=>'Unsafe','url'=>'data:text/html,test','description'=>'','featured'=>false,'visible'=>true]];$reject($input);
 $input=$base;$input['css_rules']=[['selector'=>'.app-shell h1','declarations'=>'letter-spacing: -.03em; color: #f0f0f0;','enabled'=>true]];VinusDesign::validateStudio($input);$expect(true,'Valid CSS supported.');

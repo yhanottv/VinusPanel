@@ -70,7 +70,7 @@ export default function DashboardContainer({ preview = false, design }: { previe
         if (error) clearAndAddHttpError({key: 'dashboard', error}); else clearFlashes('dashboard');
     }, [error]);
     const visit = <span className={styles.visit}>{vt('Visiter')}<Icon name="chevron" /></span>;
-    return <PageContentBlock title={vt(preview ? 'VinusPanel — Design' : 'VinusPanel — Tableau de bord')} className={styles.content} showFlashKey="dashboard">
+    return <PageContentBlock title={vt(preview ? 'VinusPanel — Design' : 'VinusPanel — Tableau de bord')} className={`${styles.content} vinus-motion-page`} showFlashKey="dashboard">
         {/* BEFORE_CONTENT */}
         <header className={styles.hero}>
             <div><h1>{vt('Bon retour, ')}{appearance.displayName || user.username}</h1><p>{vt('Gérez toutes vos instances ici.')}</p></div>

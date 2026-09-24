@@ -367,3 +367,7 @@
 .sidebar { font-family:var(--vinus-body-font); }
 
 @media(max-width:900px) { .shell>.sidebar:has(+.sidebar) { display:none; } }
+
+.shell :global(.vinus-interface-icon) { width:var(--vinus-icon-size); height:var(--vinus-icon-size); flex-shrink:0; }
+
+.shell :global(svg.vinus-interface-icon[stroke='currentColor']) { stroke-width:var(--vinus-icon-weight); }

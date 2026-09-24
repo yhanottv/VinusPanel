@@ -7,9 +7,7 @@ import { useStoreState } from 'easy-peasy';
 import { ServerContext } from '@/state/server';
 import Can from '@/components/elements/Can';
 import CopyOnClick from '@/components/elements/CopyOnClick';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faThLarge, faTerminal, faFolderOpen, faSlidersH, faCog, faUsers, faPuzzlePiece, faCubes, faGlobe, faDatabase, faArchive, faNetworkWired, faCalendarAlt, faHistory, faLifeRing } from '@fortawesome/free-solid-svg-icons';
-import Icon from '@/components/dashboard/DashboardIcon';
+import Icon, { DashboardIconName } from '@/components/dashboard/DashboardIcon';
 import dash from '@/components/dashboard/dashboard.module.css';
 import styles from './server.module.css';
 import SoftwareIcon from './SoftwareIcon';
@@ -19,30 +17,30 @@ import { vt } from '@/locales/translate';
 
 const sections = [
     { name: 'Essentiels', items: [
-        { path: '/overview', name: 'Aperçu', icon: faThLarge, permission: null },
-        { path: '', name: 'Console', icon: faTerminal, permission: null },
-        { path: '/files', name: 'Fichiers', icon: faFolderOpen, permission: 'file.*' },
-        { path: '/support', name: 'Assistance', icon: faLifeRing, permission: null },
-        { path: '/startup', name: 'Démarrage', icon: faSlidersH, permission: 'startup.*' },
-        { path: '/settings', name: 'Paramètres', icon: faCog, permission: ['settings.*', 'file.sftp'] },
+        { path: '/overview', name: 'Aperçu', icon: 'grid' as DashboardIconName, permission: null },
+        { path: '', name: 'Console', icon: 'terminal' as DashboardIconName, permission: null },
+        { path: '/files', name: 'Fichiers', icon: 'folder' as DashboardIconName, permission: 'file.*' },
+        { path: '/support', name: 'Assistance', icon: 'help' as DashboardIconName, permission: null },
+        { path: '/startup', name: 'Démarrage', icon: 'controls' as DashboardIconName, permission: 'startup.*' },
+        { path: '/settings', name: 'Paramètres', icon: 'settings' as DashboardIconName, permission: ['settings.*', 'file.sftp'] },
     ] },
     { name: 'Outils MC', items: [
-        { path: '/players', name: 'Joueurs', icon: faUsers, permission: 'file.read-content' },
-        { path: '/plugins', name: 'Plugins', icon: faPuzzlePiece, permission: 'file.read' },
-        { path: '/mods', name: 'Mods', icon: faCubes, permission: 'file.read' },
-        { path: '/modpacks', name: 'Modpacks', icon: faArchive, permission: 'file.read' },
-        { path: '/version', name: 'Version', icon: faSlidersH, permission: 'startup.read' },
-        { path: '/properties', name: 'Propriétés', icon: faCog, permission: 'file.read-content' },
-        { path: '/worlds', name: 'Mondes', icon: faGlobe, permission: 'file.read' },
-        { path: '/world-viewer', name: 'World Viewer', icon: faGlobe, permission: 'file.read-content' },
+        { path: '/players', name: 'Joueurs', icon: 'users' as DashboardIconName, permission: 'file.read-content' },
+        { path: '/plugins', name: 'Plugins', icon: 'puzzle' as DashboardIconName, permission: 'file.read' },
+        { path: '/mods', name: 'Mods', icon: 'cubes' as DashboardIconName, permission: 'file.read' },
+        { path: '/modpacks', name: 'Modpacks', icon: 'archive' as DashboardIconName, permission: 'file.read' },
+        { path: '/version', name: 'Version', icon: 'controls' as DashboardIconName, permission: 'startup.read' },
+        { path: '/properties', name: 'Propriétés', icon: 'settings' as DashboardIconName, permission: 'file.read-content' },
+        { path: '/worlds', name: 'Mondes', icon: 'globe' as DashboardIconName, permission: 'file.read' },
+        { path: '/world-viewer', name: 'World Viewer', icon: 'globe' as DashboardIconName, permission: 'file.read-content' },
     ] },
     { name: 'Gestion', items: [
-        { path: '/databases', name: 'Bases de données', icon: faDatabase, permission: 'database.*' },
-        { path: '/backups', name: 'Sauvegardes', icon: faArchive, permission: 'backup.*' },
-        { path: '/network', name: 'Réseau', icon: faNetworkWired, permission: 'allocation.*' },
-        { path: '/schedules', name: 'Planifications', icon: faCalendarAlt, permission: 'schedule.*' },
-        { path: '/users', name: 'Utilisateurs', icon: faUsers, permission: 'user.*' },
-        { path: '/activity', name: 'Activité', icon: faHistory, permission: 'activity.*' },
+        { path: '/databases', name: 'Bases de données', icon: 'database' as DashboardIconName, permission: 'database.*' },
+        { path: '/backups', name: 'Sauvegardes', icon: 'archive' as DashboardIconName, permission: 'backup.*' },
+        { path: '/network', name: 'Réseau', icon: 'network' as DashboardIconName, permission: 'allocation.*' },
+        { path: '/schedules', name: 'Planifications', icon: 'calendar' as DashboardIconName, permission: 'schedule.*' },
+        { path: '/users', name: 'Utilisateurs', icon: 'users' as DashboardIconName, permission: 'user.*' },
+        { path: '/activity', name: 'Activité', icon: 'history' as DashboardIconName, permission: 'activity.*' },
     ] },
 ];
 export default function ServerNavigation({ before, after, extensions }: { before?: React.ReactNode; after?: React.ReactNode; extensions?: React.ReactNode }) {
@@ -78,7 +76,7 @@ export default function ServerNavigation({ before, after, extensions }: { before
                 return <React.Fragment key={section.name}>
                     <button className={dash.sectionToggle} type="button" aria-expanded={!closed.includes(section.name)} aria-controls={`server-section-${index}`} onClick={() => setClosed(s => s.includes(section.name) ? s.filter(x => x !== section.name) : [...s, section.name])}>{vt(section.name)}<Icon name="down" /></button>
                     {!closed.includes(section.name) && <div className={dash.navGroup} id={`server-section-${index}`}>{items.map(item => {
-                        const link = <NavLink to={`/server/${server.id}${item.path}`} exact={!item.path}><FontAwesomeIcon icon={item.icon} fixedWidth /><span>{vt(item.name)}</span></NavLink>;
+                        const link = <NavLink to={`/server/${server.id}${item.path}`} exact={!item.path}><Icon name={item.icon} /><span>{vt(item.name)}</span></NavLink>;
                         return item.permission ? <Can key={item.path} action={item.permission} matchAny>{link}</Can> : <React.Fragment key={item.path}>{link}</React.Fragment>;
                     })}</div>}
                 </React.Fragment>;

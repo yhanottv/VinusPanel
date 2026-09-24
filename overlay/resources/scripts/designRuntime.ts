@@ -16,7 +16,7 @@ export function validCssRule(selector: string, declarations: string): boolean {
 export function applyDesign(value: VinusDesignSettings) {
     const root = document.documentElement, o = value.options;
     const rgb = [1,3,5].map(i => parseInt(value.accent.slice(i,i+2),16)).join(',');
-    const vars: Record<string,string> = { accent:value.accent, 'accent-rgb':rgb, bg:value.background, glass:value.surface, surface:value.surface, 'server-card':value.server_card, text:value.text, muted:o.muted, raised:o.raised, 'button-text':o.button_text, success:o.success, danger:o.danger, warning:o.warning, radius:`${o.radius}px`, 'body-font':fonts[o.body_font], 'heading-font':fonts[o.heading_font], 'mono-font':monoFonts[o.mono_font], 'font-size':`${o.font_size}px`, 'card-alpha':String(o.card_opacity/100), 'page-alpha':String(o.page_opacity/100), 'light-bg':o.light_background, 'light-surface':o.light_surface, 'light-text':o.light_text, 'light-muted':o.light_muted, 'icon-weight':String(o.icon_weight/10), 'motion-duration':`${o.motion_duration}ms`, 'login-width':`${o.login_width}px`, 'background-image':value.background_image ? `url("${value.background_image.replace(/["\\]/g,'')}")` : 'none' };
+    const vars: Record<string,string> = { accent:value.accent, 'accent-rgb':rgb, bg:value.background, glass:value.surface, surface:value.surface, 'server-card':value.server_card, text:value.text, muted:o.muted, raised:o.raised, 'button-text':o.button_text, success:o.success, danger:o.danger, warning:o.warning, radius:`${o.radius}px`, 'body-font':fonts[o.body_font], 'heading-font':fonts[o.heading_font], 'mono-font':monoFonts[o.mono_font], 'font-size':`${o.font_size}px`, 'card-alpha':String(o.card_opacity/100), 'page-alpha':String(o.page_opacity/100), 'light-bg':o.light_background, 'light-surface':o.light_surface, 'light-text':o.light_text, 'light-muted':o.light_muted, 'icon-size':`${o.icon_size}px`, 'icon-weight':String(o.icon_weight/10), 'motion-duration':`${o.motion_duration}ms`, 'login-width':`${o.login_width}px`, 'background-image':value.background_image ? `url("${value.background_image.replace(/["\\]/g,'')}")` : 'none' };
     Object.entries(vars).forEach(([key,v]) => root.style.setProperty(`--vinus-${key}`,v));
     Object.entries(o).forEach(([key,v]) => root.setAttribute(`data-vinus-${key.replace(/_/g,'-')}`,String(v)));
     let style = document.getElementById('vinus-custom-rules') as HTMLStyleElement | null;
@@ -39,6 +39,12 @@ export function useDesignPreview(admin: boolean) {
         if (!designPreview || !admin) return;
         let picking=false;
         const receive=(event: MessageEvent) => {
+            if (event.origin === window.location.origin && event.source === window.parent && event.data?.type === 'vinus:studio-replay') {
+                if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    document.getAnimations().filter(animation => animation instanceof CSSAnimation && ((animation.effect as KeyframeEffect)?.target as Element | null)?.classList.contains('vinus-motion-page')).forEach(animation => { animation.cancel(); animation.play(); });
+                }
+                return;
+            }
             if (event.origin === window.location.origin && event.source === window.parent && event.data?.type === 'vinus:studio-pick') { picking=true; document.body.style.cursor='crosshair'; return; }
             if (event.origin !== window.location.origin || event.source !== window.parent || event.data?.type !== 'vinus:studio-draft') return;
             if (!event.data.design || typeof event.data.design.brand_name !== 'string') return;

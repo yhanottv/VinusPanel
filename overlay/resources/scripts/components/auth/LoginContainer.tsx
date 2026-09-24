@@ -1,6 +1,6 @@
 import { vt } from '@/locales/translate';
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import login from '@/api/auth/login';
 import LoginFormContainer from '@/components/auth/LoginFormContainer';
 import { useStoreState } from 'easy-peasy';
@@ -17,7 +17,8 @@ interface Values {
     password: string;
 }
 
-const LoginContainer = ({ history }: RouteComponentProps) => {
+const LoginContainer = ({ preview = false }: { preview?: boolean }) => {
+    const history = useHistory();
     const ref = useRef<Reaptcha>(null);
     const [token, setToken] = useState('');
 
@@ -29,6 +30,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
     }, []);
 
     const onSubmit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
+        if (preview) { setSubmitting(false); return; }
         clearFlashes();
 
         // If there is no token in the state yet, request the token and then abort this submit request
@@ -68,7 +70,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
     return (
         <Formik
             onSubmit={onSubmit}
-            initialValues={{ username: '', password: '' }}
+            initialValues={{ username: preview ? 'demo@example.com' : '', password: preview ? 'preview-only' : '' }}
             validationSchema={object().shape({
                 username: string().required(vt("Saisissez votre identifiant ou votre adresse e-mail.")),
                 password: string().required(vt("Saisissez le mot de passe de votre compte.")),
@@ -82,8 +84,8 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                         type={'text'}
                         label={vt("Identifiant ou adresse e-mail")}
                         name={'username'}
-                        autoComplete={'username'}
-                        disabled={isSubmitting}
+                        autoComplete={preview ? 'off' : 'username'}
+                        disabled={preview || isSubmitting}
                     />
                     <div css={tw`mt-6`}>
                         <Field
@@ -92,14 +94,14 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                             type={'password'}
                             label={vt("Mot de passe")}
                             name={'password'}
-                            autoComplete={'current-password'}
-                            disabled={isSubmitting}
+                            autoComplete={preview ? 'off' : 'current-password'}
+                            disabled={preview || isSubmitting}
                         />
                     </div>
                     <div css={tw`mt-6`}>
                         <Button type={'submit'} size={'xlarge'} isLoading={isSubmitting} disabled={isSubmitting}>{vt("Se connecter")}</Button>
                     </div>
-                    {recaptchaEnabled && (
+                    {recaptchaEnabled && !preview && (
                         <Reaptcha
                             ref={ref}
                             size={'invisible'}

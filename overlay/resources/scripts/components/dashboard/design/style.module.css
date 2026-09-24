@@ -118,3 +118,20 @@
 @media(prefers-reduced-motion:reduce) { .studio * { animation:none!important; transition:none!important; } }
 
 .listEditor details { padding:12px 0; border-bottom:1px solid #ffffff10; }.listEditor summary { cursor:pointer; font-size:12px; }
+
+/* Visual options share one hit target, label, and keyboard focus ring. */
+.studio { grid-template-columns:64px 360px minmax(0,1fr); }
+.rail { gap:7px; padding:12px 7px; }
+.rail button,.rail a { width:46px; min-height:44px; }
+.rail svg { width:25px; height:25px; stroke-width:1.7; }
+.choices { gap:8px; }
+.choices button { padding:6px; border-color:transparent; transition:background 160ms,border-color 160ms; }
+.choices button:hover { border-color:#ffffff30; background:#202631; }
+.choices button[aria-pressed='true'] { background:#ff9b5222; border-color:#ff9b5240; }
+.choiceLabel { display:flex; align-items:center; gap:4px; min-height:28px; padding:5px 2px 0; font-size:11px; line-height:1.25; }
+.choiceLabel>span { width:9px; flex-shrink:0; color:#ff9b52; }
+.iconSample { display:flex; justify-content:space-around; align-items:center; padding:24px 14px; background:#0a0d12; border:1px solid #ffffff12; border-radius:10px; color:#c4ccd8; }
+.iconSample svg { width:var(--sample-size); height:var(--sample-size); stroke-width:var(--sample-weight); }
+.iconSample[data-corners='sharp'] svg { stroke-linejoin:miter; stroke-linecap:square; }
+@media(max-width:1100px) { .studio { grid-template-columns:54px 316px minmax(0,1fr); }.rail { padding-inline:4px; }.rail button,.rail a { width:42px; } }
+@media(max-width:650px) { .studio { grid-template-columns:46px minmax(0,1fr); }.rail { padding-inline:3px; }.rail button,.rail a { width:38px; }.rail svg { width:23px; height:23px; } }
