@@ -102,7 +102,7 @@ export default () => {
         meta={limits.cpu > 0 ? vt('Limite : {{value}}', { value: formatChartValue(limits.cpu, '%', 0) }) : vt("Sans limite CPU")}
         icon={faBolt}
       >
-        <Chart<'line' | 'bar'> type={chartType} {...cpu.props} role={'img'} aria-label={vt("Historique du processeur en pourcentage")} />
+        <Chart<'line' | 'bar'> key={chartType} type={chartType} {...cpu.props} role={'img'} aria-label={vt("Historique du processeur en pourcentage")} />
       </ChartBlock>
       <ChartBlock
         title={vt("Mémoire")}
@@ -110,7 +110,7 @@ export default () => {
         meta={limits.memory > 0 ? vt('sur {{value}}', { value: formatChartBytes(limits.memory * 1024 * 1024) }) : vt("Sans limite mémoire")}
         icon={faLayerGroup}
       >
-        <Chart<'line' | 'bar'> type={chartType} {...memory.props} role={'img'} aria-label={vt("Historique de la mémoire utilisée")} />
+        <Chart<'line' | 'bar'> key={chartType} type={chartType} {...memory.props} role={'img'} aria-label={vt("Historique de la mémoire utilisée")} />
       </ChartBlock>
       <ChartBlock
         title={vt("Réseau")}
@@ -119,7 +119,7 @@ export default () => {
         meta={vt("Entrant")}
         secondaryValue={`${formatChartBytes(current.outbound)}/s`}
       >
-        <Chart<'line' | 'bar'> type={chartType} {...network.props} role={'img'} aria-label={vt("Historique des débits entrant et sortant")} />
+        <Chart<'line' | 'bar'> key={chartType} type={chartType} {...network.props} role={'img'} aria-label={vt("Historique des débits entrant et sortant")} />
       </ChartBlock>
     </>
   );
