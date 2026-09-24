@@ -660,7 +660,7 @@ export default {
     "+ Ajouter": "+ Add",
     "+ Ajouter une règle": "+ Add a rule",
     "Accent plein": "Filled accent",
-    "Activée": "Enabled",
+    "Activée": "On",
     "Adresse dans la navigation": "Address in navigation",
     "Affichage des serveurs par défaut": "Default server view",
     "Afficher le logo": "Show logo",
@@ -964,5 +964,18 @@ export default {
     "Main secondaire": "Offhand",
     "Emplacement {{slot}}": "Slot {{slot}}",
     "Barre d’accès rapide": "Hotbar",
-    "Accès rapide {{slot}}": "Hotbar {{slot}}"
+    "Accès rapide {{slot}}": "Hotbar {{slot}}",
+    "Vos informations de connexion et la sécurité de votre compte.": "Your sign-in details and account security.",
+    "Votre adresse de connexion et de réception des messages du panel.": "Where the panel contacts you, and how you sign in.",
+    "Choisissez un mot de passe unique d’au moins 8 caractères.": "Choose a unique password with at least 8 characters.",
+    "Votre photo": "Your picture",
+    "Choisissez votre image ou conservez l’avatar généré pour vous.": "Upload a picture of your own, or keep your generated avatar.",
+    "Choisir une photo": "Choose a picture",
+    "Retirer la photo": "Remove picture",
+    "Choisissez une image PNG, JPG, GIF ou WebP de 3 Mo maximum.": "Choose a PNG, JPG, GIF or WebP image up to 3 MB.",
+    "PNG, JPG, GIF ou WebP · 3 Mo maximum · recadrage carré de 256 pixels.": "PNG, JPG, GIF or WebP · up to 3 MB · cropped to a 256-pixel square.",
+    "Photo enregistrée sur cet appareil.": "Picture saved on this device.",
+    "Cette photo est enregistrée dans ce navigateur.": "This picture is stored in this browser.",
+    "Impossible d’enregistrer la photo sur cet appareil. Vérifiez le stockage de votre navigateur.": "Unable to save the picture on this device. Check your browser storage.",
+    "Désactivée": "Off"
 };

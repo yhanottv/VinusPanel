@@ -2,6 +2,9 @@
 
 ## Unreleased — Live Design Studio
 
+- Redesign account Overview with separate picture, email, password and two-factor sections. Keep existing authentication forms and browser-local profile pictures.
+- Rebuild the administration shell and home screen with flat surfaces, searchable navigation, responsive tables, clearer forms and shared branding. Preserve server/node actions, permissions and Blueprint hooks.
+
 - Refresh selected live player profiles every second, resume immediately when returning to the tab, and synchronize unchanged XP/game-mode controls with server updates. Preserve unapplied edits and prevent overlapping polls.
 - Add player profiles with read-only inventories, equipment, Ender chests, skins, health, food and XP.
 - Add the optional Bukkit companion for live presence and validated heal/feed/kill, access, game mode and level controls.

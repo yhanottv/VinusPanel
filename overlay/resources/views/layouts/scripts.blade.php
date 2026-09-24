@@ -1,2 +1,2 @@
-{{-- VinusPanel theme assets. The admin stylesheet is scoped to body.skin-blue. --}}
-<link rel="stylesheet" href="/assets/css/vinus-admin.css?v=2.3.4">
+{{-- Admin presentation, loaded after Bootstrap and Blueprint assets. --}}
+<link rel="stylesheet" href="/assets/css/vinus-admin.css?v=3.3.0">

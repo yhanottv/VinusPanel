@@ -14,6 +14,8 @@
 
 Le dashboard utilise la largeur disponible, y compris en 1920 et 3440 px. Les logos identifient le logiciel déclaré des serveurs. La navigation regroupe l’aperçu, la console, les fichiers et les outils disponibles selon les permissions et le logiciel.
 
+La branche de développement comprend également une nouvelle vue d’ensemble du compte et une administration redessinée : navigation recherchable, tableaux adaptatifs et formulaires harmonisés. Les formulaires, permissions et actions Pterodactyl sont conservés. La photo de compte est stockée dans le navigateur et ne se synchronise pas entre appareils. La navigation et l’accueil administrateur sont en français/anglais ; les textes des formulaires historiques gardent leur langue d’origine.
+
 Les captures utilisent l’interface réelle avec des **données de démonstration**. Aucun compte, serveur ou réglage privé n’y figure. Les mises en page promotionnelles sont réalisées avec Higgsfield.
 
 ![Dashboard](docs/assets/screenshots/servers.png)

@@ -43,7 +43,15 @@ The only accepted actions are heal, kill, feed, operator, whitelist, ban, game m
 
 Kill, operator changes and bans require confirmation. Healing, feeding, game mode and XP require an online player. Operator, whitelist and ban flags may be changed for a known offline player while the companion is running. Whitelisting a player does not globally enable the server whitelist. Set-level resets progress within that level to zero. Inventory and Ender chest contents are **read-only**.
 
-## Verification
+## Refresh cost
+
+Minecraft player count and open panel tabs are separate costs. Each visible live profile makes approximately one HTTP request per second; a tab reads only its selected profile, not every inventory. Fifty players with one profile open do not produce fifty browser requests per second. Fifty visible profile tabs can produce roughly fifty requests per second before action requests and network delays.
+
+The companion collects all online players once per second on the Minecraft thread, including 36 inventory slots, five equipment slots and 27 Ender chest slots per player. At fifty players that is about 3,400 slot inspections per second, plus item metadata and player state. JSON serialization and atomic file writes run on one background worker. A periodic collection is skipped while the previous periodic write is unfinished, preventing periodic snapshots from accumulating indefinitely. Main-thread collection still has a cost; this is not a fifty-player capacity guarantee.
+
+Before relying on this at scale, compare Minecraft tick time and CPU with representative inventories, and panel/Wings response time with the expected number of simultaneous viewers. No fifty-player production load test has been performed.
+
+## Verification commands
 
 ```sh
 php scripts/test-players.php

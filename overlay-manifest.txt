@@ -5,6 +5,7 @@ app/Services/VinusSoftware.php
 app/Services/vinus-design-options.json
 app/Transformers/Api/Client/ServerTransformer.php
 public/assets/css/vinus-admin.css
+public/assets/fonts/montserrat-latin.woff2
 public/assets/images/vinus/eagle.png
 public/assets/images/vinus/login-games/ark.jpg
 public/assets/images/vinus/login-games/arma3.jpg
@@ -22,6 +23,7 @@ public/assets/images/vinus/login-games/seven-days.jpg
 public/assets/images/vinus/login-games/terraria.jpg
 public/assets/images/vinus/login-games/valheim.jpg
 public/assets/images/vinus/login-games/zomboid.jpg
+public/assets/js/vinus-admin.js
 public/assets/vinus/software/catalog-arclight.png
 public/assets/vinus/software/catalog-aspaper.png
 public/assets/vinus/software/catalog-bungeecord.png
@@ -80,6 +82,8 @@ resources/scripts/components/dashboard/DashboardIcon.tsx
 resources/scripts/components/dashboard/DashboardShell.tsx
 resources/scripts/components/dashboard/ServerRow.spec.tsx
 resources/scripts/components/dashboard/ServerRow.tsx
+resources/scripts/components/dashboard/account/AccountPicture.tsx
+resources/scripts/components/dashboard/account/account.module.css
 resources/scripts/components/dashboard/activity/ActivityLogContainer.tsx
 resources/scripts/components/dashboard/dashboard.module.css
 resources/scripts/components/dashboard/design/ChoicePreview.tsx
@@ -95,6 +99,7 @@ resources/scripts/components/dashboard/forms/UpdateEmailAddressForm.tsx
 resources/scripts/components/dashboard/forms/UpdatePasswordForm.tsx
 resources/scripts/components/dashboard/iconFamilies.ts
 resources/scripts/components/dashboard/profile/ProfileContainer.tsx
+resources/scripts/components/dashboard/profile/avatarImage.ts
 resources/scripts/components/dashboard/profile/useProfileAppearance.ts
 resources/scripts/components/dashboard/search/SearchContainer.tsx
 resources/scripts/components/elements/Button.tsx
@@ -212,6 +217,7 @@ resources/scripts/routers/routes.ts
 resources/scripts/state/flashes.ts
 resources/scripts/theme.ts
 resources/scripts/vinusDesign.ts
+resources/views/admin/index.blade.php
 resources/views/layouts/admin.blade.php
 resources/views/layouts/scripts.blade.php
 resources/views/templates/wrapper.blade.php
