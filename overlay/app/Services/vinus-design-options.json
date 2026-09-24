@@ -378,7 +378,7 @@
     "kind": "toggle"
   },
   "login_layout": {
-    "default": "right",
+    "default": "left",
     "kind": "select",
     "choices": [
       {
@@ -400,7 +400,7 @@
     ]
   },
   "login_surface": {
-    "default": "card",
+    "default": "none",
     "kind": "select",
     "choices": [
       {
@@ -446,9 +446,13 @@
     "max": 600
   },
   "login_backdrop": {
-    "default": "flat",
+    "default": "games",
     "kind": "select",
     "choices": [
+      {
+        "value": "games",
+        "label": "Mosaïque de jeux"
+      },
       {
         "value": "flat",
         "label": "Uni"

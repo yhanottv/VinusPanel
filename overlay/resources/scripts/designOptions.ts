@@ -596,7 +596,7 @@ export const designFields: DesignField[] = [
     "category": "signin",
     "key": "login_layout",
     "label": "Disposition",
-    "default": "right",
+    "default": "left",
     "kind": "select",
     "choices": [
       {
@@ -621,7 +621,7 @@ export const designFields: DesignField[] = [
     "category": "signin",
     "key": "login_surface",
     "label": "Surface du formulaire",
-    "default": "card",
+    "default": "none",
     "kind": "select",
     "choices": [
       {
@@ -676,9 +676,10 @@ export const designFields: DesignField[] = [
     "category": "signin",
     "key": "login_backdrop",
     "label": "Arrière-plan",
-    "default": "flat",
+    "default": "games",
     "kind": "select",
     "choices": [
+      {"value":"games","label":"Mosaïque de jeux"},
       {
         "value": "flat",
         "label": "Uni"
@@ -1146,11 +1147,11 @@ export const optionDefaults: DesignOptions = {
   "footer_text": "",
   "account_links": true,
   "community_links": true,
-  "login_layout": "right",
-  "login_surface": "card",
+  "login_layout": "left",
+  "login_surface": "none",
   "login_align": "left",
   "login_width": 448,
-  "login_backdrop": "flat",
+  "login_backdrop": "games",
   "login_logo": true,
   "login_pitch": true,
   "login_heading": "",

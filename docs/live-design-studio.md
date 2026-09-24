@@ -10,7 +10,7 @@ Changes are applied to the preview immediately. **Save** publishes them to all p
 - Colours, typography and icons: dark/light surfaces, text, status colours, installed/system font families, icon corners, stroke weight and size (14–28 px). Dashboard and server navigation support Vinus outlines, Lucide, Tabler and Font Awesome solid icons. The artwork is bundled locally.
 - Surfaces and layout: radii, borders, shadows, opacity, wallpaper, content width, sidebar variants, active links, search and footer.
 - Navigation: rename, hide and order existing items within their groups; add custom links. Existing route permissions still apply.
-- Sign-in: left/right/centred layouts, form surfaces, background effects, width and editorial text.
+- Sign-in: the scrolling game mosaic, left/right/centred layouts, form surfaces, background effects, width and editorial text. The mosaic uses the same continuous four-copy columns in the public page and studio preview; reduced-motion preferences stop its animation. See [game artwork sources](GAME-BANNERS.md).
 - Dashboard: server list/grid default, artwork, quick links, activity and welcome notice.
 - Servers: navigation position, header, address privacy, overview information, power-button appearance and individual server banners.
 - Console: resource/chart positions, line/bar charts, empty state, fonts, prompt and literal display-only log replacements.
