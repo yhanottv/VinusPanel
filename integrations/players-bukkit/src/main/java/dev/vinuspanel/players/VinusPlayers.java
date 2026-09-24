@@ -32,7 +32,7 @@ public final class VinusPlayers extends JavaPlugin implements Listener {
         catch (IOException e) { getLogger().severe("Cannot create player snapshot directory."); getServer().getPluginManager().disablePlugin(this); return; }
         writer = Executors.newSingleThreadExecutor(r -> { Thread t = new Thread(r, "VinusPlayers-writer"); t.setDaemon(true); return t; });
         getServer().getPluginManager().registerEvents(this,this);
-        getServer().getScheduler().runTaskTimer(this,this::publish,1,40);
+        getServer().getScheduler().runTaskTimer(this,this::publish,1,20);
         getServer().getScheduler().runTaskTimerAsynchronously(this,() -> {
             try(var paths=Files.list(root.resolve("results"))) {
                 paths.filter(p -> p.getFileName().toString().matches("[a-f0-9]{32}\\.json")).forEach(p -> {

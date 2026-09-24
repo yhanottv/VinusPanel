@@ -2,6 +2,7 @@
 
 ## Unreleased — Live Design Studio
 
+- Refresh selected live player profiles every second, resume immediately when returning to the tab, and synchronize unchanged XP/game-mode controls with server updates. Preserve unapplied edits and prevent overlapping polls.
 - Add player profiles with read-only inventories, equipment, Ender chests, skins, health, food and XP.
 - Add the optional Bukkit companion for live presence and validated heal/feed/kill, access, game mode and level controls.
 - Label saved data and unavailable capabilities explicitly; document companion installation and optional Minecraft artwork.

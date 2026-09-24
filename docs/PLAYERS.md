@@ -6,7 +6,7 @@ The **Players** page lists known players, including offline players, with a read
 
 - VinusPanel and the `vinuscatalog` Blueprint extension, installed separately following [the extension instructions](../extensions/vinuscatalog/README.md). Updating only the theme does not update the extension.
 - Minecraft Java saves: modern and legacy item NBT are supported. Unknown modded items retain their identifier and quantity with a fallback icon.
-- Live data and controls: **VinusPlayers 1.0**, Java 21, Bukkit/Spigot API 1.21.1. Validated on Paper 1.21.1. Youer exposes the Bukkit API but should be tested with your plugin/mod combination. Native Fabric/Forge, Bedrock and proxies cannot load this Bukkit plugin; saved inventories can still be read for Java servers. Folia is not supported.
+- Live data and controls: **VinusPlayers 1.0.1**, Java 21, Bukkit/Spigot API 1.21.1. Validated on Paper 1.21.1. Youer exposes the Bukkit API but should be tested with your plugin/mod combination. Native Fabric/Forge, Bedrock and proxies cannot load this Bukkit plugin; saved inventories can still be read for Java servers. Folia is not supported.
 - Panel users need `file.read-content` to view player data and additionally `control.console` for actions. The feature grants no extra permissions to subusers.
 
 Without the companion, the panel displays the last saved inventory and labels it accordingly. Live presence is unknown while the Minecraft process runs. A stopped server's players are shown offline. Missing values are shown as unavailable, not invented. A player may have no inventory save yet.
@@ -19,7 +19,7 @@ Build from the repository using Maven and JDK 21:
 mvn -f integrations/players-bukkit/pom.xml clean package
 ```
 
-Alternatively, download the `VinusPlayers` artifact from a successful **Player companion** GitHub Actions run. Put `vinus-players-1.0.0.jar` into the Minecraft server's `plugins/` directory, then perform a planned server restart. Do not use hot-reload tools. The server creates `plugins/VinusPlayers/config.yml` and `.vinus/players/`.
+Alternatively, download the `VinusPlayers` artifact from a successful **Player companion** GitHub Actions run. Put `vinus-players-1.0.1.jar` into the Minecraft server's `plugins/` directory, then perform a planned server restart. Do not use hot-reload tools. The server creates `plugins/VinusPlayers/config.yml` and `.vinus/players/`.
 
 Each action can be disabled in the companion configuration. Restart the Minecraft server after editing it. Disabled actions are also disabled in the panel. No RCON, public port, API key or plugin permission assigned to players is required.
 
@@ -37,7 +37,7 @@ Skins are fetched through the authenticated panel endpoint from Mojang's profile
 
 ## Data and actions
 
-The companion writes atomic snapshots every two seconds; the panel refreshes every five seconds while visible. A heartbeat older than 15 seconds disables live actions. Snapshots are stored only inside the selected Minecraft server volume and are accessed via authenticated Wings file access. Do not publish `.vinus/`, player saves, server properties, credentials, or production screenshots in this repository.
+The companion writes atomic snapshots every second. The selected live profile refreshes every second while visible (normally within about two seconds plus network latency). Lists and saved profiles refresh every five seconds. Returning to the tab refreshes immediately; requests never overlap within one polling session. The XP and game-mode controls follow live values unless the user is editing an unapplied draft. A heartbeat older than 15 seconds disables live actions. Snapshots are stored only inside the selected Minecraft server volume and are accessed via authenticated Wings file access. Do not publish `.vinus/`, player saves, server properties, credentials, or production screenshots in this repository.
 
 The only accepted actions are heal, kill, feed, operator, whitelist, ban, game mode and XP level. The PHP controller validates UUIDs, values, server permissions and server state. The companion accepts commands only from the server console (including an administrator's RCON console), never from an in-game player, even an operator. Unique request IDs suppress duplicate execution. The UI reports success only after the server acknowledges the result; a timeout does not trigger a second command.
 

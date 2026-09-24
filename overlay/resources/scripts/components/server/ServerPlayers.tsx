@@ -37,18 +37,32 @@ export default function ServerPlayers() {
     useEffect(()=>{alive.current=true;return()=>{alive.current=false;};},[]);
     useEffect(()=>{setSelected('');setData(null);setError('');setMessage('');},[server.uuid]);
     useEffect(()=>{
-        let active=true;let timer:ReturnType<typeof setTimeout>;
+        let active=true;let inFlight=false;let timer:ReturnType<typeof setTimeout>;
         const load=async()=>{
-            if(document.hidden){timer=setTimeout(load,5000);return;}
-            try { const result=await http.get<PlayerResponse>(endpoint,{params:selected?{selected}:undefined});if(active){setData(result.data);setLoadError('');} }
-            catch(e){if(active)setLoadError(httpErrorToHuman(e));}
-            finally{if(active)timer=setTimeout(load,5000);}
+            if(!active||inFlight||document.hidden)return;
+            clearTimeout(timer);inFlight=true;let delay=5000;
+            try {
+                const result=await http.get<PlayerResponse>(endpoint,{params:selected?{selected}:undefined});
+                if(active){setData(result.data);setLoadError('');delay=selected&&result.data.bridge?1000:5000;}
+            }catch(e){if(active)setLoadError(httpErrorToHuman(e));}
+            finally{inFlight=false;if(active&&!document.hidden)timer=setTimeout(load,delay);}
         };
-        load();return()=>{active=false;clearTimeout(timer);};
+        const resume=()=>{clearTimeout(timer);if(!document.hidden)void load();};
+        document.addEventListener('visibilitychange',resume);window.addEventListener('focus',resume);
+        void load();return()=>{active=false;clearTimeout(timer);document.removeEventListener('visibilitychange',resume);window.removeEventListener('focus',resume);};
     },[endpoint,selected,refresh]);
     useEffect(()=>{let active=true;fetch('/assets/images/vinus/players/items.json').then(r=>r.ok?r.json():{}).then(items=>{if(active)setTextures(items);}).catch(()=>{});return()=>{active=false;};},[]);
     const player=data?.selected?.uuid===selected?data.selected:null;
-    useEffect(()=>{if(player){setLevel(String(player.level??0));setMode(player.game_mode||'survival');}},[player?.uuid]);
+    const previousValues=useRef<{id:string;level:string;mode:string}|null>(null);
+    useEffect(()=>{
+        if(!player){previousValues.current=null;return;}
+        const next={id:server.uuid+':'+player.uuid,level:String(player.level??0),mode:player.game_mode||'survival'};
+        const previous=previousValues.current;
+        // Follow incoming values until the user edits a draft; resume when the server catches up.
+        setLevel(value=>!previous||previous.id!==next.id||value===previous.level?next.level:value);
+        setMode(value=>!previous||previous.id!==next.id||value===previous.mode?next.mode:value);
+        previousValues.current=next;
+    },[server.uuid,player?.uuid,player?.level,player?.game_mode]);
     const can=(action:PlayerAction)=>!!data?.can_control&&data.bridge&&data.actions.includes(action)&&!busy&&!designPreview;
     const live=(action:PlayerAction)=>can(action)&&player?.online===true;
     const act=async(action:PlayerAction,value:unknown=null,confirmed=false)=>{
