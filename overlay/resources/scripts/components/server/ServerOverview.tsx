@@ -15,9 +15,14 @@ import Icon, { DashboardIconName } from '@/components/dashboard/DashboardIcon';
 
 function Shortcut({ to, icon, title, description }: { to: string; icon: DashboardIconName; title: string; description: string }) {
     return <Link to={to} className={styles.shortcut}>
-        <span className={styles.shortcutIcon}><Icon name={icon}/></span>
+        <span className={styles.shortcutIcon}>
+            {icon === 'terminal' ? <svg viewBox="0 0 32 28" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="2" y="2" width="28" height="24" rx="3"/>
+                <path d="M2 8h28 M6 5h.01 M9 5h.01 M12 5h.01 M8 13l4 4-4 4 M16 21h7"/>
+            </svg> : <Icon name={icon}/>}
+        </span>
         <span className={styles.shortcutText}><strong>{vt(title)}</strong><small>{vt(description)}</small></span>
-        <Icon name="chevron" className={styles.shortcutArrow}/>
+        <span className={styles.shortcutArrow}><Icon name="chevron"/></span>
     </Link>;
 }
 
