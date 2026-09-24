@@ -14,3 +14,6 @@ config/vinuscatalog.php
 **/config/vinuscatalog.php
 *.pem
 *.key
+
+# Companion plugin build outputs
+integrations/**/target/

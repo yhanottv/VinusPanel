@@ -296,6 +296,10 @@ VinusPanel/
 └── CHANGELOG.md               # Version history
 ```
 
+## Minecraft players
+
+The player workspace supports read-only inventories and an optional companion for live controls. See [installation, supported servers and limitations](docs/PLAYERS.md).
+
 ## 📄 License and credits
 
 VinusPanel is available under the [MIT License](LICENSE). Licenses for files derived from Pterodactyl and Blueprint are retained in [`licenses/`](licenses/).

@@ -58,3 +58,7 @@ for test in tests/*.php; do php "$test" /path/to/pterodactyl; done
 `tests/bluemap.php` vérifie aussi le middleware livré avec le thème : fournir en deuxième argument un autre répertoire de sources du panel si nécessaire. Les tests de transactions simulent Wings et les téléchargements. Les tests de métadonnées peuvent consulter les fournisseurs ; consulter leur code avant exécution hors ligne.
 
 Des installations réelles ont été vérifiées sur un serveur jetable : Paper, Forge, un modpack Fabric, un plugin Spigot, un import de monde et BlueMap. Les 28 logiciels n’ont pas tous été démarrés. Voir [la portée complète des vérifications](../../docs/server-workspace/IMPLEMENTATION.md).
+
+## Joueurs Minecraft
+
+La fiche Joueurs nécessite aussi la dernière version du thème. La consultation des sauvegardes est disponible sans plugin ; le direct et les commandes nécessitent le compagnon Bukkit **VinusPlayers**. [Installation et compatibilité](../../docs/PLAYERS.md). Les inventaires restent en lecture seule.

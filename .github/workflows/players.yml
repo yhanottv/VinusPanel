@@ -1,0 +1,25 @@
+name: Player companion
+on:
+  push:
+    paths: ['integrations/players-bukkit/**', 'extensions/vinuscatalog/app/Player*.php', 'scripts/test-players.php', '.github/workflows/players.yml']
+  pull_request:
+    paths: ['integrations/players-bukkit/**', 'extensions/vinuscatalog/app/Player*.php', 'scripts/test-players.php', '.github/workflows/players.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - run: mvn -B -f integrations/players-bukkit/pom.xml clean package
+      - run: php scripts/test-players.php
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VinusPlayers
+          path: integrations/players-bukkit/target/vinus-players-*.jar

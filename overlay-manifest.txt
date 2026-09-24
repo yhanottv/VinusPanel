@@ -125,6 +125,8 @@ resources/scripts/components/server/ServerNavigation.tsx
 resources/scripts/components/server/ServerOverview.tsx
 resources/scripts/components/server/ServerPageTransition.spec.tsx
 resources/scripts/components/server/ServerPageTransition.tsx
+resources/scripts/components/server/ServerPlayers.spec.tsx
+resources/scripts/components/server/ServerPlayers.tsx
 resources/scripts/components/server/ServerProperties.tsx
 resources/scripts/components/server/ServerResourceCards.tsx
 resources/scripts/components/server/ServerShellHeader.tsx
@@ -168,6 +170,11 @@ resources/scripts/components/server/motd.spec.ts
 resources/scripts/components/server/motd.ts
 resources/scripts/components/server/network/AllocationRow.tsx
 resources/scripts/components/server/network/NetworkContainer.tsx
+resources/scripts/components/server/players/PlayerInventory.spec.tsx
+resources/scripts/components/server/players/PlayerInventory.tsx
+resources/scripts/components/server/players/PlayerSkin.tsx
+resources/scripts/components/server/players/players.module.css
+resources/scripts/components/server/players/types.ts
 resources/scripts/components/server/properties.module.css
 resources/scripts/components/server/properties.spec.ts
 resources/scripts/components/server/properties.ts

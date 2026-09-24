@@ -1,4 +1,5 @@
 import ServerWorldViewer from '@/components/server/ServerWorldViewer';
+import ServerPlayers from '@/components/server/ServerPlayers';
 import { vt } from '@/locales/translate';
 import React, { lazy } from 'react';
 import ServerOverview from '@/components/server/ServerOverview';
@@ -83,7 +84,7 @@ export default {
     server: [
         { path: '/overview', permission: null, name: vt('Aperçu'), component: ServerOverview, exact: true },
         { path: '/support', permission: null, name: vt('Assistance'), component: ServerTools, exact: true },
-        { path: '/players', permission: 'file.read-content', name: vt('Joueurs'), component: ServerTools, exact: true },
+        { path: '/players', permission: 'file.read-content', name: vt('Joueurs'), component: ServerPlayers, exact: true },
         { path: '/plugins', permission: 'file.read', name: 'Plugins', component: ServerTools, exact: true },
         { path: '/mods', permission: 'file.read', name: 'Mods', component: ServerTools, exact: true },
         { path: '/modpacks', permission: 'file.read', name: 'Modpacks', component: ServerModpacks, exact: true },

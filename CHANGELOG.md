@@ -2,6 +2,10 @@
 
 ## Unreleased — Live Design Studio
 
+- Add player profiles with read-only inventories, equipment, Ender chests, skins, health, food and XP.
+- Add the optional Bukkit companion for live presence and validated heal/feed/kill, access, game mode and level controls.
+- Label saved data and unavailable capabilities explicitly; document companion installation and optional Minecraft artwork.
+
 - Replace the design form with a full-screen categorized editor and isolated responsive previews.
 - Add shared visual settings for the dashboard, navigation, authentication, server overview and console.
 - Preserve legacy identity settings, private server artwork and Blueprint extension hooks.
