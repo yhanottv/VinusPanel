@@ -18,9 +18,11 @@ Changes are applied to the preview immediately. **Save** publishes them to all p
 - Motion and page metadata. Reduced-motion preferences are respected.
 - Available project modules. Integrations not included in VinusPanel are not advertised as installed.
 
-Only existing languages, icon artwork and font families are offered. This is an original implementation for VinusPanel; it does not install the commercial reference theme or its additional modules.
+Eight interface languages are available, with native names and locally rendered flags. See [language coverage](LANGUAGES.md). Only installed icon artwork and font families are offered. This is an original implementation for VinusPanel; it does not install the commercial reference theme or its additional modules.
 
 Console bars use spaced, rounded columns with opaque shading and a zero-based axis fitted to observed usage; configured server limits remain visible above the charts. Bars show the latest 15 measurements, while lines show all 30 retained samples. Switching styles preserves this history without averaging or changing measurements. Bar animations also respect reduced-motion preferences.
+
+Preview settings are synchronized when a component finishes mounting and when a suspended tab becomes visible again. This avoids a missed draft update while the console loads on slower devices. The editor reads saved settings without using the browser cache.
 
 Choice cards illustrate layouts, surfaces, typography, icons and motion with scalable miniatures. Motion previews run on selection, hover or keyboard focus; the replay control restarts the dashboard entrance without reloading its data. Both miniatures and page animations respect reduced-motion preferences.
 

@@ -1,3 +1,5 @@
+import { languages } from '@/locales/languages';
+import { LanguageFlag } from '@/components/elements/LanguageSelector';
 import React from 'react';
 import { DesignOptions } from '@/designOptions';
 import Icon from '@/components/dashboard/DashboardIcon';
@@ -19,7 +21,7 @@ export default function ChoicePreview({ field, value, duration, tick }: {
         const fonts: Record<string, string> = { system: 'system-ui', montserrat: 'Vinus Montserrat', arial: 'Arial', georgia: 'Georgia', mono: 'monospace', consolas: 'Consolas, monospace', courier: 'Courier New, monospace' };
         return <span aria-hidden="true" className={styles.sample} style={{ fontFamily: fonts[value] }}><strong>Aa</strong><small>Abc 0123</small></span>;
     }
-    if (field === 'default_language') return <span aria-hidden="true" className={styles.sample}><strong>{value === 'fr' ? 'Bonjour' : 'Hello'}</strong><small>{value === 'fr' ? 'Votre espace' : 'Your workspace'}</small></span>;
+    if (field === 'default_language') { const language=languages.find(item=>item.code===value)||languages[0]; return <span aria-hidden="true" className={styles.sample}><LanguageFlag code={language.code}/><strong>{language.greeting}</strong><small>{language.workspace}</small></span>; }
     if (field === 'icon_family' || field === 'icon_style') return <span aria-hidden="true" className={`${styles.sample} ${styles.icons}`} data-corners={field === 'icon_style' ? value : 'round'}><Icon name="user" family={field === 'icon_family' ? value : 'outline'} /><Icon name="grid" family={field === 'icon_family' ? value : 'outline'} /><Icon name="server" family={field === 'icon_family' ? value : 'outline'} /></span>;
 
     switch (field) {

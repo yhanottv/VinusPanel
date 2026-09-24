@@ -304,16 +304,7 @@ export const designFields: DesignField[] = [
     "label": "Langue par défaut",
     "default": "fr",
     "kind": "select",
-    "choices": [
-      {
-        "value": "fr",
-        "label": "Français"
-      },
-      {
-        "value": "en",
-        "label": "English"
-      }
-    ]
+    "choices": [{"value": "fr", "label": "Français"}, {"value": "en", "label": "English"}, {"value": "de", "label": "Deutsch"}, {"value": "es", "label": "Español"}, {"value": "it", "label": "Italiano"}, {"value": "pt", "label": "Português"}, {"value": "nl", "label": "Nederlands"}, {"value": "tr", "label": "Türkçe"}]
   },
   {
     "category": "language",

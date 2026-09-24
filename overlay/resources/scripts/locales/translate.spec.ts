@@ -2,6 +2,7 @@
 import i18n from '@/i18n';
 import { vt } from './translate';
 import { readLanguage, validLanguage, LANGUAGE_STORAGE_KEY } from './preferences';
+import { languages } from './languages';
 
 afterEach(async () => {
     localStorage.clear();
@@ -44,4 +45,25 @@ it('supports the URL fallback when storage is unavailable', () => {
         window.history.replaceState({}, '', '/?lang=en');
         expect(readLanguage()).toBe('en');
     } finally { spy.mockRestore(); }
+});
+
+it.each([
+    ['de', 'Deine Server'], ['es', 'Tus servidores'], ['it', 'I tuoi server'],
+    ['pt', 'Os teus servidores'], ['nl', 'Je servers'], ['tr', 'Sunucularınız'],
+])('loads %s and preserves interpolated server addresses', async (language, title) => {
+    await i18n.changeLanguage(language);
+    expect(vt('Vos serveurs')).toBe(title);
+    expect(vt('Copier l’adresse {{address}}', {address:'example.test:25565'})).toContain('example.test:25565');
+    expect(validLanguage(language)).toBe(language);
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+    expect(readLanguage()).toBe(language);
+});
+
+it('translates design settings in English and uses English for missing additional-language messages', async () => {
+    await i18n.changeLanguage('en');
+    expect(vt('Forme des graphiques')).toBe('Chart style');
+    expect(vt('Toutes les modifications sont enregistrées')).toBe('All changes are saved');
+    await i18n.changeLanguage('de');
+    expect(vt('Une règle CSS contient une syntaxe non autorisée.')).toBe('A CSS rule contains unsupported syntax.');
+    expect(languages).toHaveLength(8);
 });

@@ -79,7 +79,7 @@
     "choices": [
       {
         "value": "system",
-        "label": "Système"
+        "label": "SystÃ¨me"
       },
       {
         "value": "montserrat",
@@ -105,7 +105,7 @@
     "choices": [
       {
         "value": "system",
-        "label": "Système"
+        "label": "SystÃ¨me"
       },
       {
         "value": "montserrat",
@@ -131,7 +131,7 @@
     "choices": [
       {
         "value": "system",
-        "label": "Monospace système"
+        "label": "Monospace systÃ¨me"
       },
       {
         "value": "consolas",
@@ -160,6 +160,30 @@
       {
         "value": "en",
         "label": "English"
+      },
+      {
+        "value": "de",
+        "label": "Deutsch"
+      },
+      {
+        "value": "es",
+        "label": "Español"
+      },
+      {
+        "value": "it",
+        "label": "Italiano"
+      },
+      {
+        "value": "pt",
+        "label": "Português"
+      },
+      {
+        "value": "nl",
+        "label": "Nederlands"
+      },
+      {
+        "value": "tr",
+        "label": "Türkçe"
       }
     ]
   },
@@ -203,11 +227,11 @@
       },
       {
         "value": "subtle",
-        "label": "Discrètes"
+        "label": "DiscrÃ¨tes"
       },
       {
         "value": "strong",
-        "label": "Marquées"
+        "label": "MarquÃ©es"
       },
       {
         "value": "accent",
@@ -229,7 +253,7 @@
       },
       {
         "value": "soft",
-        "label": "Légères"
+        "label": "LÃ©gÃ¨res"
       },
       {
         "value": "deep",
@@ -285,7 +309,7 @@
       },
       {
         "value": "rail",
-        "label": "Rail d’icônes"
+        "label": "Rail dâ€™icÃ´nes"
       },
       {
         "value": "bordered",
@@ -303,7 +327,7 @@
     "choices": [
       {
         "value": "edge",
-        "label": "Trait latéral"
+        "label": "Trait latÃ©ral"
       },
       {
         "value": "pill",
@@ -315,7 +339,7 @@
       },
       {
         "value": "underline",
-        "label": "Souligné"
+        "label": "SoulignÃ©"
       },
       {
         "value": "solid",
@@ -327,7 +351,7 @@
       },
       {
         "value": "fade",
-        "label": "Dégradé"
+        "label": "DÃ©gradÃ©"
       }
     ]
   },
@@ -383,15 +407,15 @@
     "choices": [
       {
         "value": "right",
-        "label": "Formulaire à droite"
+        "label": "Formulaire Ã  droite"
       },
       {
         "value": "left",
-        "label": "Formulaire à gauche"
+        "label": "Formulaire Ã  gauche"
       },
       {
         "value": "center",
-        "label": "Centré"
+        "label": "CentrÃ©"
       },
       {
         "value": "top",
@@ -421,7 +445,7 @@
       },
       {
         "value": "raised",
-        "label": "Surélevée"
+        "label": "SurÃ©levÃ©e"
       }
     ]
   },
@@ -435,7 +459,7 @@
       },
       {
         "value": "center",
-        "label": "Centré"
+        "label": "CentrÃ©"
       }
     ]
   },
@@ -451,7 +475,7 @@
     "choices": [
       {
         "value": "games",
-        "label": "Mosaïque de jeux"
+        "label": "MosaÃ¯que de jeux"
       },
       {
         "value": "flat",
@@ -463,7 +487,7 @@
       },
       {
         "value": "gradient",
-        "label": "Dégradé"
+        "label": "DÃ©gradÃ©"
       },
       {
         "value": "aurora",
@@ -539,11 +563,11 @@
     "choices": [
       {
         "value": "tinted",
-        "label": "Teinté"
+        "label": "TeintÃ©"
       },
       {
         "value": "edge",
-        "label": "Trait latéral"
+        "label": "Trait latÃ©ral"
       },
       {
         "value": "outline",
@@ -611,7 +635,7 @@
       },
       {
         "value": "status",
-        "label": "Couleurs des états"
+        "label": "Couleurs des Ã©tats"
       },
       {
         "value": "outline",
@@ -629,11 +653,11 @@
     "choices": [
       {
         "value": "right",
-        "label": "À droite"
+        "label": "Ã€ droite"
       },
       {
         "value": "left",
-        "label": "À gauche"
+        "label": "Ã€ gauche"
       },
       {
         "value": "above",
@@ -651,7 +675,7 @@
     "choices": [
       {
         "value": "none",
-        "label": "Masqués"
+        "label": "MasquÃ©s"
       },
       {
         "value": "above",
@@ -672,7 +696,7 @@
     "kind": "toggle"
   },
   "console_prompt": {
-    "default": "»",
+    "default": "Â»",
     "kind": "text"
   },
   "console_daemon": {
@@ -699,7 +723,7 @@
       },
       {
         "value": "lift",
-        "label": "Élévation"
+        "label": "Ã‰lÃ©vation"
       },
       {
         "value": "glint",
@@ -729,7 +753,7 @@
       },
       {
         "value": "rise",
-        "label": "Montée"
+        "label": "MontÃ©e"
       },
       {
         "value": "slide",
@@ -783,7 +807,7 @@
     "choices": [
       {
         "value": "outline",
-        "label": "Vinus · contours"
+        "label": "Vinus Â· contours"
       },
       {
         "value": "lucide",
@@ -795,7 +819,7 @@
       },
       {
         "value": "solid",
-        "label": "Font Awesome · pleines"
+        "label": "Font Awesome Â· pleines"
       }
     ]
   },

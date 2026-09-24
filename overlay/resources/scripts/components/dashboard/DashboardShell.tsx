@@ -7,7 +7,7 @@ import SearchContainer from '@/components/dashboard/search/SearchContainer';
 import Icon from './DashboardIcon';
 import styles from './dashboard.module.css';
 import { vt } from '@/locales/translate';
-import { changeLanguage, panelLanguage } from '@/locales/preferences';
+import LanguageSelector from '@/components/elements/LanguageSelector';
 import { usePersistedState } from '@/plugins/usePersistedState';
 import http from '@/api/http';
 import { VINUS } from '@/theme';
@@ -71,12 +71,7 @@ export default function DashboardShell({ children, sidebar }: { children: React.
                             <Link to="/account" onClick={() => setMenu(null)}><Icon name="user" />{vt('Mon compte')}</Link>
                         </div>}
                     </div>
-                    <label className={styles.language}>
-                        <span className={styles.flag} aria-hidden="true">{panelLanguage === 'en' && <svg viewBox="0 0 60 30"><path fill="#193678" d="M0 0h60v30H0z" /><path stroke="#fff" strokeWidth="6" d="m0 0 60 30 M60 0 0 30" /><path stroke="#c8102e" strokeWidth="2" d="m0 0 60 30 M60 0 0 30" /><path stroke="#fff" strokeWidth="10" d="M30 0v30 M0 15h60" /><path stroke="#c8102e" strokeWidth="6" d="M30 0v30 M0 15h60" /></svg>}</span>
-                        <select aria-label="Langue / Language" value={panelLanguage} onChange={event => changeLanguage(event.target.value)}>
-                            <option value="fr">FR</option><option value="en">EN</option>
-                        </select>
-                    </label>
+                    <LanguageSelector compact />
                     <div className={styles.popover}>
                         <button className={styles.roundButton} type="button" title={vt('Couleur')} aria-label={vt('Couleur')} aria-expanded={menu === 'color'} aria-controls="dashboard-palette" onClick={e => toggle('color', e.currentTarget)}><Icon name="palette" /></button>
                         {menu === 'color' && <div className={styles.popoverPanel} id="dashboard-palette">

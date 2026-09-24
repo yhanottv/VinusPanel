@@ -101,6 +101,7 @@ resources/scripts/components/elements/DiscordButton.tsx
 resources/scripts/components/elements/GreyRowBox.tsx
 resources/scripts/components/elements/Input.tsx
 resources/scripts/components/elements/Label.tsx
+resources/scripts/components/elements/LanguageSelector.spec.tsx
 resources/scripts/components/elements/LanguageSelector.tsx
 resources/scripts/components/elements/PageContentBlock.tsx
 resources/scripts/components/elements/PrivateValue.tsx
@@ -111,6 +112,7 @@ resources/scripts/components/elements/activity/ActivityLogEntry.tsx
 resources/scripts/components/elements/activity/ActivityLogMetaButton.tsx
 resources/scripts/components/elements/activity/style.module.css
 resources/scripts/components/elements/button/style.module.css
+resources/scripts/components/elements/language-selector.module.css
 resources/scripts/components/elements/private-value.module.css
 resources/scripts/components/server/MotdEditor.tsx
 resources/scripts/components/server/ServerActivityLogContainer.tsx
@@ -173,11 +175,20 @@ resources/scripts/components/server/useServerTelemetry.ts
 resources/scripts/components/server/viewer.module.css
 resources/scripts/components/server/worlds.module.css
 resources/scripts/designOptions.ts
+resources/scripts/designPreview.spec.tsx
 resources/scripts/designRuntime.test.ts
 resources/scripts/designRuntime.ts
 resources/scripts/i18n.ts
+resources/scripts/locales/dates.ts
+resources/scripts/locales/de.ts
 resources/scripts/locales/en.ts
+resources/scripts/locales/es.ts
+resources/scripts/locales/it.ts
+resources/scripts/locales/languages.ts
+resources/scripts/locales/nl.ts
 resources/scripts/locales/preferences.ts
+resources/scripts/locales/pt.ts
+resources/scripts/locales/tr.ts
 resources/scripts/locales/translate.spec.ts
 resources/scripts/locales/translate.ts
 resources/scripts/routers/AuthenticationRouter.tsx

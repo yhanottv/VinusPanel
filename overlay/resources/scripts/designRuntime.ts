@@ -30,7 +30,14 @@ export function publishDesign(value: VinusDesignSettings) {
 }
 export function useDesign() {
     const [value,setValue] = useState(() => ({...vinusDesign}));
-    useEffect(() => { const update=() => setValue({...vinusDesign}); window.addEventListener('vinus:design-change',update); return () => window.removeEventListener('vinus:design-change',update); }, []);
+    useEffect(() => {
+        const update=() => setValue({...vinusDesign});
+        window.addEventListener('vinus:design-change',update);
+        // A preview message can arrive between rendering and effect subscription,
+        // especially while lazy console components load on a slower device.
+        update();
+        return () => window.removeEventListener('vinus:design-change',update);
+    }, []);
     return value;
 }
 // Only mounted in an authenticated administrator's frame. Origin AND parent window are checked.
@@ -64,8 +71,12 @@ export function useDesignPreview(admin: boolean) {
             if (event.type === 'submit' || (event.target as Element)?.closest('a,button,input,select,textarea')) { event.preventDefault(); event.stopImmediatePropagation(); } };
         window.addEventListener('message',receive);
         ['click','submit','keydown'].forEach(type => document.addEventListener(type,block,true));
-        window.parent.postMessage({type:'vinus:studio-ready'},window.location.origin);
-        return () => { window.removeEventListener('message',receive); ['click','submit','keydown'].forEach(type => document.removeEventListener(type,block,true)); };
+        const ready=()=>window.parent.postMessage({type:'vinus:studio-ready'},window.location.origin);
+        const resume=()=>{if(document.visibilityState==='visible') ready();};
+        window.addEventListener('pageshow',ready);
+        document.addEventListener('visibilitychange',resume);
+        ready();
+        return () => { window.removeEventListener('message',receive); window.removeEventListener('pageshow',ready); document.removeEventListener('visibilitychange',resume); ['click','submit','keydown'].forEach(type => document.removeEventListener(type,block,true)); };
     },[admin]);
 }
 if (typeof document !== 'undefined') applyDesign(vinusDesign);

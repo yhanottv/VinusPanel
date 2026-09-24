@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
 import useSWR from 'swr';
 import { formatDistanceToNow } from 'date-fns';
-import { fr, enUS } from 'date-fns/locale';
+import { dateLocale } from '@/locales/dates';
 import getServers from '@/api/getServers';
 import { Server } from '@/api/server/getServer';
 import { PaginatedResult } from '@/api/http';
@@ -19,7 +19,7 @@ import useProfileAppearance from '@/components/dashboard/profile/useProfileAppea
 import { VinusDesignSettings } from '@/vinusDesign';
 import { VINUS } from '@/theme';
 import { vt } from '@/locales/translate';
-import { panelLanguage } from '@/locales/preferences';
+import { formatLocale } from '@/locales/preferences';
 import ServerRow from './ServerRow';
 import Icon from './DashboardIcon';
 import styles from './dashboard.module.css';
@@ -112,7 +112,7 @@ export default function DashboardContainer({ preview = false, design }: { previe
                 : !activity ? <div className={styles.loading}><Spinner centered /></div>
                 : activity.items.length ? <ul>{activity.items.slice(safeActivityPage * 3, safeActivityPage * 3 + 3).map(entry => <li key={entry.id}>
                     <span className={styles.statusDot} /><div><strong>{activityLabel(entry)}</strong><small>{entry.event.split(':')[0]}{entry.relationships.actor ? ` · ${entry.relationships.actor.username}` : ''}</small></div>
-                    <time dateTime={entry.timestamp.toISOString()} title={entry.timestamp.toLocaleString(panelLanguage === 'fr' ? 'fr-FR' : 'en-US')}>{formatDistanceToNow(entry.timestamp, {addSuffix: true, locale: panelLanguage === 'fr' ? fr : enUS})}</time>
+                    <time dateTime={entry.timestamp.toISOString()} title={entry.timestamp.toLocaleString(formatLocale)}>{formatDistanceToNow(entry.timestamp, {addSuffix: true, locale: dateLocale})}</time>
                 </li>)}</ul> : <p className={styles.loading}>{vt('Aucune activité récente.')}</p>}
             <div className={styles.activityFooter}><span>{vt('Page {{page}} sur {{total}}', {page: safeActivityPage + 1, total: activityPages})}</span><div className={styles.paginationActions}>
                 <button type="button" aria-label={vt('Page précédente')} disabled={safeActivityPage === 0 || !!activityError} onClick={() => setActivityPage(safeActivityPage - 1)}><Icon name="chevron" /></button>

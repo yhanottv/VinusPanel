@@ -1,9 +1,10 @@
 import { vinusDesign } from '@/vinusDesign';
-export type PanelLanguage = 'fr' | 'en';
+import { languages, PanelLanguage } from './languages';
+export type { PanelLanguage } from './languages';
 export const LANGUAGE_STORAGE_KEY = 'vinus:language';
 
 export function validLanguage(value: string | null | undefined): PanelLanguage | null {
-    return value === 'fr' || value === 'en' ? value : null;
+    return languages.some(language => language.code === value) ? value as PanelLanguage : null;
 }
 
 export function readLanguage(): PanelLanguage {
@@ -18,7 +19,7 @@ export function readLanguage(): PanelLanguage {
 }
 
 export const panelLanguage = readLanguage();
-export const formatLocale = panelLanguage === 'fr' ? 'fr-FR' : 'en-US';
+export const formatLocale = languages.find(language => language.code === panelLanguage)!.locale;
 
 // A navigation also refreshes module-level labels, form schemas and the terminal.
 // The URL fallback keeps switching usable when browser storage is disabled.
