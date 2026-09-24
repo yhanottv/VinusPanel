@@ -33,6 +33,11 @@ html[data-vinus-login-pitch='false'] .vinus-auth-editorial { display:none; }
 html[data-vinus-language-picker='false'] .vinus-auth-language { display:none; }
 html[data-vinus-footer-credit='false'] .vinus-footer-credit { display:none; }
 .vinus-footer-custom { text-align:center; font-size:11px; color:var(--vinus-muted); padding:5px; }
+@media(min-width:901px) {
+ /* Keep the form inset and the caption near the capped mosaic on ultrawide screens. */
+ html[data-vinus-login-layout='left'] .vinus-auth-shell { padding-left:clamp(64px,10vw,360px); }
+ html[data-vinus-login-layout='left'] .vinus-auth-editorial { left:max(48vw,calc(100% - 1560px)); }
+}
 @media(max-width:900px) {
  html[data-vinus-login-layout='right'] .vinus-auth-mosaic { inset:-10% auto -10% -42%; }
  html[data-vinus-login-layout='right'] .vinus-auth-stage::before { background:linear-gradient(270deg,var(--vinus-bg),color-mix(in srgb,var(--vinus-bg) 97%,transparent) 52%,color-mix(in srgb,var(--vinus-bg) 79%,transparent)); }
