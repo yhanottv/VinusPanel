@@ -21,8 +21,8 @@ export default () => {
   const connected = ServerContext.useStoreState((state) => state.socket.connected);
   const [current, setCurrent] = useState({ cpu: 0, memory: 0, inbound: 0, outbound: 0 });
 
-  const cpu = useChartTickLabel(vt("Processeur"), limits.cpu, '%', 0);
-  const memory = useChartTickLabel(vt("Mémoire"), limits.memory, vt("Mio"));
+  const cpu = useChartTickLabel(vt("Processeur"), limits.cpu, '%', 0, chartType);
+  const memory = useChartTickLabel(vt("Mémoire"), limits.memory, vt("Mio"), undefined, chartType);
   const networkOptions = useMemo(
     () => ({
       scales: {
@@ -39,6 +39,7 @@ export default () => {
   );
   const network = useChart(vt("Réseau"), {
     sets: 2,
+    type: chartType,
     options: networkOptions,
     callback(opts, index) {
       return {

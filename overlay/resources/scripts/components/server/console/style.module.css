@@ -148,6 +148,7 @@
 .chart_inbound { color: #66cbaa; }
 .chart_outbound { color: #ff9b52; }
 .chart_canvas { position: relative; height: 116px; margin-top: 12px; }
+:global(html[data-vinus-chart-shape='bar']) .chart_canvas { height: 150px; }
 @media (max-width: 767px) {
     .terminal > .container {
         height: 26rem;

@@ -129,24 +129,53 @@ function getEmptyData(label: string, sets = 1, callback?: ChartDatasetCallback |
 
 interface UseChartOptions {
   sets: number;
+  type?: 'line' | 'bar';
   options?: DeepPartial<ChartOptions<'line'>> | number;
   callback?: ChartDatasetCallback;
 }
 
 function useChart(label: string, opts?: UseChartOptions) {
-  const chartRef = useRef<ChartJS<'line'>>(null);
+  const type = opts?.type || 'line';
+  const chartRef = useRef<ChartJS<'line' | 'bar'>>(null);
   const chartOptions = useMemo(() => {
-    const result = getOptions(
+    const result: ChartOptions<'line' | 'bar'> = getOptions(
       typeof opts?.options === 'number' ? { scales: { y: { min: 0, suggestedMax: opts.options } } } : opts?.options
     );
+    if (type === 'bar') {
+      // Leave half a slot on either end so the first and latest bars are not clipped.
+      result.scales!.x = { ...result.scales!.x, min: -0.5, max: 29.5 };
+      const y = result.scales!.y;
+      if (y?.type === 'linear') {
+        delete y.suggestedMax;
+        y.min = 0;
+        y.grace = '10%';
+        y.ticks = { ...y.ticks, precision: 2 };
+      }
+      result.animation = { duration: 320, easing: 'easeOutCubic' };
+    }
     if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       result.animation = false;
     }
     return result;
-  }, [opts?.options]);
+  }, [opts?.options, type]);
   // Keep the React data object stable. Update the mounted chart in place so
   // new telemetry never recreates its datasets or restarts the initial animation.
   const [data] = useState(() => getEmptyData(label, opts?.sets || 1, opts?.callback));
+  const displayData = useMemo<ChartData<'line' | 'bar'>>(() => type === 'line' ? data : {
+    ...data,
+    // Retain the same sample arrays when switching modes; only presentation changes.
+    datasets: data.datasets.map(dataset => ({
+      ...dataset,
+      backgroundColor: dataset.borderColor,
+      hoverBackgroundColor: dataset.borderColor,
+      borderWidth: 0,
+      borderRadius: { topLeft: 3, topRight: 3, bottomLeft: 0, bottomRight: 0 },
+      borderSkipped: 'bottom',
+      categoryPercentage: 0.94,
+      barPercentage: 0.92,
+      maxBarThickness: 24,
+    })),
+  }, [data, type]);
   const push = (items: number | null | (number | null)[]) => {
     const values = Array.isArray(items) ? items : [items];
     const target = chartRef.current?.data || data;
@@ -163,10 +192,10 @@ function useChart(label: string, opts?: UseChartOptions) {
     });
     chartRef.current?.update('none');
   };
-  return { props: { ref: chartRef, data, options: chartOptions }, push, clear };
+  return { props: { ref: chartRef, data: displayData, options: chartOptions }, push, clear };
 }
 
-function useChartTickLabel(label: string, max: number, tickLabel: string, roundTo?: number) {
+function useChartTickLabel(label: string, max: number, tickLabel: string, roundTo?: number, type: 'line' | 'bar' = 'line') {
   const chartOptions = useMemo(
     () => ({
       scales: {
@@ -174,15 +203,15 @@ function useChartTickLabel(label: string, max: number, tickLabel: string, roundT
           suggestedMax: max,
           ticks: {
             callback(value: string | number) {
-              return formatChartValue(Number(value), tickLabel, roundTo ?? 0);
+              return formatChartValue(Number(value), tickLabel, type === 'bar' ? Math.max(roundTo ?? 0, 2) : roundTo ?? 0);
             },
           },
         },
       },
     }),
-    [max, tickLabel, roundTo]
+    [max, tickLabel, roundTo, type]
   );
-  return useChart(label, { sets: 1, options: chartOptions });
+  return useChart(label, { sets: 1, options: chartOptions, type });
 }
 
 export { useChart, useChartTickLabel, getOptions, getEmptyData };
