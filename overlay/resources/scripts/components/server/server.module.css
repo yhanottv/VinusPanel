@@ -52,7 +52,7 @@
 .shortcut:hover { border-color:rgba(var(--dash-accent-rgb),.5); background:var(--dash-raised); }
 .shortcut:hover .shortcutArrow { color:var(--dash-accent); }
 .shortcut:focus-visible { outline:2px solid var(--dash-accent); outline-offset:3px; }
-@media (max-width:1200px) { .shortcuts { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:1400px) { .shortcuts { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width:540px) { .shortcuts { grid-template-columns:minmax(0,1fr); }.shortcut { min-height:84px; padding:16px; } }
 @media (prefers-reduced-motion:reduce) { .shortcut { transition:none; } }
 .action:disabled { opacity: .45; cursor: not-allowed; }
