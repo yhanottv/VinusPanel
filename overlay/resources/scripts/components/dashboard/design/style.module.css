@@ -103,7 +103,7 @@
 .colorInput { background:#171b23; }
 .listEditor { margin-top:20px; }.listEditor fieldset { border:1px solid #ffffff12; border-radius:9px; padding:12px; margin:16px 0; }.listEditor legend { padding:0 6px; }.listEditor label { display:block; margin:10px 0; }.listEditor .toggle { display:flex; }.listEditor input,.listEditor textarea { margin-top:5px; }.rowActions { display:flex; justify-content:space-between; margin-top:14px; }.rowActions button { font-size:11px; color:#b2bccb; }.rowActions button:disabled { opacity:.3; }
 .hint { font-size:11px; color:#7f8998; line-height:1.6; }.addon { display:flex; align-items:center; gap:10px; padding:16px 0; border-bottom:1px solid #ffffff0a; }.addon svg { color:#43d6a3; }
-.saveBar { padding:12px 16px 16px; border-top:1px solid #ffffff12; background:#101319; }.saveBar>div { display:grid; grid-template-columns:1fr 1fr; gap:8px; }.saveBar p { margin:0 0 10px; }.saveBar .error { padding:8px; font-size:11px; max-height:85px; overflow:auto; }
+.saveBar { padding:12px 16px 16px; border-top:1px solid #ffffff12; background:#101319; }.saveBar>div:last-child { display:grid; grid-template-columns:1fr 1fr; gap:8px; }.saveBar p { margin:0 0 10px; }.saveBar .error { padding:8px; font-size:11px; max-height:85px; overflow:auto; }
 .primaryButton,.secondaryButton { min-height:36px; padding:8px 12px; font-size:11px; }.secondaryButton { background:#1a202a; }
 .previewArea { position:relative; top:0; display:flex; flex-direction:column; min-height:0; background:#090c10; overflow:hidden; }
 .previewToolbar { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px 22px; padding:13px 18px; background:#0c1016; border-bottom:1px solid #ffffff08; }
@@ -135,3 +135,5 @@
 .iconSample[data-corners='sharp'] svg { stroke-linejoin:miter; stroke-linecap:square; }
 @media(max-width:1100px) { .studio { grid-template-columns:54px 316px minmax(0,1fr); }.rail { padding-inline:4px; }.rail button,.rail a { width:42px; } }
 @media(max-width:650px) { .studio { grid-template-columns:46px minmax(0,1fr); }.rail { padding-inline:3px; }.rail button,.rail a { width:38px; }.rail svg { width:23px; height:23px; } }
+
+.saveBar>[role="alert"] { margin-bottom:10px; font-size:13px; }

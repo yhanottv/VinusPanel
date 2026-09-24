@@ -1,3 +1,4 @@
+import MessageBox from '@/components/MessageBox';
 import { useDesign, useDesignPreview, designPreview } from '@/designRuntime';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -85,7 +86,7 @@ export default function DashboardShell({ children, sidebar }: { children: React.
                     <button className={`${styles.roundButton} ${styles.logoutButton}`} type="button" aria-label={vt('Déconnexion')} title={vt('Déconnexion')} disabled={loggingOut} onClick={logout}><Icon name="logout" /></button>
                 </div>
             </header>
-            {error && <p className={styles.error} role="alert">{error}</p>}
+            {error && <MessageBox type="error" dismissible key={error}>{error}</MessageBox>}
             {children}
         </main>
     </div>;

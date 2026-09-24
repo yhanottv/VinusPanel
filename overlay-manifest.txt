@@ -64,6 +64,9 @@ resources/scripts/api/server/getServer.ts
 resources/scripts/assets/css/GlobalStylesheet.ts
 resources/scripts/assets/fonts/montserrat-latin-wght-normal.woff2
 resources/scripts/components/Avatar.tsx
+resources/scripts/components/FlashMessageRender.spec.tsx
+resources/scripts/components/FlashMessageRender.tsx
+resources/scripts/components/MessageBox.tsx
 resources/scripts/components/NavigationBar.tsx
 resources/scripts/components/auth/ForgotPasswordContainer.tsx
 resources/scripts/components/auth/LoginCheckpointContainer.tsx
@@ -114,6 +117,7 @@ resources/scripts/components/elements/activity/style.module.css
 resources/scripts/components/elements/button/style.module.css
 resources/scripts/components/elements/language-selector.module.css
 resources/scripts/components/elements/private-value.module.css
+resources/scripts/components/message-box.module.css
 resources/scripts/components/server/MotdEditor.tsx
 resources/scripts/components/server/ServerActivityLogContainer.tsx
 resources/scripts/components/server/ServerModpacks.tsx
@@ -195,6 +199,7 @@ resources/scripts/routers/AuthenticationRouter.tsx
 resources/scripts/routers/DashboardRouter.tsx
 resources/scripts/routers/ServerRouter.tsx
 resources/scripts/routers/routes.ts
+resources/scripts/state/flashes.ts
 resources/scripts/theme.ts
 resources/scripts/vinusDesign.ts
 resources/views/layouts/admin.blade.php

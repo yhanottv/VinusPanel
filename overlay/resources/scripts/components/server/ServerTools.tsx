@@ -1,3 +1,4 @@
+import MessageBox from '@/components/MessageBox';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ServerContext } from '@/state/server';
@@ -69,7 +70,7 @@ export default function ServerTools() {
         </div>
         {catalog && <div className={styles.toolbar} role="group" aria-label={vt('Vue du catalogue')}><button type="button" className={styles.action} aria-pressed={tab === 'catalog'} onClick={() => setTab('catalog')}>{vt('Découvrir')}</button><button type="button" className={styles.action} aria-pressed={tab === 'installed'} onClick={() => setTab('installed')}>{vt('Installés')}</button></div>}
         {catalog && tab === 'catalog' ? <VinusCatalogEntry key={`${server.uuid}:${tool}:${refresh}`} kind={tool as 'mods' | 'plugins'} /> : <>
-            {error && <div role="alert" className={styles.error}>{error}<p>{tool === 'players' ? vt('La liste devient disponible après les premières connexions sur un serveur Minecraft compatible.') : vt('Vérifiez les permissions et la disponibilité des fichiers du serveur.')}</p></div>}
+            {error && <MessageBox type="error" dismissible key={error}>{error}<p>{tool === 'players' ? vt('La liste devient disponible après les premières connexions sur un serveur Minecraft compatible.') : vt('Vérifiez les permissions et la disponibilité des fichiers du serveur.')}</p></MessageBox>}
             {loading && <p role="status" className={styles.note}>{vt('Chargement…')}</p>}
             {(catalog || tool === 'worlds') && !loading && !error && <>
                 <div className={styles.toolbar}><Can action="file.read"><Link className={styles.action} to={`${base}/files#/${catalog ? tool : ''}`}>{vt('Ouvrir les fichiers')}</Link></Can><Can action="backup.read"><Link className={styles.action} to={`${base}/backups`}>{vt('Sauvegardes')}</Link></Can></div>

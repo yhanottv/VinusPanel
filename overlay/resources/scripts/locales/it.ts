@@ -227,5 +227,6 @@ export default {
     "Créer et restaurer des sauvegardes": "Crea e ripristina backup",
     "Consulter les actions récentes": "Consulta le azioni recenti",
     "Ouvrir la console": "Apri console",
-    "Gérer les fichiers": "Gestisci file"
+    "Gérer les fichiers": "Gestisci file",
+    "Fermer la notification": "Chiudi notifica"
 };

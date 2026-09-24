@@ -227,5 +227,6 @@ export default {
     "Créer et restaurer des sauvegardes": "Yedek oluştur ve geri yükle",
     "Consulter les actions récentes": "Son işlemleri incele",
     "Ouvrir la console": "Konsolu aç",
-    "Gérer les fichiers": "Dosyaları yönet"
+    "Gérer les fichiers": "Dosyaları yönet",
+    "Fermer la notification": "Bildirimi kapat"
 };

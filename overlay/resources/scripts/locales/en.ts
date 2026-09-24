@@ -891,5 +891,6 @@ export default {
     "Commandes et journaux en direct": "Live commands and logs",
     "Parcourir et modifier les fichiers": "Browse and edit files",
     "Créer et restaurer des sauvegardes": "Create and restore backups",
-    "Consulter les actions récentes": "Review recent actions"
+    "Consulter les actions récentes": "Review recent actions",
+    "Fermer la notification": "Dismiss notification"
 };

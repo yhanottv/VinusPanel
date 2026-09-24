@@ -227,5 +227,6 @@ export default {
     "Créer et restaurer des sauvegardes": "Back-ups maken en herstellen",
     "Consulter les actions récentes": "Recente acties bekijken",
     "Ouvrir la console": "Console openen",
-    "Gérer les fichiers": "Bestanden beheren"
+    "Gérer les fichiers": "Bestanden beheren",
+    "Fermer la notification": "Melding sluiten"
 };

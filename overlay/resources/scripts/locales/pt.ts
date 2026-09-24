@@ -227,5 +227,6 @@ export default {
     "Créer et restaurer des sauvegardes": "Criar e restaurar cópias de segurança",
     "Consulter les actions récentes": "Consultar ações recentes",
     "Ouvrir la console": "Abrir consola",
-    "Gérer les fichiers": "Gerir ficheiros"
+    "Gérer les fichiers": "Gerir ficheiros",
+    "Fermer la notification": "Fechar notificação"
 };

@@ -1,3 +1,4 @@
+import MessageBox from '@/components/MessageBox';
 import NavLink from '@/components/dashboard/design/DesignNavLink';
 import { useDesign } from '@/designRuntime';
 import React, { useEffect, useState } from 'react';
@@ -58,7 +59,7 @@ export default function NavigationBar() {
             <span><strong>{appearance.displayName || user.username}</strong><small>{user.email}</small></span>
         </Link>
         <button className={styles.standaloneLogout} type="button" onClick={logout} disabled={busy}><Icon name="logout" />{vt('Déconnexion')}</button>
-        {error && <p role="alert" className={styles.error}>{error}</p>}
+        {error && <MessageBox type="error" dismissible key={error}>{error}</MessageBox>}
         {/* AFTER_NAV */}
     </aside>;
 }

@@ -1,3 +1,4 @@
+import MessageBox from '@/components/MessageBox';
 import useServerOperation from './useServerOperation';
 import React, { useEffect, useRef, useState } from 'react';
 import { ServerContext } from '@/state/server';
@@ -78,7 +79,7 @@ export default function ServerSoftware() {
     return <PageContentBlock title={`${server.name} | Version`} className={styles.page}>
         <header className={styles.heading}><div><h2>{vt('Version du serveur')}</h2><p>{vt('Choisissez votre logiciel, sa version et le build à installer.')}</p></div><span className={styles.current}><SoftwareIcon software={server.softwareProfile?.software} size={24} />{softwareName(server.softwareProfile?.software)} · {server.softwareProfile?.game_version || '—'}</span></header>
         <div className={styles.warning}>{vt('Un changement de logiciel peut rendre vos mondes, plugins ou mods incompatibles. Les fichiers remplacés sont conservés dans un dossier de récupération. Créez aussi une sauvegarde de vos mondes avant de changer de version.')}</div>
-        {error && !selected && <p className={styles.error} role="alert">{error}</p>}
+        {error && !selected && <MessageBox type="error" dismissible key={error}>{error}</MessageBox>}
         {message && <div className={styles.success} role="status">{message}{backup && <Link to={`/server/${server.id}/files#/${backup}`}>{vt('Ouvrir les fichiers de récupération')} ↗</Link>}</div>}
         <input className={styles.search} value={query} onChange={e => setQuery(e.target.value)} placeholder={vt('Rechercher un logiciel…')} aria-label={vt('Rechercher un logiciel…')} />
         {loading && !selected && <p role="status">{vt('Chargement des logiciels…')}</p>}
@@ -92,7 +93,7 @@ export default function ServerSoftware() {
         {!!Object.keys(groups).length && !Object.values(software).some(item => item.name.toLowerCase().includes(query.toLowerCase())) && <p>{vt('Aucun logiciel ne correspond à cette recherche.')}</p>}
         <Dialog open={!!selected} title={software[selected]?.name || vt('Version')} onClose={() => { if (!busy) { setSelected(''); setPlan(null); setError(''); } }}>
             <div className={styles.modal}>
-                {error && <p className={styles.error} role="alert">{error}</p>}
+                {error && <MessageBox type="error" dismissible key={error}>{error}</MessageBox>}
                 <label>{vt('Version')}<select disabled={loading || busy || !!plan} value={version} onChange={e => setVersion(e.target.value)}>{versions.map(v => <option key={v.id} value={v.id}>{v.id} · Java {v.java}{v.channel !== 'RELEASE' ? ` · ${v.channel}` : ''}</option>)}</select></label>
                 <label>{vt('Build')}<select disabled={loading || busy || !!plan} value={build} onChange={e => { setBuild(e.target.value); setPlan(null); }}>{builds.map(b => <option key={b.id} value={b.id}>{b.name}{b.experimental ? ` · ${vt('Expérimental')}` : ''}</option>)}</select></label>
                 {loading && <p role="status">{vt('Chargement des versions…')}</p>}

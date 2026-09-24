@@ -1,3 +1,4 @@
+import MessageBox from '@/components/MessageBox';
 import React, { useEffect, useRef, useState } from 'react';
 import { Prompt, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -253,7 +254,7 @@ export default function DesignStudio() {
                 {query&&!fields.length&&<p>{vt("Aucun réglage trouvé.")}</p>}
             </div>
             <footer className={styles.saveBar}>
-                <p role="status" className={error?styles.error:styles.hint}>{error||message||vt(changed?'Modifications non enregistrées':'Toutes les modifications sont enregistrées')}</p>
+                <>{error ? <MessageBox type="error" onDismiss={() => setError('')}>{error}</MessageBox> : <p role="status" className={styles.hint}>{message||vt(changed?'Modifications non enregistrées':'Toutes les modifications sont enregistrées')}</p>}</>
                 <div><button type="button" className={styles.secondaryButton} onClick={reset} disabled={!changed||busy}>{vt("Annuler")}</button><button type="button" className={styles.primaryButton} onClick={save} disabled={!changed||busy}>{vt(busy?'Enregistrement…':'Enregistrer')}</button></div>
             </footer>
         </aside>

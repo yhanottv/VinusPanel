@@ -1,3 +1,4 @@
+import MessageBox from '@/components/MessageBox';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ServerContext } from '@/state/server';
@@ -61,7 +62,7 @@ export default function ServerWorldViewer() {
     };
     return <PageContentBlock title={`${server.name} | World Viewer`} className={form.page}>
         <header className={form.heading}><div><h2>World Viewer</h2><p>{vt('Explorez votre monde Minecraft en 3D avec BlueMap.')}</p></div><button className={styles.refresh} type="button" onClick={()=>setRefresh(v=>v+1)} disabled={loading||busy}><FontAwesomeIcon icon={faSyncAlt}/> {vt('Actualiser')}</button></header>
-        {error&&<p role="alert" className={form.error}>{error}</p>}{message&&<p role="status" className={form.success}>{message}</p>}
+        {error&&<MessageBox type="error" dismissible key={error}>{error}</MessageBox>}{message&&<p role="status" className={form.success}>{message}</p>}
         {viewer?<><div className={styles.bar}><span><i/> BlueMap · Minecraft {profile?.minecraft}</span><span>{vt('Vue privée du serveur')}</span></div><iframe title={vt('Carte 3D du monde')} className={styles.frame} src={viewer} sandbox="allow-scripts allow-pointer-lock" referrerPolicy="no-referrer"/><p className={styles.note}>{vt('Les rendus continuent lorsque le serveur est en ligne. Les cartes déjà générées restent consultables à l’arrêt.')}</p></>:<section className={styles.empty}>
             <div className={styles.globe}><FontAwesomeIcon icon={faGlobe}/><span><FontAwesomeIcon icon={faCube}/></span></div>
             <h3>{loading?vt('Chargement…'):profile?.can_authorize?vt('Autorisation Minecraft requise'):profile?.configured?vt('BlueMap est installé'):vt('Découvrez votre monde en 3D')}</h3>
