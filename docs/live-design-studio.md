@@ -20,7 +20,7 @@ Changes are applied to the preview immediately. **Save** publishes them to all p
 
 Only existing languages, icon artwork and font families are offered. This is an original implementation for VinusPanel; it does not install the commercial reference theme or its additional modules.
 
-Console bars use opaque colours and a zero-based axis fitted to observed usage; configured server limits remain visible above the charts. Switching between lines and bars preserves the last 30 real samples. Bar animations also respect reduced-motion preferences.
+Console bars use spaced, rounded columns with opaque shading and a zero-based axis fitted to observed usage; configured server limits remain visible above the charts. Bars show the latest 15 measurements, while lines show all 30 retained samples. Switching styles preserves this history without averaging or changing measurements. Bar animations also respect reduced-motion preferences.
 
 Choice cards illustrate layouts, surfaces, typography, icons and motion with scalable miniatures. Motion previews run on selection, hover or keyboard focus; the replay control restarts the dashboard entrance without reloading its data. Both miniatures and page animations respect reduced-motion preferences.
 

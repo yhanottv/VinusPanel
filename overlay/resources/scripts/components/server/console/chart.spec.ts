@@ -61,12 +61,12 @@ it('switches between opaque bars and translucent curves without losing or inflat
     const samples = chart.props.data.datasets[0].data;
     const lineFill = chart.props.data.datasets[0].backgroundColor;
     rerender(React.createElement(Harness, { type: 'bar' }));
-    expect(chart.props.data.datasets[0].backgroundColor).toBe('#ff9b52');
+    expect(chart.props.data.datasets[0].backgroundColor).toEqual(expect.any(Function));
     expect(chart.props.data.datasets[0].data).toBe(samples);
     expect(samples.slice(-3)).toEqual([0, 0.15, 0.6]);
     expect(chart.props.options.scales!.y).not.toHaveProperty('suggestedMax');
     expect(chart.props.options.scales!.y!.min).toBe(0);
-    expect(chart.props.options.scales!.x!.min).toBe(-0.5);
+    expect(chart.props.options.scales!.x!.min).toBe(14.5);
     expect(chart.props.options.scales!.x!.max).toBe(29.5);
     act(() => chart.push(0.2));
     rerender(React.createElement(Harness, { type: 'line' }));

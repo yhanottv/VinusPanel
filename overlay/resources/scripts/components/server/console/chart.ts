@@ -9,6 +9,7 @@ import {
   LinearScale,
   LineElement,
   PointElement,
+  ScriptableContext,
 } from 'chart.js';
 import { DeepPartial } from 'ts-essentials';
 import { useMemo, useRef, useState } from 'react';
@@ -134,6 +135,21 @@ interface UseChartOptions {
   callback?: ChartDatasetCallback;
 }
 
+// Solid colours throughout: the shading gives each column depth without fading
+// small measurements into the panel background.
+const columnFill = (colour: string) => ({ chart, parsed }: ScriptableContext<'line' | 'bar'>) => {
+  const y = chart.scales.y;
+  if (!chart.chartArea || !y || !parsed || !Number.isFinite(parsed.y)) return colour;
+  const top = y.getPixelForValue(parsed.y);
+  const bottom = y.getPixelForValue(0);
+  if (top >= bottom) return colour;
+  const fill = chart.ctx.createLinearGradient(0, top, 0, bottom);
+  const green = colour === '#43d6a3';
+  fill.addColorStop(0, green ? '#81dfbc' : '#ffb880');
+  fill.addColorStop(1, green ? '#329a79' : '#ba713f');
+  return fill;
+};
+
 function useChart(label: string, opts?: UseChartOptions) {
   const type = opts?.type || 'line';
   const chartRef = useRef<ChartJS<'line' | 'bar'>>(null);
@@ -143,7 +159,7 @@ function useChart(label: string, opts?: UseChartOptions) {
     );
     if (type === 'bar') {
       // Leave half a slot on either end so the first and latest bars are not clipped.
-      result.scales!.x = { ...result.scales!.x, min: -0.5, max: 29.5 };
+      result.scales!.x = { ...result.scales!.x, min: 14.5, max: 29.5 };
       const y = result.scales!.y;
       if (y?.type === 'linear') {
         delete y.suggestedMax;
@@ -166,14 +182,14 @@ function useChart(label: string, opts?: UseChartOptions) {
     // Retain the same sample arrays when switching modes; only presentation changes.
     datasets: data.datasets.map(dataset => ({
       ...dataset,
-      backgroundColor: dataset.borderColor,
+      backgroundColor: columnFill(typeof dataset.borderColor === 'string' ? dataset.borderColor : '#ff9b52'),
       hoverBackgroundColor: dataset.borderColor,
       borderWidth: 0,
-      borderRadius: { topLeft: 3, topRight: 3, bottomLeft: 0, bottomRight: 0 },
-      borderSkipped: 'bottom',
-      categoryPercentage: 0.94,
-      barPercentage: 0.92,
-      maxBarThickness: 24,
+      borderRadius: 6,
+      borderSkipped: false,
+      categoryPercentage: 0.72,
+      barPercentage: 0.82,
+      maxBarThickness: 22,
     })),
   }, [data, type]);
   const push = (items: number | null | (number | null)[]) => {
