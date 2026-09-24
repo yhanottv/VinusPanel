@@ -6,22 +6,38 @@ The **Players** page lists known players, including offline players, with a read
 
 - VinusPanel and the `vinuscatalog` Blueprint extension, installed separately following [the extension instructions](../extensions/vinuscatalog/README.md). Updating only the theme does not update the extension.
 - Minecraft Java saves: modern and legacy item NBT are supported. Unknown modded items retain their identifier and quantity with a fallback icon.
-- Live data and controls: **VinusPlayers 1.0.1**, Java 21, Bukkit/Spigot API 1.21.1. Validated on Paper 1.21.1. Youer exposes the Bukkit API but should be tested with your plugin/mod combination. Native Fabric/Forge, Bedrock and proxies cannot load this Bukkit plugin; saved inventories can still be read for Java servers. Folia is not supported.
+- Live data: a compatible **VinusPlayers 1.1.0** companion from the exact matrix below. Bukkit provides actions; the native mods provide read-only snapshots. Folia, Vanilla, proxies, Bedrock and other versions are not automatically supported.
 - Panel users need `file.read-content` to view player data and additionally `control.console` for actions. The feature grants no extra permissions to subusers.
 
 Without the companion, the panel displays the last saved inventory and labels it accordingly. Live presence is unknown while the Minecraft process runs. A stopped server's players are shown offline. Missing values are shown as unavailable, not invented. A player may have no inventory save yet.
 
-## Install the companion
+## Automatic installation and compatibility
 
-Build from the repository using Maven and JDK 21:
+The catalogue offers more Minecraft versions than the bridge supports. **Catalogue availability is not a compatibility claim.** Only the combinations listed here are enabled; unknown or newer Minecraft/loader versions remain unavailable until tested and added to the manifest.
+
+| Companion | Minecraft | Runtime validation | Java | Capabilities |
+| --- | --- | --- | --- | --- |
+| Bukkit | 1.20.1, 1.21.1 | Paper; Bukkit API derivatives require their own integration check | 17 for 1.20.1, 21 for 1.21.1 | Live data and actions |
+| Fabric | 1.20.1 | Loader 0.16.10 | 17+ | Read-only live data |
+| Fabric | 1.21.1 | Loader 0.16.14 | 21+ | Read-only live data |
+| Forge | 1.20.1 | Forge 47.3.0 | 17+ | Read-only live data |
+| NeoForge | 1.21.1 | NeoForge 21.1.219 | 21+ | Read-only live data |
+
+The extension includes small bridge JARs built from this repository and their SHA-256 manifest. It includes no Minecraft server or dependency JARs. The installer verifies the checksum locally and after upload, checks the runtime again, and promotes a temporary non-JAR file only while the server is stopped. It never restarts a server, overwrites an existing detected VinusPlayers JAR, or installs both a plugin and a mod on a hybrid. Bukkit takes precedence on hybrids; a custom hybrid/plugin combination still needs testing by its operator.
+
+After a successful server installation, a delayed Laravel queue job attempts the compatible installation. The normal Pterodactyl queue worker must be running. The Versions and Modpacks installers also attempt it after releasing their installation lock. Bridge errors are logged without failing the Minecraft installation. Set `players_auto_install` to `false` in `config/vinuscatalog.php` to disable automatic installation.
+
+For an existing server, open **Players → Install bridge** while stopped, then start it normally. Installation requires `file.read-content`, `file.create`, `file.update` and `control.console`; opening the page alone never installs anything. The theme and extension must both be updated. The theme's Pterodactyl 1.15.1 `EventServiceProvider` overlay registers the installation listener; merge that registration if your installation has custom event listeners.
+
+The selector requires an explicit Minecraft version and a recognized Java image such as `java_17` or `java_21`. Native mods also require a verified loader version. Catalogue installations record it automatically. Egg installations read `FABRIC_LOADER_VERSION`/`FABRIC_VERSION`/`LOADER_VERSION`, `FORGE_VERSION`, or `NEOFORGE_VERSION`. Values such as `latest`, missing variables and custom Java images are not guessed. For older catalogue records, the bridge resolves the recorded build ID against catalogue metadata without reinstalling. If that build cannot be verified, live installation stays unavailable and saved data remains accessible.
+
+For manual Bukkit builds:
 
 ```sh
 mvn -f integrations/players-bukkit/pom.xml clean package
 ```
 
-Alternatively, download the `VinusPlayers` artifact from a successful **Player companion** GitHub Actions run. Put `vinus-players-1.0.1.jar` into the Minecraft server's `plugins/` directory, then perform a planned server restart. Do not use hot-reload tools. The server creates `plugins/VinusPlayers/config.yml` and `.vinus/players/`.
-
-Each action can be disabled in the companion configuration. Restart the Minecraft server after editing it. Disabled actions are also disabled in the panel. No RCON, public port, API key or plugin permission assigned to players is required.
+Put `vinus-players-1.1.0.jar` into `plugins/`, replacing an older bridge only during planned maintenance. Do not use hot reload. It creates `plugins/VinusPlayers/config.yml` and `.vinus/players/`. Each Bukkit action can be disabled in that configuration; restart after editing. No RCON, public port, API key or in-game player permission is needed. Native mods belong in `mods/` and expose no commands or action toggles in this release. See [mod build instructions](../integrations/players-mods/README.md).
 
 ## Item artwork
 
@@ -39,7 +55,7 @@ Skins are fetched through the authenticated panel endpoint from Mojang's profile
 
 The companion writes atomic snapshots every second. The selected live profile refreshes every second while visible (normally within about two seconds plus network latency). Lists and saved profiles refresh every five seconds. Returning to the tab refreshes immediately; requests never overlap within one polling session. The XP and game-mode controls follow live values unless the user is editing an unapplied draft. A heartbeat older than 15 seconds disables live actions. Snapshots are stored only inside the selected Minecraft server volume and are accessed via authenticated Wings file access. Do not publish `.vinus/`, player saves, server properties, credentials, or production screenshots in this repository.
 
-The only accepted actions are heal, kill, feed, operator, whitelist, ban, game mode and XP level. The PHP controller validates UUIDs, values, server permissions and server state. The companion accepts commands only from the server console (including an administrator's RCON console), never from an in-game player, even an operator. Unique request IDs suppress duplicate execution. The UI reports success only after the server acknowledges the result; a timeout does not trigger a second command.
+For the Bukkit companion, the only accepted actions are heal, kill, feed, operator, whitelist, ban, game mode and XP level. The PHP controller validates UUIDs, values, server permissions and server state. The companion accepts commands only from the server console (including an administrator's RCON console), never from an in-game player, even an operator. Unique request IDs suppress duplicate execution. The UI reports success only after the server acknowledges the result; a timeout does not trigger a second command.
 
 Kill, operator changes and bans require confirmation. Healing, feeding, game mode and XP require an online player. Operator, whitelist and ban flags may be changed for a known offline player while the companion is running. Whitelisting a player does not globally enable the server whitelist. Set-level resets progress within that level to zero. Inventory and Ender chest contents are **read-only**.
 
@@ -55,6 +71,7 @@ Before relying on this at scale, compare Minecraft tick time and CPU with repres
 
 ```sh
 php scripts/test-players.php
+php scripts/test-player-companion.php
 mvn -f integrations/players-bukkit/pom.xml clean package
 ```
 

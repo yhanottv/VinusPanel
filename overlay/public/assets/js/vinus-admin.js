@@ -36,4 +36,16 @@
         scroll.setAttribute('role','region'); scroll.setAttribute('aria-label',french?'Tableau défilant':'Scrollable table');
         table.parentNode.insertBefore(scroll,table); scroll.appendChild(table);
     });
+    // Animate only the active navigation marker; keep native links and history intact.
+    var active = document.querySelector('.sidebar-menu > li.active > a');
+    if (active && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && window.innerWidth >= 768) {
+        var marker = document.createElement('span'); marker.className='vinus-admin-indicator'; marker.setAttribute('aria-hidden','true');
+        var place = function () { var box=active.getBoundingClientRect(); marker.style.top=(box.top+9)+'px'; marker.style.height=Math.max(0,box.height-18)+'px'; marker.hidden=document.body.classList.contains('sidebar-collapse')||active.parentElement.hidden; };
+        document.body.appendChild(marker); place(); document.body.classList.add('vinus-marker-ready');
+        try { var previous=Number(sessionStorage.getItem('vinus:admin-nav-y')); if(previous>0 && previous<window.innerHeight) marker.animate([{transform:'translateY('+(previous-parseFloat(marker.style.top))+'px)'},{transform:'translateY(0)'}],{duration:240,easing:'cubic-bezier(.2,.7,.2,1)'}); sessionStorage.removeItem('vinus:admin-nav-y'); } catch (_) {}
+        document.querySelectorAll('.sidebar-menu > li > a').forEach(function(link){link.addEventListener('click',function(){try{sessionStorage.setItem('vinus:admin-nav-y',String(active.getBoundingClientRect().top+9));}catch(_){}});});
+        window.addEventListener('resize',place); document.addEventListener('scroll',place,true);
+        if(search)search.addEventListener('input',place);
+        new MutationObserver(place).observe(document.body,{attributes:true,attributeFilter:['class']});
+    }
 })();

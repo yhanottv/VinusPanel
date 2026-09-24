@@ -1,14 +1,14 @@
-name: Player companion
+name: Player companions
 on:
   push:
-    paths: ['integrations/players-bukkit/**', 'extensions/vinuscatalog/app/Player*.php', 'scripts/test-players.php', '.github/workflows/players.yml']
+    paths: ['integrations/players-*/**', 'extensions/vinuscatalog/app/Player*.php', 'extensions/vinuscatalog/app/player-artifacts/**', 'scripts/test-player*.php', 'scripts/bundle-player-companions.py', '.github/workflows/players.yml']
   pull_request:
-    paths: ['integrations/players-bukkit/**', 'extensions/vinuscatalog/app/Player*.php', 'scripts/test-players.php', '.github/workflows/players.yml']
+    paths: ['integrations/players-*/**', 'extensions/vinuscatalog/app/Player*.php', 'extensions/vinuscatalog/app/player-artifacts/**', 'scripts/test-player*.php', 'scripts/bundle-player-companions.py', '.github/workflows/players.yml']
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  validate:
+  bukkit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,8 +18,58 @@ jobs:
           java-version: '21'
           cache: maven
       - run: mvn -B -f integrations/players-bukkit/pom.xml clean package
-      - run: php scripts/test-players.php
+      - run: php scripts/test-players.php && php scripts/test-player-companion.php
       - uses: actions/upload-artifact@v4
         with:
-          name: VinusPlayers
+          name: VinusPlayers-bukkit
           path: integrations/players-bukkit/target/vinus-players-*.jar
+  mods:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: fabric-1.20.1
+            java: '21'
+            gradle: '8.10.2'
+          - target: fabric-1.21.1
+            java: '21'
+            gradle: '8.10.2'
+          - target: forge-1.20.1
+            java: '17'
+            gradle: '8.10.2'
+          - target: neoforge-1.21.1
+            java: '21'
+            gradle: '8.14'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: ${{ matrix.gradle }}
+      - run: gradle -p integrations/players-mods/${{ matrix.target }} clean build --no-daemon --max-workers=1
+        env:
+          CI: 'true'
+      - name: Reject empty or dependency-filled mod JARs
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          python3 - <<'PY'
+          import os, zipfile
+          from pathlib import Path
+          jars=list(Path('integrations/players-mods',os.environ['TARGET'],'build/libs').glob('*.jar'))
+          assert jars
+          for path in jars:
+              with zipfile.ZipFile(path) as jar:
+                  names=jar.namelist()
+                  classes=[p for p in names if p.endswith('.class')]
+                  assert classes and all(p.startswith('dev/vinuspanel/players/') for p in classes)
+                  assert any(p in names for p in ['fabric.mod.json','META-INF/mods.toml','META-INF/neoforge.mods.toml'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VinusPlayers-${{ matrix.target }}
+          path: integrations/players-mods/${{ matrix.target }}/build/libs/*.jar

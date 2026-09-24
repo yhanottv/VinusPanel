@@ -8,9 +8,9 @@
 
 @section('content')
 <div class="vinus-admin-actions">
-    <a class="vinus-admin-action" href="{{ route('admin.servers') }}"><i class="fa fa-server" aria-hidden="true"></i><span><strong data-vinus-en="Servers" data-vinus-fr="Serveurs">Servers</strong><small data-vinus-en="Create instances and manage their resources." data-vinus-fr="Créez des instances et gérez leurs ressources.">Create instances and manage their resources.</small></span></a>
-    <a class="vinus-admin-action" href="{{ route('admin.nodes') }}"><i class="fa fa-sitemap" aria-hidden="true"></i><span><strong data-vinus-en="Nodes" data-vinus-fr="Nodes">Nodes</strong><small data-vinus-en="Manage machines, capacity and allocations." data-vinus-fr="Gérez les machines, la capacité et les allocations.">Manage machines, capacity and allocations.</small></span></a>
-    <a class="vinus-admin-action" href="{{ route('admin.users') }}"><i class="fa fa-users" aria-hidden="true"></i><span><strong data-vinus-en="Users" data-vinus-fr="Utilisateurs">Users</strong><small data-vinus-en="Find accounts and manage their access." data-vinus-fr="Retrouvez les comptes et gérez leurs accès.">Find accounts and manage their access.</small></span></a>
+    <a class="vinus-admin-action" href="{{ route('admin.servers') }}"><span class="vinus-action-symbol">@include('layouts.vinus-icon', ['name' => 'server'])</span><span><strong data-vinus-en="Servers" data-vinus-fr="Serveurs">Servers</strong><small data-vinus-en="Create instances and manage their resources." data-vinus-fr="Créez des instances et gérez leurs ressources.">Create instances and manage their resources.</small></span></a>
+    <a class="vinus-admin-action" href="{{ route('admin.nodes') }}"><span class="vinus-action-symbol">@include('layouts.vinus-icon', ['name' => 'nodes'])</span><span><strong data-vinus-en="Nodes" data-vinus-fr="Nodes">Nodes</strong><small data-vinus-en="Manage machines, capacity and allocations." data-vinus-fr="Gérez les machines, la capacité et les allocations.">Manage machines, capacity and allocations.</small></span></a>
+    <a class="vinus-admin-action" href="{{ route('admin.users') }}"><span class="vinus-action-symbol">@include('layouts.vinus-icon', ['name' => 'users'])</span><span><strong data-vinus-en="Users" data-vinus-fr="Utilisateurs">Users</strong><small data-vinus-en="Find accounts and manage their access." data-vinus-fr="Retrouvez les comptes et gérez leurs accès.">Find accounts and manage their access.</small></span></a>
 </div>
 <div class="box">
     <div class="box-header with-border"><h2 class="box-title" data-vinus-en="Panel status" data-vinus-fr="État du panel">Panel status</h2></div>
@@ -25,11 +25,11 @@
 </div>
 <div class="box">
     <div class="box-header with-border"><h2 class="box-title" data-vinus-en="Configuration" data-vinus-fr="Configuration">Configuration</h2></div>
-    <div class="box-body vinus-admin-links">
-        <a href="{{ route('admin.nests') }}" data-vinus-en="Nests & eggs" data-vinus-fr="Nests et eggs">Nests & eggs</a>
-        <a href="{{ route('admin.locations') }}" data-vinus-en="Locations" data-vinus-fr="Emplacements">Locations</a>
-        <a href="{{ route('admin.databases') }}" data-vinus-en="Database hosts" data-vinus-fr="Hôtes de bases de données">Database hosts</a>
-        <a href="{{ route('admin.settings') }}" data-vinus-en="Panel settings" data-vinus-fr="Paramètres du panel">Panel settings</a>
+    <div class="box-body vinus-config-grid">
+        <a class="vinus-config-link" href="{{ route('admin.nests') }}"><span class="vinus-config-icon">@include('layouts.vinus-icon', ['name' => 'boxes'])</span><span><strong data-vinus-en="Nests & eggs" data-vinus-fr="Nests et eggs">Nests & eggs</strong><small data-vinus-en="Server templates and installation settings." data-vinus-fr="Modèles de serveurs et paramètres d’installation.">Server templates and installation settings.</small></span><span class="vinus-config-arrow">@include('layouts.vinus-icon', ['name' => 'arrow'])</span></a>
+        <a class="vinus-config-link" href="{{ route('admin.locations') }}"><span class="vinus-config-icon">@include('layouts.vinus-icon', ['name' => 'pin'])</span><span><strong data-vinus-en="Locations" data-vinus-fr="Emplacements">Locations</strong><small data-vinus-en="Organize your infrastructure by location." data-vinus-fr="Organisez votre infrastructure par emplacement.">Organize your infrastructure by location.</small></span><span class="vinus-config-arrow">@include('layouts.vinus-icon', ['name' => 'arrow'])</span></a>
+        <a class="vinus-config-link" href="{{ route('admin.databases') }}"><span class="vinus-config-icon">@include('layouts.vinus-icon', ['name' => 'database'])</span><span><strong data-vinus-en="Database hosts" data-vinus-fr="Hôtes de bases de données">Database hosts</strong><small data-vinus-en="Connect database hosts for your servers." data-vinus-fr="Connectez les hôtes de bases de données.">Connect database hosts for your servers.</small></span><span class="vinus-config-arrow">@include('layouts.vinus-icon', ['name' => 'arrow'])</span></a>
+        <a class="vinus-config-link" href="{{ route('admin.settings') }}"><span class="vinus-config-icon">@include('layouts.vinus-icon', ['name' => 'settings'])</span><span><strong data-vinus-en="Panel settings" data-vinus-fr="Paramètres du panel">Panel settings</strong><small data-vinus-en="Branding, mail and general preferences." data-vinus-fr="Identité, e-mails et préférences générales.">Branding, mail and general preferences.</small></span><span class="vinus-config-arrow">@include('layouts.vinus-icon', ['name' => 'arrow'])</span></a>
     </div>
 </div>
 <div class="vinus-admin-links">

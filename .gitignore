@@ -17,3 +17,5 @@ config/vinuscatalog.php
 
 # Companion plugin build outputs
 integrations/**/target/
+integrations/**/build/
+integrations/**/.gradle/

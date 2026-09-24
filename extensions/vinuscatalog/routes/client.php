@@ -7,6 +7,8 @@ use Pterodactyl\BlueprintFramework\Extensions\vinuscatalog\CatalogController;
 
 Route::prefix('/servers/{server}/players')->middleware([\Pterodactyl\BlueprintFramework\Extensions\vinuscatalog\CatalogErrors::class,ServerSubject::class,AuthenticateServerAccess::class,'throttle:120,1,vinusplayers:'])->controller(\Pterodactyl\BlueprintFramework\Extensions\vinuscatalog\PlayerController::class)->group(function () {
     Route::get('/','index');
+    Route::get('/companion','companion');
+    Route::post('/companion','installCompanion')->middleware('throttle:3,1,vinusplayers-install:');
     Route::post('/actions','action')->middleware('throttle:20,1,vinusplayers-action:');
     Route::get('/actions/{id}','result');
     Route::get('/{uuid}/skin','skin');

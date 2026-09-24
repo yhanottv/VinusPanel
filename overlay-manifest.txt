@@ -1,5 +1,8 @@
 app/Http/Controllers/Admin/VinusDesignController.php
 app/Http/Middleware/SetSecurityHeaders.php
+app/Jobs/InstallVinusPlayerCompanion.php
+app/Listeners/VinusPlayerCompanion.php
+app/Providers/EventServiceProvider.php
 app/Services/VinusDesign.php
 app/Services/VinusSoftware.php
 app/Services/vinus-design-options.json
@@ -82,6 +85,8 @@ resources/scripts/components/dashboard/DashboardIcon.tsx
 resources/scripts/components/dashboard/DashboardShell.tsx
 resources/scripts/components/dashboard/ServerRow.spec.tsx
 resources/scripts/components/dashboard/ServerRow.tsx
+resources/scripts/components/dashboard/account/AccountField.spec.tsx
+resources/scripts/components/dashboard/account/AccountField.tsx
 resources/scripts/components/dashboard/account/AccountPicture.tsx
 resources/scripts/components/dashboard/account/account.module.css
 resources/scripts/components/dashboard/activity/ActivityLogContainer.tsx
@@ -175,6 +180,8 @@ resources/scripts/components/server/motd.spec.ts
 resources/scripts/components/server/motd.ts
 resources/scripts/components/server/network/AllocationRow.tsx
 resources/scripts/components/server/network/NetworkContainer.tsx
+resources/scripts/components/server/players/PlayerCompanion.spec.tsx
+resources/scripts/components/server/players/PlayerCompanion.tsx
 resources/scripts/components/server/players/PlayerInventory.spec.tsx
 resources/scripts/components/server/players/PlayerInventory.tsx
 resources/scripts/components/server/players/PlayerSkin.tsx
@@ -220,6 +227,7 @@ resources/scripts/vinusDesign.ts
 resources/views/admin/index.blade.php
 resources/views/layouts/admin.blade.php
 resources/views/layouts/scripts.blade.php
+resources/views/layouts/vinus-icon.blade.php
 resources/views/templates/wrapper.blade.php
 routes/admin.php
 tailwind.config.js

@@ -53,6 +53,17 @@ final class PlayerController extends Controller
         return ['players'=>array_values($players),'selected'=>$detail,'bridge'=>(bool)$bridge,'actions'=>$bridge?array_values(array_intersect($bridge['actions']??[],['heal','kill','feed','operator','whitelist','ban','gamemode','experience'])):[],
             'can_control'=>$request->user()->can('control.console',$server),'refreshed_at'=>time()];
     }
+    public function companion(Request $request, Server $server): array
+    {
+        $this->access($request, $server);
+        return app(PlayerCompanion::class)->availability($server) + ['can_install' => $request->user()->can('file.create', $server) && $request->user()->can('file.update', $server) && $request->user()->can('control.console', $server)];
+    }
+    public function installCompanion(Request $request, Server $server): array
+    {
+        $this->access($request, $server, true);
+        foreach (['file.create', 'file.update'] as $permission) abort_unless($request->user()->can($permission, $server), 403);
+        return app(PlayerCompanion::class)->install($server);
+    }
     public static function command(string $action,string $uuid,string $request,mixed $value): string
     {
         abort_unless(PlayerFiles::uuid($uuid)&&preg_match('/^[a-f0-9]{32}$/D',$request),422,'Identifiant invalide.');

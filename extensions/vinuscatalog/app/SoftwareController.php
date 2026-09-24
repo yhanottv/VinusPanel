@@ -60,7 +60,9 @@ final class SoftwareController extends Controller
             abort_unless($server->startup === $saved['startup'] && $server->image === $saved['image'], 409, 'La configuration du serveur a changé.');
             $server->validateCurrentState();
             Cache::forget('vinussoftware:plan:'.$token);
-            return $this->installer->install($server, $saved['plan']);
+            $result = $this->installer->install($server, $saved['plan']);
         } finally { $lock->release(); }
+        app(PlayerCompanion::class)->automatic($server->fresh());
+        return $result;
     }
 }

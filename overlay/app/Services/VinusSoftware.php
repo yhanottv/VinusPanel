@@ -13,7 +13,7 @@ final class VinusSoftware
         }
         $variables = [];
         foreach ($server->variables as $variable) {
-            if (in_array($variable->env_variable, ['MC_VERSION', 'MINECRAFT_VERSION', 'MINECRAFT_VER', 'MC_VER', 'LOADER', 'MOD_LOADER', 'SOFTWARE', 'SERVER_TYPE', 'SERVER_JARFILE', 'JARFILE', 'SERVER_JAR_PATH'], true)) {
+            if (in_array($variable->env_variable, ['MC_VERSION', 'MINECRAFT_VERSION', 'MINECRAFT_VER', 'MC_VER', 'LOADER', 'MOD_LOADER', 'SOFTWARE', 'SERVER_TYPE', 'SERVER_JARFILE', 'JARFILE', 'SERVER_JAR_PATH', 'FABRIC_VERSION', 'FABRIC_LOADER_VERSION', 'LOADER_VERSION', 'FORGE_VERSION', 'NEOFORGE_VERSION'], true)) {
                 $variables[$variable->env_variable] = $variable->server_value ?? $variable->default_value;
             }
         }
@@ -82,6 +82,17 @@ final class VinusSoftware
                 break;
             }
         }
-        return ['software' => $profile, 'categories' => self::PROFILES[$profile] ?? [], 'game_version' => $version];
+        $loaderVersion = null;
+        $keys = match ($profile) {
+            'fabric' => ['FABRIC_LOADER_VERSION', 'FABRIC_VERSION', 'LOADER_VERSION'],
+            'forge' => ['FORGE_VERSION', 'LOADER_VERSION'],
+            'neoforge' => ['NEOFORGE_VERSION', 'LOADER_VERSION'],
+            default => [],
+        };
+        foreach ($keys as $key) {
+            $value = trim((string) ($variables[$key] ?? ''));
+            if (preg_match('/^\d+(?:\.\d+){1,3}$/D', $value)) { $loaderVersion = $value; break; }
+        }
+        return ['loader_version' => $loaderVersion, 'software' => $profile, 'categories' => self::PROFILES[$profile] ?? [], 'game_version' => $version];
     }
 }

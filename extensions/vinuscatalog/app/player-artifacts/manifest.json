@@ -1,0 +1,69 @@
+{
+  "protocol": 1,
+  "artifacts": [
+    {
+      "loader": "bukkit",
+      "minecraft": [
+        "1.20.1",
+        "1.21.1"
+      ],
+      "java": 17,
+      "read_only": false,
+      "loader_versions": [],
+      "file": "vinus-players-bukkit-1.20.1-1.21.1-1.1.0.jar",
+      "sha256": "d0081deed6e18fb79a22988127a411202eaade637e9e42e8558785fb07cb5569"
+    },
+    {
+      "loader": "fabric",
+      "minecraft": [
+        "1.20.1"
+      ],
+      "java": 17,
+      "read_only": true,
+      "loader_versions": [
+        "0.16.10"
+      ],
+      "file": "vinus-players-fabric-1.20.1-1.1.0.jar",
+      "sha256": "d1e1f01d0e5623cf73316f5c834a8998b5e1c2caad0af64fdfd9bd1621f1be1d"
+    },
+    {
+      "loader": "fabric",
+      "minecraft": [
+        "1.21.1"
+      ],
+      "java": 21,
+      "read_only": true,
+      "loader_versions": [
+        "0.16.14"
+      ],
+      "file": "vinus-players-fabric-1.21.1-1.1.0.jar",
+      "sha256": "7a2e1a5353c189c22600089484f91535d26cc2ca27867f077d9fb0509bec6a01"
+    },
+    {
+      "loader": "forge",
+      "minecraft": [
+        "1.20.1"
+      ],
+      "java": 17,
+      "read_only": true,
+      "loader_versions": [
+        "47.3.0"
+      ],
+      "file": "vinus-players-forge-1.20.1-1.1.0.jar",
+      "sha256": "e5b64f35103332ca47a8072c5b83004517cbf7d425926ac35071494582753548"
+    },
+    {
+      "loader": "neoforge",
+      "minecraft": [
+        "1.21.1"
+      ],
+      "java": 21,
+      "read_only": true,
+      "loader_versions": [
+        "21.1.219"
+      ],
+      "file": "vinus-players-neoforge-1.21.1-1.1.0.jar",
+      "sha256": "6f54b7a7db3afd06e798a9ad394d7a77c305499fd16b031c94a75112e12b97df"
+    }
+  ]
+}

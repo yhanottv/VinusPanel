@@ -1,0 +1,5 @@
+plugins { id 'net.neoforged.moddev' version '2.0.147' }
+version='1.1.0'; group='dev.vinuspanel'; base.archivesName='vinus-players-neoforge-1.21.1'
+java.toolchain.languageVersion=JavaLanguageVersion.of(21)
+neoForge { version='21.1.219' }
+sourceSets.main.java.srcDir '../common'

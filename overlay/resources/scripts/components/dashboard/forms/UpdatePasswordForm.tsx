@@ -2,7 +2,7 @@ import { vt } from '@/locales/translate';
 import React from 'react';
 import { Actions, State, useStoreActions, useStoreState } from 'easy-peasy';
 import { Form, Formik, FormikHelpers } from 'formik';
-import Field from '@/components/elements/Field';
+import Field from '../account/AccountField';
 import * as Yup from 'yup';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import updateAccountPassword from '@/api/account/updateAccountPassword';
@@ -62,14 +62,14 @@ export default () => {
                         <Field
                             id={'current_password'}
                             type={'password'}
-                            name={'current'}
+                            autoComplete={'current-password'} name={'current'}
                             label={vt("Mot de passe actuel")}
                         />
                         <div css={tw`mt-5`}>
                             <Field
                                 id={'new_password'}
                                 type={'password'}
-                                name={'password'}
+                                autoComplete={'new-password'} name={'password'}
                                 label={vt("Nouveau mot de passe")}
                                 description={vt("Utilisez au moins 8 caractères et un mot de passe unique.")}
                             />
@@ -78,7 +78,7 @@ export default () => {
                             <Field
                                 id={'confirm_new_password'}
                                 type={'password'}
-                                name={'confirmPassword'}
+                                autoComplete={'new-password'} name={'confirmPassword'}
                                 label={vt("Confirmer le mot de passe")}
                             />
                         </div>

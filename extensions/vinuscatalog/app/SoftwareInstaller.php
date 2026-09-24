@@ -96,6 +96,7 @@ final class SoftwareInstaller
             }
             $server = $this->startup->setUserLevel(User::USER_LEVEL_ADMIN)->handle($server, ['startup' => self::STARTUP, 'docker_image' => $image, 'skip_scripts' => $old['skip_scripts']]);
             $profile = ServerSoftware::profile($plan['software'], $plan['version'], $plan['label']);
+            $profile['loader_version'] = $plan['loader_version'] ?? null;
             $record = ['profile' => $profile, 'startup' => self::STARTUP, 'image' => $image, 'build' => $plan['build'], 'backup' => $batch, 'installed_at' => now()->toIso8601String(), 'artifacts' => array_map(fn ($f) => $f['sha512'], $prepared)];
             abort_unless(file_put_contents($recordPath.'.tmp', json_encode($record, JSON_THROW_ON_ERROR)) !== false && rename($recordPath.'.tmp', $recordPath), 500, 'Impossible d’enregistrer le logiciel installé.');
             $this->suspension->toggle($server, SuspensionService::ACTION_UNSUSPEND); $suspended = false;

@@ -1,7 +1,7 @@
 name: VinusPlayers
-version: 1.0.1
+version: 1.1.0
 main: dev.vinuspanel.players.VinusPlayers
-api-version: '1.21'
+api-version: '1.20'
 description: Read-only player snapshots and typed console-only controls for VinusPanel.
 website: https://github.com/yhanottv/VinusPanel
 commands:

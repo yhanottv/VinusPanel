@@ -8,6 +8,7 @@ import { vt } from '@/locales/translate';
 import { designPreview } from '@/designRuntime';
 import Icon from '@/components/dashboard/DashboardIcon';
 import PlayerSkin from './players/PlayerSkin';
+import PlayerCompanion from './players/PlayerCompanion';
 import PlayerInventory, { PlayerMeter } from './players/PlayerInventory';
 import { PlayerAction, PlayerResponse, requestId } from './players/types';
 import styles from './players/players.module.css';
@@ -90,7 +91,7 @@ export default function ServerPlayers() {
         {loadError&&<MessageBox type="error" onDismiss={()=>setLoadError('')}>{loadError}</MessageBox>}
         {error&&<MessageBox type="error" onDismiss={()=>setError('')}>{error}</MessageBox>}
         {message&&<MessageBox type="success" onDismiss={()=>setMessage('')}>{message}</MessageBox>}
-        {data&&!data.bridge&&<MessageBox type="info">{vt('Les données sauvegardées sont disponibles. Le direct et les commandes nécessitent la liaison VinusPlayers sur le serveur Minecraft.')} <a href="https://github.com/yhanottv/VinusPanel/blob/codex/live-design-studio/docs/PLAYERS.md" target="_blank" rel="noreferrer">{vt('Configurer la liaison')}</a></MessageBox>}
+        {data&&!data.bridge&&<PlayerCompanion key={endpoint} endpoint={endpoint} onInstalled={()=>setRefresh(v=>v+1)}/>}
         {!selected?<>
             <div className={styles.toolbar}><label className={styles.search}><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={vt('Rechercher un joueur…')} aria-label={vt('Rechercher un joueur…')}/></label><div className={styles.tabs}>{[['all','Tous'],['online','En ligne'],['offline','Hors ligne']].map(([value,label])=><button key={value} aria-pressed={filter===value} onClick={()=>setFilter(value)}>{vt(label)}</button>)}</div></div>
             <div className={styles.roster}>{players.map(p=><button key={p.uuid} className={styles.playerCard} onClick={()=>select(p.uuid)}><PlayerSkin endpoint={endpoint} uuid={p.uuid} name={p.name} head/><span><strong>{p.name}</strong><small><i data-online={String(p.online)}/>{vt(p.online===true?'En ligne':p.online===false?'Hors ligne':'Statut en direct indisponible')}</small></span><span className={styles.badges}>{p.operator&&<span>OP</span>}{p.whitelisted&&<span>WL</span>}{p.banned&&<span>{vt('Banni')}</span>}</span><Icon name="chevron"/></button>)}</div>
@@ -108,7 +109,7 @@ export default function ServerPlayers() {
                 <label>{vt('Niveau d’expérience')}<input type="number" min={0} max={10000} step={1} value={level} disabled={!live('experience')} onChange={e=>setLevel(e.target.value)}/></label><button className={styles.apply} disabled={!live('experience')||!/^\d+$/.test(level)||Number(level)>10000} onClick={()=>act('experience',Number(level))}>{vt('Appliquer le niveau')}</button>
                 <div className={styles.actions}><button className={styles.heal} disabled={!live('heal')} onClick={()=>act('heal')}><span>♥</span>{vt('Soigner')}</button><button className={styles.kill} disabled={!live('kill')} onClick={()=>setConfirmation({action:'kill',value:true})}><Icon name="close"/>{vt('Éliminer')}</button><button className={styles.feed} disabled={!live('feed')} onClick={()=>act('feed')}><Icon name="plus"/>{vt('Nourrir')}</button></div>
                 <div className={styles.toggles}>{([['operator','Opérateur',player.operator],['whitelist','Liste blanche',player.whitelisted],['ban','Banni',player.banned]] as const).map(([action,label,value])=><label key={action}><span>{vt(label)}</span><button type="button" role="switch" aria-label={vt(label)} aria-checked={value} disabled={!can(action)} onClick={()=>action==='whitelist'?act(action,!value):setConfirmation({action,value:!value})}><span/></button></label>)}</div>
-                <p className={styles.controlHint}>{vt(designPreview?'Les actions sont désactivées dans l’aperçu.':!data?.can_control?'La permission console est nécessaire pour gérer les joueurs.':!data?.bridge?'Liaison joueurs inactive.':player.online!==true?'Soins, nourriture, mode de jeu et XP nécessitent un joueur connecté.':'Les commandes sont appliquées directement au joueur sélectionné.')}</p>
+                <p className={styles.controlHint}>{vt(designPreview?'Les actions sont désactivées dans l’aperçu.':!data?.can_control?'La permission console est nécessaire pour gérer les joueurs.':!data?.bridge?'Liaison joueurs inactive.':!data.actions.length?'Cette liaison de mod permet la consultation uniquement.':player.online!==true?'Soins, nourriture, mode de jeu et XP nécessitent un joueur connecté.':'Les commandes sont appliquées directement au joueur sélectionné.')}</p>
                 {busy&&<p role="status">{vt('Confirmation du serveur en cours…')}</p>}
             </aside></div>
         </>}

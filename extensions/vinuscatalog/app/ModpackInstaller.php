@@ -106,6 +106,7 @@ class ModpackInstaller
             }
             $server = $this->startup->setUserLevel(User::USER_LEVEL_ADMIN)->handle($server, ['startup' => SoftwareInstaller::STARTUP, 'docker_image' => $image, 'skip_scripts' => $old['skip_scripts']]);
             $profile = ServerSoftware::profile($runtime['software'], $runtime['version'], $runtime['label']);
+            $profile['loader_version'] = $runtime['loader_version'] ?? null;
             $record = ['profile' => $profile, 'startup' => SoftwareInstaller::STARTUP, 'image' => $image, 'build' => $runtime['build'], 'backup' => $batch, 'installed_at' => now()->toIso8601String(), 'modpack' => ['source' => $plan['source']??'modrinth','project' => $plan['project'],'version' => $plan['version'],'title' => $plan['title'],'sha512' => $artifact['sha512']]];
             abort_unless(file_put_contents($recordPath.'.tmp', json_encode($record, JSON_THROW_ON_ERROR)) !== false && rename($recordPath.'.tmp', $recordPath), 500, 'Impossible d’enregistrer le pack installé.');
             if (is_file($catalogPath)) abort_unless(unlink($catalogPath), 500, 'Impossible de mettre à jour les extensions installées.');

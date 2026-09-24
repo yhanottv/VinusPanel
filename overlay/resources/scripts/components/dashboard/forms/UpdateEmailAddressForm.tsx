@@ -4,7 +4,7 @@ import { Actions, State, useStoreActions, useStoreState } from 'easy-peasy';
 import { Form, Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
-import Field from '@/components/elements/Field';
+import Field from '../account/AccountField';
 import { httpErrorToHuman } from '@/api/http';
 import { ApplicationStore } from '@/state';
 import tw from 'twin.macro';
@@ -46,12 +46,12 @@ export default () => {
                 <React.Fragment>
                     <SpinnerOverlay size={'large'} visible={isSubmitting} />
                     <Form css={tw`m-0`}>
-                        <Field id={'current_email'} type={'email'} name={'email'} label={vt("Adresse e-mail")} />
+                        <Field id={'current_email'} type={'email'} autoComplete={'email'} name={'email'} label={vt("Adresse e-mail")} />
                         <div css={tw`mt-5`}>
                             <Field
                                 id={'confirm_password'}
                                 type={'password'}
-                                name={'password'}
+                                autoComplete={'current-password'} name={'password'}
                                 label={vt("Mot de passe actuel")}
                             />
                         </div>

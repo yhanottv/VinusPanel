@@ -107,7 +107,9 @@ final class ModpackController extends Controller
             abort_unless($saved && $saved['user'] === $request->user()->id && $saved['server'] === $server->uuid, 422, 'L’aperçu a expiré ou a déjà été utilisé.');
             abort_unless($server->startup === $saved['startup'] && $server->image === $saved['image'], 409, 'Le démarrage du serveur a changé.');
             $server->validateCurrentState(); Cache::forget('vinusmodpacks:plan:'.$data['token']);
-            return $this->installer->install($server, $saved['plan'], $data['optional']);
+            $result = $this->installer->install($server, $saved['plan'], $data['optional']);
         } finally { $lock->release(); }
+        app(PlayerCompanion::class)->automatic($server->fresh());
+        return $result;
     }
 }
