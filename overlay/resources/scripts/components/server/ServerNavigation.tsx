@@ -14,6 +14,7 @@ import SoftwareIcon from './SoftwareIcon';
 import { VINUS } from '@/theme';
 import { ip } from '@/lib/formatters';
 import { vt } from '@/locales/translate';
+import useNavigationIndicator from './useNavigationIndicator';
 
 const sections = [
     { name: 'Essentiels', items: [
@@ -50,6 +51,7 @@ export default function ServerNavigation({ before, after, extensions }: { before
     const [mobile, setMobile] = useState(false);
     const [closed, setClosed] = useState<string[]>([]);
     const location = useLocation();
+    const indicator = useNavigationIndicator([location.pathname, closed, mobile, design, server.softwareProfile, extensions]);
     const allocation = server.allocations.find(a => a.isDefault);
     const address = allocation ? `${allocation.alias || ip(allocation.ip)}:${allocation.port}` : '';
     const profile = server.softwareProfile;
@@ -62,7 +64,8 @@ export default function ServerNavigation({ before, after, extensions }: { before
     return <aside className={dash.sidebar} data-open={mobile}>
         <Link className={dash.brand} to="/" aria-label={design.brand_name}><img className="vinus-brand-dark" src={design.logo} alt={design.options.logo_alt} /><img className="vinus-brand-light" src={design.options.logo_light || design.logo} alt={design.options.logo_alt} /><img className="vinus-brand-square" src={design.options.logo_square || design.logo} alt={design.options.logo_alt} /><strong>{design.brand_name}</strong></Link>
         <button className={dash.mobileToggle} type="button" aria-label={vt(mobile ? 'Fermer le menu' : 'Ouvrir le menu')} aria-expanded={mobile} aria-controls="server-navigation" onClick={() => setMobile(!mobile)}><Icon name={mobile ? 'close' : 'menu'} /></button>
-        <nav className={dash.nav} id="server-navigation" aria-label={vt('Sections du serveur')}>
+        <nav ref={indicator.ref} className={`${dash.nav} ${styles.slidingNav}`} data-indicator={!!indicator.position} id="server-navigation" aria-label={vt('Sections du serveur')}>
+            {indicator.position && <span className={styles.navIndicator} aria-hidden="true" style={{ transform: `translate3d(${indicator.position.x}px,${indicator.position.y}px,0)`, width: indicator.position.width, height: indicator.position.height }} />}
             <Link to="/" className={styles.backLink}>‹ {vt('Tableau de bord')}</Link>
             <div className={styles.sidebarIdentity}><SoftwareIcon software={profile?.software} /><div><strong title={server.name}>{server.name}</strong><small>{server.node}</small></div></div>
             {address && <CopyOnClick text={address}><button className={styles.sidebarAddress} type="button" title={vt('Copier l’adresse')}><PrivateValue>{address}</PrivateValue> ⧉</button></CopyOnClick>}

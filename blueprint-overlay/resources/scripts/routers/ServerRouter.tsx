@@ -1,3 +1,4 @@
+import ServerPageTransition from '@/components/server/ServerPageTransition';
 import NavigationBar from '@/components/NavigationBar';
 import { useDesign } from '@/designRuntime';
 import React, { useEffect, useState } from 'react';
@@ -48,9 +49,9 @@ export default () => {
             {design.options.server_nav === 'top' && <div className="vinus-server-topnav">{navigation}</div>}
             <InstallListener /><TransferListener /><WebsocketHandler /><ServerStatusBootstrap />
             <ServerShellHeader />
-            {conflict && !(admin && consolePath) ? <ConflictStateRenderer /> : <ErrorBoundary>
+            {conflict && !(admin && consolePath) ? <ConflictStateRenderer /> : <ServerPageTransition><ErrorBoundary>
                 <NavigationRouter />
-            </ErrorBoundary>}
+            </ErrorBoundary></ServerPageTransition>}
         </div>
     </DashboardShell>;
 };
