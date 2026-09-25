@@ -2,6 +2,10 @@
 
 Pterodactyl gère les comptes et serveurs. Blueprint est le framework d’extensions. Vinus Catalog fournit les outils Minecraft utilisés par le thème. **Mettre à jour le thème ne met pas à jour le catalogue.**
 
+## Compatibilité automatique
+
+Installer Blueprint **rétrograde** `css-loader` vers 5.2.7 et livre un webpack plus ancien. Depuis VinusPanel 3.2.x, `install.sh` gère automatiquement ces écarts : activation du fournisseur OpenSSL historique sur Node ≥ 17 (`--openssl-legacy-provider`), désactivation du polyfill `:has()` dans `postcss.config.js`, normalisation de l’option `exportLocalsConvention` et installation de `xterm-addon-unicode11`. Utiliser la release **`beta-2026-06`** de Blueprint, seule version validée. Ne pas lancer `yarn add` manuellement juste avant une compilation : cela peut casser l’arbre de dépendances.
+
 ## Installation de l’extension
 
 Après Blueprint et VinusPanel, depuis la racine du dépôt :
