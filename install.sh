@@ -227,6 +227,11 @@ install_dependencies() {
     printf '$nrconf{restart} = "a";\n' > /etc/needrestart/conf.d/99-vinus.conf 2>/dev/null || true
 
     log "Mise a jour du systeme et installation des dependances..."
+
+    # Recupere un etat dpkg interrompu eventuel (paquet non configure, etc.).
+    dpkg --configure -a >/dev/null 2>&1 || true
+    apt-get -f install -y >/dev/null 2>&1 || true
+
     apt-get update -y
     apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
     apt-get install -y software-properties-common curl ca-certificates gnupg2 sudo lsb-release
