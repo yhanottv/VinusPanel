@@ -638,6 +638,7 @@ rollback() {
         printf '\n%s[VinusPanel] Installation interrompue, restauration automatique...%s\n' "$C_ERR" "$C_RESET" >&2
         restore_from "$TRANSACTION_BACKUP"
         (cd "$PANEL_DIR" && composer dump-autoload --no-interaction --no-scripts) >/dev/null 2>&1 || true
+        enable_legacy_openssl
         (cd "$PANEL_DIR" && yarn build:production) >/dev/null 2>&1 || true
         (cd "$PANEL_DIR" && php artisan route:clear && php artisan view:clear && php artisan cache:clear) >/dev/null 2>&1 || true
     fi
@@ -645,9 +646,20 @@ rollback() {
     exit "$exit_code"
 }
 
+enable_legacy_openssl() {
+    # Blueprint s'appuie sur un webpack ancien qui exige le fournisseur OpenSSL
+    # historique sur Node >= 17 (« digital envelope routines::unsupported »).
+    if command -v node >/dev/null 2>&1; then
+        local major
+        major="$(node --version 2>/dev/null | sed -E 's/^v([0-9]+).*/\1/')"
+        if [[ "$major" =~ ^[0-9]+$ ]] && ((major >= 17)) && [[ "${NODE_OPTIONS:-}" != *openssl-legacy-provider* ]]; then
+            export NODE_OPTIONS="${NODE_OPTIONS:-} --openssl-legacy-provider"
+        fi
+    fi
+}
+
 install_theme() {
     build_manifest
-
     mkdir -p "$BACKUP_ROOT" "$STATE_DIR"
     local timestamp; timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
     TRANSACTION_BACKUP="$BACKUP_ROOT/install-$timestamp"
@@ -682,17 +694,40 @@ install_theme() {
     cd "$PANEL_DIR"
     log "Mise a jour de l'autoload PHP..."
     composer dump-autoload --no-interaction --no-scripts
+
+    # Blueprint retrograde css-loader a 5.2.7, qui n'accepte que camelCase pour
+    # exportLocalsConvention ; la variante Blueprint du theme utilise 'as-is'
+    # (css-loader 6+). On normalise pour que la compilation passe partout.
+    if ((USE_BLUEPRINT)) && [[ -f webpack.config.js ]] && grep -q "exportLocalsConvention: 'as-is'" webpack.config.js; then
+        sed -i "s/exportLocalsConvention: 'as-is'/exportLocalsConvention: 'camelCase'/" webpack.config.js
+        log "Option css-loader ajustee pour la version embarquee par Blueprint."
+    fi
+    if ((USE_BLUEPRINT)) && [[ -f webpack.config.js ]] && grep -q "namedExport: false" webpack.config.js; then
+        sed -i "/namedExport: false/d" webpack.config.js
+    fi
     if [[ ! -d node_modules ]]; then
         log "Installation des dependances frontend..."
         yarn install --frozen-lockfile
     fi
-    yarn add -D @fontsource-variable/ibm-plex-sans@^5.2.8 jest-environment-jsdom@28.1.3 --ignore-scripts
+    # La police et l'addon unicode11 font partie de VinusPanel, pas des
+    # dependances Pterodactyl. On n'ajoute un paquet que s'il manque : relancer
+    # "yarn add" re-resout l'arbre de dependances juste avant la compilation
+    # et peut la casser.
+    local need_deps=0
+    grep -q '@fontsource-variable/ibm-plex-sans' package.json 2>/dev/null || need_deps=1
+    node -e "require.resolve('xterm-addon-unicode11')" >/dev/null 2>&1 || need_deps=1
+    if ((need_deps)); then
+        yarn add -D @fontsource-variable/ibm-plex-sans@^5.2.8 jest-environment-jsdom@28.1.3 --ignore-scripts
+        yarn add xterm-addon-unicode11@^0.6.0 --ignore-scripts
+    fi
 
     if [[ "$BUILD_MODE" == "development" ]]; then
         log "Compilation des assets (mode developpement)..."
+        enable_legacy_openssl
         yarn build
     else
         log "Compilation des assets de production..."
+        enable_legacy_openssl
         yarn build:production
     fi
 

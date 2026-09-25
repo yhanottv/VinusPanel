@@ -8,6 +8,7 @@ app/Services/VinusDesign.php
 app/Services/VinusSoftware.php
 app/Services/vinus-design-options.json
 app/Transformers/Api/Client/ServerTransformer.php
+postcss.config.js
 public/assets/css/vinus-admin.css
 public/assets/fonts/montserrat-latin.woff2
 public/assets/images/vinus/eagle.png
