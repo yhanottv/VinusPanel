@@ -1,4 +1,4 @@
-# Installer VinusPanel
+# 🚀 Installer VinusPanel
 
 ## Préparer le panel
 
@@ -11,13 +11,13 @@ Si les outils Minecraft sont souhaités, installer d’abord la version compatib
 ## Télécharger la branche documentée
 
 ```bash
-git clone --branch codex/live-design-studio --single-branch https://github.com/yhanottv/VinusPanel.git
+git clone --branch main --single-branch https://github.com/yhanottv/VinusPanel.git
 cd VinusPanel
 bash install.sh --check
 sudo bash install.sh
 ```
 
-Ces commandes choisissent la branche de développement documentée ici. Pour une version publiée, choisir son tag ou son archive et ses instructions ; les fonctions récentes peuvent en être absentes.
+Ces commandes choisissent la branche principale à jour, documentée ici. Pour une version publiée, choisir son tag ou son archive et ses instructions ; les fonctions récentes peuvent en être absentes.
 
 Le chemin par défaut est `/var/www/pterodactyl`. Avec un autre emplacement :
 

@@ -1,4 +1,4 @@
-# Versions et modpacks
+# 📦 Versions et modpacks
 
 ## Installer une version
 

@@ -1,4 +1,4 @@
-# Mises à jour, récupération et dépannage
+# 🔧 Mises à jour, récupération et dépannage
 
 ## Mise à jour
 

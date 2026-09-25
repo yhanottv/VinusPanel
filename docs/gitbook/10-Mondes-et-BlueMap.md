@@ -1,4 +1,4 @@
-# Propriétés, mondes et BlueMap
+# 🗺️ Propriétés, mondes et BlueMap
 
 ## Propriétés et MOTD
 

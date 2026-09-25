@@ -1,4 +1,4 @@
-# Administration, nœuds et eggs
+# 🛡️ Administration, nœuds et eggs
 
 Le nouveau design conserve routes, formulaires, actions et autorisations Pterodactyl. Il ajoute vue d’ensemble, icônes, recherche de navigation, transitions et tableaux adaptatifs. Navigation et vue d’ensemble sont disponibles en français/anglais ; les formulaires hérités ne sont pas tous traduits.
 

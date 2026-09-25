@@ -1,4 +1,4 @@
-# Mods, plugins et mises à jour
+# 🔌 Mods, plugins et mises à jour
 
 Le logiciel détecté détermine les onglets : Fabric/Forge/NeoForge proposent des mods, Paper/Spigot des plugins, les proxys leurs plugins spécifiques. Les hybrides peuvent proposer les deux. Un mod Fabric n’est pas un plugin Paper ; une version Minecraft identique ne garantit pas la compatibilité.
 

@@ -1,4 +1,4 @@
-# Développement et entretien de la documentation
+# 🤝 Développement et entretien de la documentation
 
 ## Structure
 

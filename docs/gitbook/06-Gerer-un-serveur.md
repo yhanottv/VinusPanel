@@ -1,4 +1,4 @@
-# Console, fichiers et gestion
+# ⚙️ Console, fichiers et gestion
 
 ## Aperçu et console
 

@@ -1,13 +1,13 @@
-# English quick start
+# 🌐 English quick start
 
-This documentation documents the **codex/live-design-studio development branch**, including features not yet included in older archives or main. Detailed chapters are currently in French. The repository also has an [English README](https://github.com/yhanottv/VinusPanel/blob/codex/live-design-studio/README.md) and [player documentation](https://github.com/yhanottv/VinusPanel/blob/codex/live-design-studio/docs/PLAYERS.md).
+This documentation covers the **main branch**, including features not yet included in older release archives. Detailed chapters are currently in French. The repository also has an [English README](https://github.com/yhanottv/VinusPanel/blob/main/README.md) and [player documentation](https://github.com/yhanottv/VinusPanel/blob/main/docs/PLAYERS.md).
 
 ## Install
 
 Use an existing Pterodactyl **1.15.1** panel, Node **22**, Yarn **1.x** and a working Wings connection. PHP **8.3** and Ubuntu **24.04** were validated. Blueprint **beta-2026-06** is optional for the theme but required for Vinus Catalog. Back up the panel, database, configuration and game data first.
 
 ```bash
-git clone --branch codex/live-design-studio --single-branch https://github.com/yhanottv/VinusPanel.git
+git clone --branch main --single-branch https://github.com/yhanottv/VinusPanel.git
 cd VinusPanel
 bash install.sh --check
 sudo bash install.sh

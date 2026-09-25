@@ -1,4 +1,4 @@
-# Design Studio
+# 🎨 Design Studio
 
 Le pinceau ouvre le studio pour les **administrateurs racine**. Les réglages sont à gauche et le véritable aperçu du panel à droite.
 
@@ -35,4 +35,4 @@ Les réglages globaux sont stockés dans `storage/app/vinuspanel/design.json`, l
 
 Les options du studio s’appliquent sans rebuild. Modifier le code dans `overlay/resources/scripts` exige de recompiler/réinstaller. Les modules absents ne sont pas annoncés comme déjà installés.
 
-[Guide technique](https://github.com/yhanottv/VinusPanel/blob/codex/live-design-studio/docs/live-design-studio.md) · [Sommaire](README.md)
+[Guide technique](https://github.com/yhanottv/VinusPanel/blob/main/docs/live-design-studio.md) · [Sommaire](README.md)

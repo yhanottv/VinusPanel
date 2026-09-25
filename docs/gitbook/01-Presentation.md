@@ -1,4 +1,4 @@
-# Présentation et compatibilité
+# 📖 Présentation et compatibilité
 
 VinusPanel est une surcouche pour **un panel Pterodactyl existant**. Le dépôt ne contient ni une distribution complète de Pterodactyl, ni Wings, ni les données d’un hébergeur. Les outils Minecraft sont fournis séparément par l’extension Blueprint **Vinus Catalog**.
 

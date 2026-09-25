@@ -1,4 +1,4 @@
-# Blueprint et Vinus Catalog
+# 🧩 Blueprint et Vinus Catalog
 
 Pterodactyl gère les comptes et serveurs. Blueprint est le framework d’extensions. Vinus Catalog fournit les outils Minecraft utilisés par le thème. **Mettre à jour le thème ne met pas à jour le catalogue.**
 
@@ -40,4 +40,4 @@ php artisan config:clear
 
 Si une catégorie manque, vérifier Blueprint, l’extension, les permissions, la détection du logiciel et la version exacte. Les proxys et Vanilla n’offrent pas les mêmes outils que les serveurs moddés.
 
-[Guide technique de l’extension](https://github.com/yhanottv/VinusPanel/blob/codex/live-design-studio/extensions/vinuscatalog/README.md) · [Sommaire](README.md)
+[Guide technique de l’extension](https://github.com/yhanottv/VinusPanel/blob/main/extensions/vinuscatalog/README.md) · [Sommaire](README.md)
