@@ -367,6 +367,7 @@ create_admin_user_if_missing() {
 configure_webserver() {
     log "Configuration de Nginx..."
     local host; host="$(panel_hostname)"
+    mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
     cat > /etc/nginx/sites-available/pterodactyl.conf <<'NGINX'
 server {
     listen 80;
