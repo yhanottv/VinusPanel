@@ -1,5 +1,79 @@
 # 🚀 Installer VinusPanel
 
+## Installer Pterodactyl sur une machine vierge
+
+Cette procédure vise une installation classique sur Ubuntu 24.04, avec le code du panel dans `/var/www/pterodactyl`. Elle ne s’applique pas à l’image Docker officielle : dans Docker, le panel se trouve généralement dans `/app` et l’image de production ne contient pas les outils de compilation nécessaires à VinusPanel.
+
+Pour une installation Docker, consulter la [documentation officielle du Panel](https://pterodactyl.io/panel/1.0/getting_started.html) et prévoir ensuite une image personnalisée qui contient Node.js 22, Yarn et la surcouche compilée. Le projet Pterodactyl documente surtout l’installation classique du Panel ; l’image Docker de production ne se personnalise pas avec `install.sh` directement.
+
+### Dépendances du serveur
+
+Exécuter ces commandes en SSH avec `root` ou `sudo` :
+
+```bash
+apt update
+apt -y upgrade
+apt install -y software-properties-common curl ca-certificates gnupg2 sudo lsb-release
+add-apt-repository -y ppa:ondrej/php
+apt update
+apt install -y php8.3 php8.3-{common,cli,gd,mysql,mbstring,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
+curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+apt install -y nodejs
+npm install --global yarn@1
+```
+
+Vérifier les prérequis avant de continuer :
+
+```bash
+php -v
+composer --version
+systemctl status mariadb nginx redis-server --no-pager
+node --version
+yarn --version
+```
+
+### Télécharger Pterodactyl 1.15.1
+
+```bash
+mkdir -p /var/www/pterodactyl
+cd /var/www/pterodactyl
+curl -fL -o panel.tar.gz https://github.com/pterodactyl/panel/releases/download/v1.15.1/panel.tar.gz
+tar -xzvf panel.tar.gz
+rm panel.tar.gz
+chmod -R 755 storage/* bootstrap/cache
+```
+
+Créer ensuite une base MariaDB et un utilisateur dédiés. Remplacer les valeurs entre chevrons et ne jamais publier le mot de passe :
+
+```bash
+mariadb -u root -p
+```
+
+```sql
+CREATE DATABASE panel;
+CREATE USER 'pterodactyl'@'127.0.0.1' IDENTIFIED BY '<MOT_DE_PASSE_DB_LONG_ET_UNIQUE>';
+GRANT ALL PRIVILEGES ON panel.* TO 'pterodactyl'@'127.0.0.1';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+Configurer le panel avec les assistants intégrés :
+
+```bash
+cd /var/www/pterodactyl
+composer install --no-dev --optimize-autoloader
+php artisan p:environment:setup
+php artisan p:environment:database
+php artisan p:environment:mail
+php artisan key:generate --force
+php artisan migrate --seed --force
+php artisan p:user:make
+chown -R www-data:www-data /var/www/pterodactyl/*
+```
+
+Il reste à configurer Nginx, le worker `pteroq`, le cron du scheduler et Wings. Suivre les sections correspondantes du [guide officiel d’installation Pterodactyl](https://pterodactyl.io/panel/1.0/getting_started.html) avant d’installer VinusPanel.
+
 ## Préparer le panel
 
 Intervenir sur la machine qui héberge **Pterodactyl Panel**, pas seulement sur un nœud Wings. Le panel doit déjà fonctionner. Prévoir SSH, `sudo`, Git, Bash, PHP, Composer, Node 22, Yarn 1 et les sources frontend Pterodactyl.
