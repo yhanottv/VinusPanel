@@ -1,0 +1,12 @@
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+site:
+  title: VinusPanel
+  structure:
+    - type: space
+      key: vinus-docs
+      title: Documentation VinusPanel
+      path: docs
+      default: true
+      content:
+        directory: ./
+        language: fr
