@@ -22,6 +22,7 @@ import { VINUS } from '@/theme';
 import { vt } from '@/locales/translate';
 import { formatLocale } from '@/locales/preferences';
 import ServerRow from './ServerRow';
+import DeployWizard from './deploy/DeployWizard';
 import Icon from './DashboardIcon';
 import styles from './dashboard.module.css';
 
@@ -120,6 +121,7 @@ export default function DashboardContainer({ preview = false, design }: { previe
                 <button type="button" aria-label={vt('Page suivante')} disabled={safeActivityPage >= activityPages - 1 || !!activityError} onClick={() => setActivityPage(safeActivityPage + 1)}><Icon name="chevron" /></button>
             </div></div>
         </section>
+        {!preview && user.rootAdmin && <DeployWizard hasServers={(servers?.pagination.total ?? 0) > 0} />}
         {/* AFTER_CONTENT */}
     </PageContentBlock>;
 }

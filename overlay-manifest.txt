@@ -1,3 +1,4 @@
+app/Http/Controllers/Admin/VinusDeployController.php
 app/Http/Controllers/Admin/VinusDesignController.php
 app/Http/Middleware/SetSecurityHeaders.php
 app/Jobs/InstallVinusPlayerCompanion.php
@@ -91,6 +92,8 @@ resources/scripts/components/dashboard/account/AccountPicture.tsx
 resources/scripts/components/dashboard/account/account.module.css
 resources/scripts/components/dashboard/activity/ActivityLogContainer.tsx
 resources/scripts/components/dashboard/dashboard.module.css
+resources/scripts/components/dashboard/deploy/DeployWizard.tsx
+resources/scripts/components/dashboard/deploy/deploy.module.css
 resources/scripts/components/dashboard/design/ChoicePreview.tsx
 resources/scripts/components/dashboard/design/DesignNavLink.tsx
 resources/scripts/components/dashboard/design/DesignStudio.tsx
