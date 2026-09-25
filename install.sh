@@ -234,7 +234,7 @@ install_dependencies() {
     apt-get update -y
     apt-get install -y php8.3 php8.3-common php8.3-cli php8.3-gd php8.3-mysql \
         php8.3-mbstring php8.3-bcmath php8.3-xml php8.3-fpm php8.3-curl php8.3-zip \
-        mariadb-server nginx tar unzip git redis-server
+        mariadb-server nginx tar unzip git redis-server openssl
 
     if ! command -v composer >/dev/null 2>&1; then
         curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -680,6 +680,10 @@ install_theme() {
 # ---------------------------------------------------------------------------
 install_wings() {
     log "Installation de Wings..."
+    if ! command -v docker >/dev/null 2>&1; then
+        log "Installation de Docker (requis par Wings)..."
+        curl -fsSL https://get.docker.com | CHANNEL=stable bash
+    fi
     systemctl enable --now docker >/dev/null 2>&1 || true
     mkdir -p /etc/pterodactyl
 
