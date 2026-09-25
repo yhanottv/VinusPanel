@@ -467,6 +467,16 @@ fix_permissions() {
     chmod -R 755 "$PANEL_DIR/storage" "$PANEL_DIR/bootstrap/cache" 2>/dev/null || true
 }
 
+ensure_base_services() {
+    local svc
+    for svc in mariadb redis-server php8.3-fpm nginx; do
+        systemctl enable "$svc" >/dev/null 2>&1 || true
+        if ! systemctl is-active --quiet "$svc"; then
+            systemctl start "$svc" >/dev/null 2>&1 || warn "service ${svc} non demarre"
+        fi
+    done
+}
+
 bootstrap_panel() {
     require_supported_os
     free_web_ports
@@ -474,6 +484,7 @@ bootstrap_panel() {
     if command -v update-alternatives >/dev/null 2>&1 && [[ -x /usr/bin/php8.3 ]]; then
         update-alternatives --set php /usr/bin/php8.3 >/dev/null 2>&1 || true
     fi
+    ensure_base_services
     download_panel
     ensure_app_key
     configure_database
