@@ -1,5 +1,51 @@
 # 🔧 Mises à jour, récupération et dépannage
 
+## Mettre à jour Pterodactyl
+
+Faire une sauvegarde du VPS ou un snapshot, exporter la base MariaDB et sauvegarder `.env` avant toute mise à jour. Cette procédure concerne une installation classique dans `/var/www/pterodactyl` ; pour Docker, reconstruire l’image avec la nouvelle version au lieu de modifier un conteneur de production à la main.
+
+Vérifier les versions et placer le panel en maintenance :
+
+```bash
+cd /var/www/pterodactyl
+php artisan p:info
+php -v
+composer --version
+php artisan down
+```
+
+Pour viser précisément la version `1.15.1` :
+
+```bash
+curl -fL https://github.com/pterodactyl/panel/releases/download/v1.15.1/panel.tar.gz | tar -xzv
+chmod -R 755 storage/* bootstrap/cache
+composer install --no-dev --optimize-autoloader
+php artisan migrate --seed --force
+php artisan view:clear
+php artisan config:clear
+chown -R www-data:www-data /var/www/pterodactyl/*
+php artisan queue:restart
+php artisan up
+systemctl restart pteroq
+systemctl reload nginx
+```
+
+Ne pas utiliser `releases/latest` si une version précise est exigée par Blueprint ou VinusPanel. Après la mise à jour, vérifier `php artisan p:info`, la connexion au panel, la console et les permissions. Les migrations peuvent mettre à jour les eggs intégrés : conserver les eggs personnalisés séparément.
+
+### Mettre Wings à jour
+
+La version de Wings doit rester compatible avec la version du Panel. Vérifier la version réellement publiée sur le [dépôt officiel Wings](https://github.com/pterodactyl/wings/releases) et ne jamais inventer un numéro de version qui n’existe pas. Exemple pour une release Linux `amd64` publiée :
+
+```bash
+systemctl stop wings
+curl -fL -o /usr/local/bin/wings https://github.com/pterodactyl/wings/releases/download/<VERSION_WINGS>/wings_linux_amd64
+chmod u+x /usr/local/bin/wings
+systemctl start wings
+systemctl --no-pager status wings
+```
+
+Après validation de Pterodactyl et de Wings, relancer `bash install.sh --check`, puis installer VinusPanel.
+
 ## Mise à jour
 
 Lire le changelog, vérifier Pterodactyl/Blueprint et sauvegarder panel, base, réglages/images Design et données serveur. Dans le checkout de la branche voulue :
