@@ -1,3 +1,7 @@
+import PlayerCompanionPrompt from '@/components/server/players/PlayerCompanionPrompt';
+import ServerPageTransition from '@/components/server/ServerPageTransition';
+import NavigationBar from '@/components/NavigationBar';
+import { useDesign } from '@/designRuntime';
 import React, { useEffect, useState } from 'react';
 import { Route, Switch, useRouteMatch, useLocation } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
@@ -24,6 +28,7 @@ import AfterSubNavigation from '@blueprint/components/Navigation/SubNavigation/A
 import VinusExtensionLinks from '@/components/server/VinusExtensionLinks';
 
 export default () => {
+    const design = useDesign();
     const match = useRouteMatch<{ id: string }>();
     const location = useLocation();
     const admin = useStoreState(s => s.user.data!.rootAdmin);
@@ -39,13 +44,16 @@ export default () => {
     }, [match.params.id]);
     if (!server) return error ? <ServerError message={error} /> : <Spinner size="large" centered />;
     const consolePath = location.pathname.replace(/\/$/, '') === match.url.replace(/\/$/, '');
-    return <DashboardShell sidebar={<ServerNavigation before={<BeforeSubNavigation />} after={<><AdditionalServerItems /><AfterSubNavigation /></>} extensions={<VinusExtensionLinks />} />}>
+    const navigation = <ServerNavigation before={<BeforeSubNavigation />} after={<><AdditionalServerItems /><AfterSubNavigation /></>} extensions={<VinusExtensionLinks />} />;
+    return <DashboardShell sidebar={design.options.server_nav === 'replace' ? navigation : design.options.server_nav === 'second' ? <><NavigationBar />{navigation}</> : <NavigationBar />}>
         <div className={styles.route}>
+            {design.options.server_nav === 'top' && <div className="vinus-server-topnav">{navigation}</div>}
             <InstallListener /><TransferListener /><WebsocketHandler /><ServerStatusBootstrap />
             <ServerShellHeader />
-            {conflict && !(admin && consolePath) ? <ConflictStateRenderer /> : <ErrorBoundary>
+            {!conflict && <PlayerCompanionPrompt key={server.uuid} />}
+            {conflict && !(admin && consolePath) ? <ConflictStateRenderer /> : <ServerPageTransition><ErrorBoundary>
                 <NavigationRouter />
-            </ErrorBoundary>}
+            </ErrorBoundary></ServerPageTransition>}
         </div>
     </DashboardShell>;
 };

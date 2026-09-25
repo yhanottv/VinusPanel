@@ -1,0 +1,10 @@
+# Inventory is always read-only. No HTTP listener, public port or API key.
+actions:
+  heal: true
+  kill: true
+  feed: true
+  operator: true
+  whitelist: true
+  ban: true
+  gamemode: true
+  experience: true

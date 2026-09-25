@@ -1,0 +1,832 @@
+{
+  "logo_mode": {
+    "default": "both",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "art",
+        "label": "Image seule"
+      },
+      {
+        "value": "text",
+        "label": "Texte seul"
+      },
+      {
+        "value": "both",
+        "label": "Image et texte"
+      }
+    ]
+  },
+  "logo_light": {
+    "default": "",
+    "kind": "image"
+  },
+  "logo_square": {
+    "default": "",
+    "kind": "image"
+  },
+  "logo_alt": {
+    "default": "VinusPanel",
+    "kind": "text"
+  },
+  "muted": {
+    "default": "#9ba3b1",
+    "kind": "color"
+  },
+  "raised": {
+    "default": "#171b23",
+    "kind": "color"
+  },
+  "button_text": {
+    "default": "#071824",
+    "kind": "color"
+  },
+  "success": {
+    "default": "#43d6a3",
+    "kind": "color"
+  },
+  "danger": {
+    "default": "#fb7185",
+    "kind": "color"
+  },
+  "warning": {
+    "default": "#fbbf24",
+    "kind": "color"
+  },
+  "light_background": {
+    "default": "#f6f8fc",
+    "kind": "color"
+  },
+  "light_surface": {
+    "default": "#ffffff",
+    "kind": "color"
+  },
+  "light_text": {
+    "default": "#202b3e",
+    "kind": "color"
+  },
+  "light_muted": {
+    "default": "#586579",
+    "kind": "color"
+  },
+  "palette_picker": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "body_font": {
+    "default": "montserrat",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "system",
+        "label": "SystÃ¨me"
+      },
+      {
+        "value": "montserrat",
+        "label": "Montserrat"
+      },
+      {
+        "value": "arial",
+        "label": "Arial"
+      },
+      {
+        "value": "georgia",
+        "label": "Georgia"
+      },
+      {
+        "value": "mono",
+        "label": "Monospace"
+      }
+    ]
+  },
+  "heading_font": {
+    "default": "montserrat",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "system",
+        "label": "SystÃ¨me"
+      },
+      {
+        "value": "montserrat",
+        "label": "Montserrat"
+      },
+      {
+        "value": "arial",
+        "label": "Arial"
+      },
+      {
+        "value": "georgia",
+        "label": "Georgia"
+      },
+      {
+        "value": "mono",
+        "label": "Monospace"
+      }
+    ]
+  },
+  "mono_font": {
+    "default": "system",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "system",
+        "label": "Monospace systÃ¨me"
+      },
+      {
+        "value": "consolas",
+        "label": "Consolas"
+      },
+      {
+        "value": "courier",
+        "label": "Courier New"
+      }
+    ]
+  },
+  "font_size": {
+    "default": 14,
+    "kind": "range",
+    "min": 12,
+    "max": 18
+  },
+  "default_language": {
+    "default": "fr",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "fr",
+        "label": "Français"
+      },
+      {
+        "value": "en",
+        "label": "English"
+      },
+      {
+        "value": "de",
+        "label": "Deutsch"
+      },
+      {
+        "value": "es",
+        "label": "Español"
+      },
+      {
+        "value": "it",
+        "label": "Italiano"
+      },
+      {
+        "value": "pt",
+        "label": "Português"
+      },
+      {
+        "value": "nl",
+        "label": "Nederlands"
+      },
+      {
+        "value": "tr",
+        "label": "Türkçe"
+      }
+    ]
+  },
+  "language_picker": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "icon_style": {
+    "default": "round",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "round",
+        "label": "Arrondi"
+      },
+      {
+        "value": "sharp",
+        "label": "Angulaire"
+      }
+    ]
+  },
+  "icon_weight": {
+    "default": 15,
+    "kind": "range",
+    "min": 10,
+    "max": 30
+  },
+  "radius": {
+    "default": 14,
+    "kind": "range",
+    "min": 0,
+    "max": 28
+  },
+  "border": {
+    "default": "subtle",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "none",
+        "label": "Aucune"
+      },
+      {
+        "value": "subtle",
+        "label": "DiscrÃ¨tes"
+      },
+      {
+        "value": "strong",
+        "label": "MarquÃ©es"
+      },
+      {
+        "value": "accent",
+        "label": "Accent"
+      }
+    ]
+  },
+  "input_border": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "shadow": {
+    "default": "none",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "none",
+        "label": "Aucune"
+      },
+      {
+        "value": "soft",
+        "label": "LÃ©gÃ¨res"
+      },
+      {
+        "value": "deep",
+        "label": "Profondes"
+      }
+    ]
+  },
+  "card_opacity": {
+    "default": 100,
+    "kind": "range",
+    "min": 30,
+    "max": 100
+  },
+  "page_opacity": {
+    "default": 100,
+    "kind": "range",
+    "min": 30,
+    "max": 100
+  },
+  "content_width": {
+    "default": "full",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "contained",
+        "label": "Contenue"
+      },
+      {
+        "value": "wide",
+        "label": "Large"
+      },
+      {
+        "value": "full",
+        "label": "Pleine largeur"
+      }
+    ]
+  },
+  "sidebar_style": {
+    "default": "classic",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "classic",
+        "label": "Classique"
+      },
+      {
+        "value": "floating",
+        "label": "Flottante"
+      },
+      {
+        "value": "compact",
+        "label": "Compacte"
+      },
+      {
+        "value": "rail",
+        "label": "Rail dâ€™icÃ´nes"
+      },
+      {
+        "value": "bordered",
+        "label": "Bordure"
+      }
+    ]
+  },
+  "solid_sidebar": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "active_link": {
+    "default": "pill",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "edge",
+        "label": "Trait latÃ©ral"
+      },
+      {
+        "value": "pill",
+        "label": "Pilule"
+      },
+      {
+        "value": "glow",
+        "label": "Lueur"
+      },
+      {
+        "value": "underline",
+        "label": "SoulignÃ©"
+      },
+      {
+        "value": "solid",
+        "label": "Accent plein"
+      },
+      {
+        "value": "dot",
+        "label": "Point"
+      },
+      {
+        "value": "fade",
+        "label": "DÃ©gradÃ©"
+      }
+    ]
+  },
+  "account_block": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "topbar_search": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "search_style": {
+    "default": "inline",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "inline",
+        "label": "Champ"
+      },
+      {
+        "value": "pill",
+        "label": "Pilule"
+      },
+      {
+        "value": "full",
+        "label": "Pleine largeur"
+      }
+    ]
+  },
+  "footer_credit": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "footer_theme": {
+    "default": false,
+    "kind": "toggle"
+  },
+  "footer_text": {
+    "default": "",
+    "kind": "text"
+  },
+  "account_links": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "community_links": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "login_layout": {
+    "default": "left",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "right",
+        "label": "Formulaire Ã  droite"
+      },
+      {
+        "value": "left",
+        "label": "Formulaire Ã  gauche"
+      },
+      {
+        "value": "center",
+        "label": "CentrÃ©"
+      },
+      {
+        "value": "top",
+        "label": "Texte au-dessus"
+      }
+    ]
+  },
+  "login_surface": {
+    "default": "none",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "none",
+        "label": "Aucune"
+      },
+      {
+        "value": "card",
+        "label": "Carte"
+      },
+      {
+        "value": "glass",
+        "label": "Verre"
+      },
+      {
+        "value": "outline",
+        "label": "Contour"
+      },
+      {
+        "value": "raised",
+        "label": "SurÃ©levÃ©e"
+      }
+    ]
+  },
+  "login_align": {
+    "default": "left",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "left",
+        "label": "Gauche"
+      },
+      {
+        "value": "center",
+        "label": "CentrÃ©"
+      }
+    ]
+  },
+  "login_width": {
+    "default": 448,
+    "kind": "range",
+    "min": 320,
+    "max": 600
+  },
+  "login_backdrop": {
+    "default": "games",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "games",
+        "label": "MosaÃ¯que de jeux"
+      },
+      {
+        "value": "flat",
+        "label": "Uni"
+      },
+      {
+        "value": "image",
+        "label": "Image du panel"
+      },
+      {
+        "value": "gradient",
+        "label": "DÃ©gradÃ©"
+      },
+      {
+        "value": "aurora",
+        "label": "Aurore"
+      },
+      {
+        "value": "grid",
+        "label": "Grille"
+      }
+    ]
+  },
+  "login_logo": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "login_pitch": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "login_heading": {
+    "default": "",
+    "kind": "text"
+  },
+  "login_description": {
+    "default": "",
+    "kind": "textarea"
+  },
+  "login_footnote": {
+    "default": "",
+    "kind": "text"
+  },
+  "server_view": {
+    "default": "list",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "list",
+        "label": "Lignes"
+      },
+      {
+        "value": "grid",
+        "label": "Cartes"
+      }
+    ]
+  },
+  "row_artwork": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "quick_cards": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "recent_activity": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "welcome_notice": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "notice_title": {
+    "default": "",
+    "kind": "text"
+  },
+  "notice_message": {
+    "default": "",
+    "kind": "textarea"
+  },
+  "notice_style": {
+    "default": "tinted",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "tinted",
+        "label": "TeintÃ©"
+      },
+      {
+        "value": "edge",
+        "label": "Trait latÃ©ral"
+      },
+      {
+        "value": "outline",
+        "label": "Contour"
+      },
+      {
+        "value": "plain",
+        "label": "Simple"
+      }
+    ]
+  },
+  "server_nav": {
+    "default": "replace",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "replace",
+        "label": "Barre principale"
+      },
+      {
+        "value": "second",
+        "label": "Seconde colonne"
+      },
+      {
+        "value": "top",
+        "label": "Au-dessus du contenu"
+      }
+    ]
+  },
+  "server_inset": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "server_logo": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "server_header": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "server_address": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "blur_address": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "overview_resources": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "overview_info": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "power_style": {
+    "default": "accent",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "accent",
+        "label": "Accent"
+      },
+      {
+        "value": "status",
+        "label": "Couleurs des Ã©tats"
+      },
+      {
+        "value": "outline",
+        "label": "Contour"
+      }
+    ]
+  },
+  "power_joined": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "console_usage": {
+    "default": "right",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "right",
+        "label": "Ã€ droite"
+      },
+      {
+        "value": "left",
+        "label": "Ã€ gauche"
+      },
+      {
+        "value": "above",
+        "label": "Au-dessus"
+      },
+      {
+        "value": "below",
+        "label": "En dessous"
+      }
+    ]
+  },
+  "console_charts": {
+    "default": "below",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "none",
+        "label": "MasquÃ©s"
+      },
+      {
+        "value": "above",
+        "label": "Au-dessus"
+      },
+      {
+        "value": "below",
+        "label": "En dessous"
+      }
+    ]
+  },
+  "console_address": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "console_empty": {
+    "default": true,
+    "kind": "toggle"
+  },
+  "console_prompt": {
+    "default": "Â»",
+    "kind": "text"
+  },
+  "console_daemon": {
+    "default": "Pterodactyl Daemon",
+    "kind": "text"
+  },
+  "console_font_size": {
+    "default": 12,
+    "kind": "range",
+    "min": 10,
+    "max": 20
+  },
+  "button_motion": {
+    "default": "none",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "none",
+        "label": "Aucune"
+      },
+      {
+        "value": "press",
+        "label": "Pression"
+      },
+      {
+        "value": "lift",
+        "label": "Ã‰lÃ©vation"
+      },
+      {
+        "value": "glint",
+        "label": "Reflet"
+      },
+      {
+        "value": "pulse",
+        "label": "Pulsation"
+      },
+      {
+        "value": "grow",
+        "label": "Agrandissement"
+      }
+    ]
+  },
+  "page_motion": {
+    "default": "fade",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "none",
+        "label": "Aucune"
+      },
+      {
+        "value": "fade",
+        "label": "Fondu"
+      },
+      {
+        "value": "rise",
+        "label": "MontÃ©e"
+      },
+      {
+        "value": "slide",
+        "label": "Glissement"
+      },
+      {
+        "value": "scale",
+        "label": "Zoom"
+      }
+    ]
+  },
+  "motion_duration": {
+    "default": 180,
+    "kind": "range",
+    "min": 0,
+    "max": 600
+  },
+  "title_template": {
+    "default": "{page} | {panel}",
+    "kind": "text"
+  },
+  "description": {
+    "default": "",
+    "kind": "textarea"
+  },
+  "favicon": {
+    "default": "",
+    "kind": "image"
+  },
+  "social_image": {
+    "default": "",
+    "kind": "image"
+  },
+  "chart_shape": {
+    "default": "line",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "line",
+        "label": "Courbes"
+      },
+      {
+        "value": "bar",
+        "label": "Barres"
+      }
+    ]
+  },
+  "icon_family": {
+    "default": "outline",
+    "kind": "select",
+    "choices": [
+      {
+        "value": "outline",
+        "label": "Vinus Â· contours"
+      },
+      {
+        "value": "lucide",
+        "label": "Lucide"
+      },
+      {
+        "value": "tabler",
+        "label": "Tabler"
+      },
+      {
+        "value": "solid",
+        "label": "Font Awesome Â· pleines"
+      }
+    ]
+  },
+  "icon_size": {
+    "default": 18,
+    "kind": "range",
+    "min": 14,
+    "max": 28
+  }
+}

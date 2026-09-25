@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera, faCheck, faInfoCircle, faPalette, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components/macro';
 import tw from 'twin.macro';
+import { resizeImage } from './avatarImage';
 import useProfileAppearance, { ProfileAppearance } from './useProfileAppearance';
 
 const Header = styled.header`
@@ -59,38 +60,6 @@ const Editor = styled.section`
     }
 `;
 
-const resizeImage = (file: File): Promise<string> =>
-    new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onerror = () => reject(new Error(vt("Impossible de lire cette image.")));
-        reader.onload = () => {
-            const image = new Image();
-            image.onerror = () => reject(new Error(vt("Format d’image non pris en charge.")));
-            image.onload = () => {
-                const canvas = document.createElement('canvas');
-                const size = 320;
-                const sourceSize = Math.min(image.width, image.height);
-                canvas.width = size;
-                canvas.height = size;
-                const context = canvas.getContext('2d');
-                if (!context) return reject(new Error(vt("Impossible de préparer cette image.")));
-                context.drawImage(
-                    image,
-                    (image.width - sourceSize) / 2,
-                    (image.height - sourceSize) / 2,
-                    sourceSize,
-                    sourceSize,
-                    0,
-                    0,
-                    size,
-                    size
-                );
-                resolve(canvas.toDataURL('image/jpeg', 0.86));
-            };
-            image.src = String(reader.result);
-        };
-        reader.readAsDataURL(file);
-    });
 
 export default () => {
     const user = useStoreState((state: ApplicationStore) => state.user.data!);

@@ -1,3 +1,4 @@
+import { useDesign, monoFonts, designPreview } from '@/designRuntime';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faHistory, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
@@ -16,6 +17,7 @@ import styles from './terminal.module.css';
 /* BLUEPRINT_IMPORT */
 
 export default function Console() {
+    const design = useDesign();
     const host = useRef<HTMLDivElement>(null);
     const command = useRef<HTMLInputElement>(null);
     const lines = useRef<string[]>([]);
@@ -23,7 +25,7 @@ export default function Console() {
     const [revision, setRevision] = useState(0);
     const [filter, setFilter] = useState<LogLevel>('all');
     const [search, setSearch] = useState('');
-    const [fontSize, setFontSize] = useState(12);
+    const [fontSize, setFontSize] = useState(design.options.console_font_size);
     const [showFilter, setShowFilter] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
     const [history, setHistory] = useState<string[]>([]);
@@ -37,10 +39,13 @@ export default function Console() {
     const terminal = useMemo(() => new Terminal({ disableStdin: true, cursorBlink: false, cursorStyle: 'underline', fontSize: 12, fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', lineHeight: 1.25, scrollback: 5000, theme: { background: '#101319', foreground: '#d4dbe6', cursor: 'transparent', selection: '#ff9b5250' } }), []);
     const fit = useMemo(() => new FitAddon(), []);
     const finder = useMemo(() => new SearchAddon(), []);
+    const renderLine = (line: string) => design.console_rules.reduce((text,rule)=>rule.search ? text.split(rule.search).join(rule.replacement || '') : text,line.split('[Pterodactyl Daemon]').join(`[${design.options.console_daemon}]`));
+    const renderer = useRef(renderLine); renderer.current = renderLine;
+    useEffect(() => { setFontSize(design.options.console_font_size); terminal.options.fontFamily = monoFonts[design.options.mono_font]; terminal.options.theme = { background: design.surface, foreground: design.text, cursor: 'transparent' }; if (terminal.element) { redraw(); fit.fit(); } }, [design]);
     const redraw = () => {
         terminal.clear(); terminal.reset();
         const { filter, search } = filterRef.current;
-        lines.current.filter(line => matchesLog(line, filter, search)).forEach(line => terminal.writeln(line));
+        lines.current.filter(line => matchesLog(line, filter, search)).forEach(line => terminal.writeln(renderer.current(line)));
     };
     useEffect(() => {
         if (!host.current) return;
@@ -64,7 +69,7 @@ export default function Console() {
             const incoming = raw.replace(/\r\n/g, '\n').replace(/\n$/, '').split('\n');
             for (const line of incoming) {
                 lines.current.push(line);
-                if (matchesLog(line, filterRef.current.filter, filterRef.current.search)) terminal.writeln(line + '\x1b[0m');
+                if (matchesLog(line, filterRef.current.filter, filterRef.current.search)) terminal.writeln(renderer.current(line) + '\x1b[0m');
             }
             if (lines.current.length > 5000) lines.current.splice(0, lines.current.length - 5000);
             if (frame.current === null) frame.current = requestAnimationFrame(() => { frame.current = null; setRevision(n => n + 1); });
@@ -77,7 +82,7 @@ export default function Console() {
     const shown = lines.current.filter(line => matchesLog(line, filter, search));
     const submit = () => {
         const value = command.current?.value || '';
-        if (!value.trim() || !canSend || !connected || !instance || blocked || status === 'offline') return;
+        if (designPreview || !value.trim() || !canSend || !connected || !instance || blocked || status === 'offline') return;
         instance.send('send command', value);
         setHistory(items => [value, ...items].slice(0, 32)); setHistoryIndex(-1);
         if (command.current) command.current.value = '';
@@ -103,10 +108,10 @@ export default function Console() {
         <div className={styles.terminal}>
             <div className={styles.fontControls}><button type="button" disabled={fontSize <= 10} aria-label={vt('Réduire le texte de la console')} onClick={() => setFontSize(n => n - 1)}>−</button><button type="button" title={vt('Revenir à 12 pixels')} onClick={() => setFontSize(12)}>{fontSize}</button><button type="button" disabled={fontSize >= 20} aria-label={vt('Agrandir le texte de la console')} onClick={() => setFontSize(n => n + 1)}>+</button></div>
             <div className={styles.output} ref={host} />
-            {!lines.current.length && <div className={styles.empty}><span>⏻</span><strong>{!connected ? vt('Connexion à la console…') : status === 'offline' ? vt('Serveur hors ligne') : vt('En attente de journaux')}</strong><p>{status === 'offline' && connected ? vt('Démarrez le serveur pour recevoir sa sortie ici.') : vt('Les messages du serveur apparaîtront ici.')}</p></div>}
+            {design.options.console_empty && !lines.current.length && <div className={styles.empty}><span>⏻</span><strong>{!connected ? vt('Connexion à la console…') : status === 'offline' ? vt('Serveur hors ligne') : vt('En attente de journaux')}</strong><p>{status === 'offline' && connected ? vt('Démarrez le serveur pour recevoir sa sortie ici.') : vt('Les messages du serveur apparaîtront ici.')}</p></div>}
             {!!lines.current.length && !shown.length && <div className={styles.empty}><strong>{vt('Aucun message pour ce filtre.')}</strong></div>}
         </div>
-        <div className={styles.command}><span aria-hidden="true">»</span><input ref={command} type="text" aria-label={vt('Commande à envoyer au serveur')} placeholder={vt('Commande…')} disabled={!canSend || !connected || !instance || blocked || status === 'offline'} onKeyDown={keyDown} autoComplete="off" spellCheck={false} autoCorrect="off" autoCapitalize="none" />
+        <div className={styles.command}><span aria-hidden="true">{design.options.console_prompt}</span><input ref={command} type="text" aria-label={vt('Commande à envoyer au serveur')} placeholder={vt('Commande…')} disabled={!canSend || !connected || !instance || blocked || status === 'offline'} onKeyDown={keyDown} autoComplete="off" spellCheck={false} autoCorrect="off" autoCapitalize="none" />
             {canSend && <button type="button" title={vt('Envoyer')} aria-label={vt('Envoyer')} disabled={!connected || blocked || status === 'offline'} onClick={submit}><FontAwesomeIcon icon={faPaperPlane} /></button>}
             <button type="button" title={vt('Filtrer la sortie')} aria-label={vt('Filtrer la sortie')} aria-pressed={showFilter} onClick={() => { setShowFilter(v => !v); if (showFilter) setSearch(''); }}><FontAwesomeIcon icon={faSearch} /></button>
             <button type="button" title={vt('Historique des commandes')} aria-label={vt('Historique des commandes')} aria-pressed={showHistory} onClick={() => setShowHistory(v => !v)}><FontAwesomeIcon icon={faHistory} /></button>

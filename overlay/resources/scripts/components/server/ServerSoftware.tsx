@@ -1,3 +1,7 @@
+import { CompanionOffer } from './players/CompanionChoice';
+import { queueCompanion } from './players/companionFollowup';
+import { useStoreState } from 'easy-peasy';
+import MessageBox from '@/components/MessageBox';
 import useServerOperation from './useServerOperation';
 import React, { useEffect, useRef, useState } from 'react';
 import { ServerContext } from '@/state/server';
@@ -13,11 +17,12 @@ import styles from './software.module.css';
 interface Software { name: string; icon: string | null; description: string; deprecated: boolean; experimental: boolean; }
 interface Version { id: string; java: number; channel: string; supported: boolean; }
 interface Build { id: number; name: string; experimental: boolean; }
-interface Plan { token: string; java: number; image: string; label: string; size: number; }
+interface Plan { companion: CompanionOffer; token: string; java: number; image: string; label: string; size: number; }
 const groupNames: Record<string, string> = { recommended: 'Recommandés', established: 'Établis', experimental: 'Expérimentaux', miscellaneous: 'Autres logiciels', limbos: 'Serveurs d’attente' };
 
 export default function ServerSoftware() {
     const server = ServerContext.useStoreState(s => s.server.data!);
+    const user = useStoreState(s => s.user.data!.uuid);
     const status = ServerContext.useStoreState(s => s.status.value);
     const refreshServer = ServerContext.useStoreActions(a => a.server.getServer);
     const operation = useServerOperation(server.uuid);
@@ -71,14 +76,15 @@ export default function ServerSoftware() {
         if (!plan || busy) return;
         setBusy(true); setError(''); setMessage('');
         try {
-            const { data } = await http.post(`${endpoint}/install`, { token: plan.token }, { timeout: 660000 });
-            if (operation.current()) { setMessage(data.message); setBackup(data.backup); setPlan(null); setSelected(''); await refreshServer(server.id); }
+            const { data } = await http.post(`${endpoint}/install`, { token: plan.token, install_players: false }, { timeout: 660000 });
+            if (operation.current()) { queueCompanion(user, server.uuid, data.companion_followup); setMessage(data.message); setBackup(data.backup); setPlan(null); setSelected(''); await refreshServer(server.id); }
         } catch (e) { if (operation.current()) { setError(httpErrorToHuman(e)); setPlan(null); } } finally { operation.reconnect(); if (operation.current()) setBusy(false); }
     };
     return <PageContentBlock title={`${server.name} | Version`} className={styles.page}>
         <header className={styles.heading}><div><h2>{vt('Version du serveur')}</h2><p>{vt('Choisissez votre logiciel, sa version et le build à installer.')}</p></div><span className={styles.current}><SoftwareIcon software={server.softwareProfile?.software} size={24} />{softwareName(server.softwareProfile?.software)} · {server.softwareProfile?.game_version || '—'}</span></header>
         <div className={styles.warning}>{vt('Un changement de logiciel peut rendre vos mondes, plugins ou mods incompatibles. Les fichiers remplacés sont conservés dans un dossier de récupération. Créez aussi une sauvegarde de vos mondes avant de changer de version.')}</div>
-        {error && !selected && <p className={styles.error} role="alert">{error}</p>}
+        {status === 'running' && <button className={styles.primary} type="button" onClick={() => queueCompanion(user, server.uuid)}>{vt('Découvrir VinusPlayers')}</button>}
+        {error && !selected && <MessageBox type="error" dismissible key={error}>{error}</MessageBox>}
         {message && <div className={styles.success} role="status">{message}{backup && <Link to={`/server/${server.id}/files#/${backup}`}>{vt('Ouvrir les fichiers de récupération')} ↗</Link>}</div>}
         <input className={styles.search} value={query} onChange={e => setQuery(e.target.value)} placeholder={vt('Rechercher un logiciel…')} aria-label={vt('Rechercher un logiciel…')} />
         {loading && !selected && <p role="status">{vt('Chargement des logiciels…')}</p>}
@@ -92,12 +98,13 @@ export default function ServerSoftware() {
         {!!Object.keys(groups).length && !Object.values(software).some(item => item.name.toLowerCase().includes(query.toLowerCase())) && <p>{vt('Aucun logiciel ne correspond à cette recherche.')}</p>}
         <Dialog open={!!selected} title={software[selected]?.name || vt('Version')} onClose={() => { if (!busy) { setSelected(''); setPlan(null); setError(''); } }}>
             <div className={styles.modal}>
-                {error && <p className={styles.error} role="alert">{error}</p>}
+                {error && <MessageBox type="error" dismissible key={error}>{error}</MessageBox>}
                 <label>{vt('Version')}<select disabled={loading || busy || !!plan} value={version} onChange={e => setVersion(e.target.value)}>{versions.map(v => <option key={v.id} value={v.id}>{v.id} · Java {v.java}{v.channel !== 'RELEASE' ? ` · ${v.channel}` : ''}</option>)}</select></label>
                 <label>{vt('Build')}<select disabled={loading || busy || !!plan} value={build} onChange={e => { setBuild(e.target.value); setPlan(null); }}>{builds.map(b => <option key={b.id} value={b.id}>{b.name}{b.experimental ? ` · ${vt('Expérimental')}` : ''}</option>)}</select></label>
                 {loading && <p role="status">{vt('Chargement des versions…')}</p>}
                 {!canInstall && <p>{vt('Les permissions de réinstallation, de démarrage et de gestion des fichiers sont nécessaires.')}</p>}
                 {plan ? <><div className={styles.warning}>{vt('Confirmer ce changement remplacera le logiciel et ses bibliothèques. Vos mondes et extensions restent présents. Le serveur doit être arrêté et restera arrêté après l’installation.')}</div><p>{plan.label} · Java {plan.java} · {(plan.size / 1048576).toFixed(1)} Mio</p><label className={styles.imageLabel}>{vt('Image Docker')}<code>{plan.image}</code></label>{status !== 'offline' && <p>{vt('Arrêtez le serveur depuis la console pour continuer.')}</p>}
+                <p>{vt('Après l’installation, démarrez le serveur. Une fenêtre vous proposera ensuite d’activer les informations Joueurs.')}</p>
                     <button className={styles.primary} type="button" disabled={busy || status !== 'offline'} onClick={install}>{busy ? vt('Téléchargement, vérification et installation…') : vt('Confirmer l’installation')}</button>
                 </> : <button className={styles.primary} type="button" disabled={!canInstall || busy || loading || !build} onClick={prepare}>{busy ? vt('Préparation…') : vt('Préparer l’installation')}</button>}
             </div>

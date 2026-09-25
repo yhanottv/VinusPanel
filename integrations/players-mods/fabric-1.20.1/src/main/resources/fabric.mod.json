@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "vinusplayers",
+  "version": "1.1.0",
+  "name": "VinusPlayers",
+  "description": "Read-only player snapshots for VinusPanel. Server only.",
+  "environment": "server",
+  "license": "MIT",
+  "mixins": [
+    "vinusplayers.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.10",
+    "minecraft": "1.20.1",
+    "java": ">=17"
+  }
+}

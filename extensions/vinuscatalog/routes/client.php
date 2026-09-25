@@ -5,6 +5,17 @@ use Pterodactyl\Http\Middleware\Activity\ServerSubject;
 use Pterodactyl\Http\Middleware\Api\Client\Server\AuthenticateServerAccess;
 use Pterodactyl\BlueprintFramework\Extensions\vinuscatalog\CatalogController;
 
+Route::prefix('/servers/{server}/players')->middleware([\Pterodactyl\BlueprintFramework\Extensions\vinuscatalog\CatalogErrors::class,ServerSubject::class,AuthenticateServerAccess::class,'throttle:120,1,vinusplayers:'])->controller(\Pterodactyl\BlueprintFramework\Extensions\vinuscatalog\PlayerController::class)->group(function () {
+    Route::get('/','index');
+    Route::get('/companion','companion');
+    Route::get('/companion/followup','followup');
+    Route::post('/companion/followup/dismiss','dismissFollowup');
+    Route::post('/companion','installCompanion')->middleware('throttle:3,1,vinusplayers-install:');
+    Route::post('/actions','action')->middleware('throttle:20,1,vinusplayers-action:');
+    Route::get('/actions/{id}','result');
+    Route::get('/{uuid}/skin','skin');
+});
+
 // Map-only capabilities are issued by the fully authenticated session endpoint below.
 // The iframe is sandboxed to an opaque origin, so it cannot use panel cookies.
 Route::get('/map/{token}/{path}', [\Pterodactyl\BlueprintFramework\Extensions\vinuscatalog\BlueMapController::class, 'asset'])

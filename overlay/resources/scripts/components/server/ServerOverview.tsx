@@ -11,6 +11,20 @@ import { softwareName } from './SoftwareIcon';
 import ServerResourceCards from './ServerResourceCards';
 import useServerTelemetry from './useServerTelemetry';
 import styles from './server.module.css';
+import Icon, { DashboardIconName } from '@/components/dashboard/DashboardIcon';
+
+function Shortcut({ to, icon, title, description }: { to: string; icon: DashboardIconName; title: string; description: string }) {
+    return <Link to={to} className={styles.shortcut}>
+        <span className={styles.shortcutIcon}>
+            {icon === 'terminal' ? <svg viewBox="0 0 32 28" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="2" y="2" width="28" height="24" rx="3"/>
+                <path d="M2 8h28 M6 5h.01 M9 5h.01 M12 5h.01 M8 13l4 4-4 4 M16 21h7"/>
+            </svg> : <Icon name={icon}/>}
+        </span>
+        <span className={styles.shortcutText}><strong>{vt(title)}</strong><small>{vt(description)}</small></span>
+        <span className={styles.shortcutArrow}><Icon name="chevron"/></span>
+    </Link>;
+}
 
 export default function ServerOverview() {
     const server = ServerContext.useStoreState(s => s.server.data!);
@@ -38,11 +52,11 @@ export default function ServerOverview() {
             </dl></section>
         </div>
         {server.description && <p className={styles.note}>{server.description}</p>}
-        <div className={styles.shortcuts}>
-            <Link to={base}>{vt('Ouvrir la console')} →</Link>
-            <Can action="file.read"><Link to={`${base}/files`}>{vt('Gérer les fichiers')} →</Link></Can>
-            <Can action="backup.read"><Link to={`${base}/backups`}>{vt('Sauvegardes')} →</Link></Can>
-            <Can action="activity.read"><Link to={`${base}/activity`}>{vt('Activité')} →</Link></Can>
-        </div>
+        <nav className={styles.shortcuts} aria-label={vt('Raccourcis du serveur')}>
+            <Shortcut to={base} icon="terminal" title="Ouvrir la console" description="Commandes et journaux en direct"/>
+            <Can action="file.read"><Shortcut to={`${base}/files`} icon="folder" title="Gérer les fichiers" description="Parcourir et modifier les fichiers"/></Can>
+            <Can action="backup.read"><Shortcut to={`${base}/backups`} icon="archive" title="Sauvegardes" description="Créer et restaurer des sauvegardes"/></Can>
+            <Can action="activity.read"><Shortcut to={`${base}/activity`} icon="history" title="Activité" description="Consulter les actions récentes"/></Can>
+        </nav>
     </PageContentBlock>;
 }

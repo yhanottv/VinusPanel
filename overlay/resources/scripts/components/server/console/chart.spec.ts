@@ -6,7 +6,7 @@ import { useChartTickLabel, formatChartValue, formatChartBytes } from './chart';
 jest.mock('twin.macro', () => ({ theme: () => '#999999' }));
 
 let chart: ReturnType<typeof useChartTickLabel>;
-const Harness = () => { chart = useChartTickLabel('CPU', 100, '%'); return null; };
+const Harness = ({ type = 'line' }: { type?: 'line' | 'bar' }) => { chart = useChartTickLabel('CPU', 100, '%', 0, type); return null; };
 beforeEach(() => {
     window.matchMedia = jest.fn().mockReturnValue({ matches: false });
 });
@@ -53,4 +53,31 @@ it('keeps fractional axis labels compact and chooses readable memory units', () 
     expect(formatChartBytes(0)).toBe('0 o');
     expect(formatChartBytes(1536)).toBe('1,5 Kio');
     expect(formatChartBytes(0.5)).toBe('0,5 o');
+});
+
+it('switches between opaque bars and translucent curves without losing or inflating telemetry', () => {
+    const { rerender } = render(React.createElement(Harness));
+    act(() => { chart.push(0); chart.push(0.15); chart.push(0.6); });
+    const samples = chart.props.data.datasets[0].data;
+    const lineFill = chart.props.data.datasets[0].backgroundColor;
+    rerender(React.createElement(Harness, { type: 'bar' }));
+    expect(chart.props.data.datasets[0].backgroundColor).toEqual(expect.any(Function));
+    expect(chart.props.data.datasets[0].data).toBe(samples);
+    expect(samples.slice(-3)).toEqual([0, 0.15, 0.6]);
+    expect(chart.props.options.scales!.y).not.toHaveProperty('suggestedMax');
+    expect(chart.props.options.scales!.y!.min).toBe(0);
+    expect(chart.props.options.scales!.x!.min).toBe(14.5);
+    expect(chart.props.options.scales!.x!.max).toBe(29.5);
+    act(() => chart.push(0.2));
+    rerender(React.createElement(Harness, { type: 'line' }));
+    expect(chart.props.data.datasets[0].backgroundColor).toBe(lineFill);
+    expect(chart.props.options.scales!.y).toHaveProperty('suggestedMax', 100);
+    expect(chart.props.data.datasets[0].data).toBe(samples);
+    expect(samples.slice(-4)).toEqual([0, 0.15, 0.6, 0.2]);
+});
+
+it('also disables bar animation when reduced motion is requested', () => {
+    window.matchMedia = jest.fn().mockReturnValue({ matches: true });
+    render(React.createElement(Harness, { type: 'bar' }));
+    expect(chart.props.options.animation).toBe(false);
 });

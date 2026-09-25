@@ -8,7 +8,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>{{ $vinusDesign['brand_name'] }} - @yield('title')</title>
-        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <meta content="width=device-width, initial-scale=1" name="viewport">
         <meta name="_token" content="{{ csrf_token() }}">
 
         <link rel="apple-touch-icon" href="{{ $vinusDesign['logo'] }}">
@@ -19,7 +19,6 @@
         <meta name="msapplication-config" content="/favicons/browserconfig.xml">
         <meta name="theme-color" content="#0e4688">
 
-        @include('layouts.scripts')
 
         @section('scripts')
             {!! Theme::css('vendor/select2/select2.min.css?t={cache-version}') !!}
@@ -39,21 +38,25 @@
         @show
 
         @yield("blueprint.import")
+        @include('layouts.scripts')
+        <style>:root{--vinus-admin-accent:{{ $vinusDesign['accent'] }};}</style>
     </head>
-    <body class="hold-transition skin-blue fixed sidebar-mini">
+    <body class="hold-transition skin-blue fixed sidebar-mini" data-admin-language="{{ $vinusDesign['options']['default_language'] ?? 'fr' }}">
+        <a class="vinus-skip" href="#admin-content">Aller au contenu</a>
         @yield('blueprint.cache')
         <div class="wrapper">
             <header class="main-header">
                 <a href="{{ route('index') }}" class="logo">
-                    <span>{{ $vinusDesign['brand_name'] }}</span>
+                    <img class="vinus-admin-logo" src="{{ $vinusDesign['logo'] }}" alt=""><span class="vinus-admin-brand">{{ $vinusDesign['brand_name'] }}</span><span class="vinus-admin-label">Admin</span>
                 </a>
                 <nav class="navbar navbar-static-top">
                     <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
-                        <span class="sr-only">Toggle navigation</span>
+                        <span class="sr-only" data-vinus-en="Toggle navigation" data-vinus-fr="Afficher ou masquer le menu">Toggle navigation</span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </a>
+                    <span class="vinus-admin-context" data-vinus-en="Administration" data-vinus-fr="Administration">Administration</span>
                     <div class="navbar-custom-menu">
                         <ul class="nav navbar-nav">
                             <li class="user-menu">
@@ -63,77 +66,74 @@
                                 </a>
                             </li>
                             @yield("blueprint.navigation")
-                            <li>
-                                <li><a href="{{ route('index') }}" data-toggle="tooltip" data-placement="bottom" title="Exit Admin Control"><i class="fa fa-server"></i></a></li>
-                            </li>
-                            <li>
-                                <li><a href="{{ route('auth.logout') }}" id="logoutButton" data-toggle="tooltip" data-placement="bottom" title="Logout"><i class="fa fa-sign-out"></i></a></li>
-                            </li>
+                            <li><a href="{{ route('index') }}" class="vinus-return"><i class="fa fa-arrow-left" aria-hidden="true"></i><span data-vinus-en="Back to panel" data-vinus-fr="Retour au panel">Back to panel</span></a></li>
+                            <li><a href="{{ route('auth.logout') }}" id="logoutButton" aria-label="Déconnexion" title="Déconnexion"><i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
                         </ul>
                     </div>
                 </nav>
             </header>
             <aside class="main-sidebar">
                 <section class="sidebar">
+                    <label class="vinus-menu-search"><i class="fa fa-search" aria-hidden="true"></i><input id="vinus-admin-search" type="search" placeholder="Rechercher une rubrique" aria-label="Rechercher une rubrique" autocomplete="off"></label>
                     <ul class="sidebar-menu">
-                        <li class="header">BASIC ADMINISTRATION</li>
+                        <li class="header" data-vinus-en="Basic Administration" data-vinus-fr="Administration">Basic Administration</li>
                         <li class="{{ Route::currentRouteName() !== 'admin.index' ?: 'active' }}">
                             <a href="{{ route('admin.index') }}">
-                                <i class="fa fa-home"></i> <span>Overview</span>
+                                @include('layouts.vinus-icon', ['name' => 'home']) <span data-vinus-en="Overview" data-vinus-fr="Vue d’ensemble">Overview</span>
                             </a>
                         </li>
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.settings') ?: 'active' }}">
                             <a href="{{ route('admin.settings')}}">
-                                <i class="fa fa-wrench"></i> <span>Settings</span>
+                                @include('layouts.vinus-icon', ['name' => 'settings']) <span data-vinus-en="Settings" data-vinus-fr="Paramètres">Settings</span>
                             </a>
                         </li>
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.api') ?: 'active' }}">
                             <a href="{{ route('admin.api.index')}}">
-                                <i class="fa fa-gamepad"></i> <span>Application API</span>
+                                @include('layouts.vinus-icon', ['name' => 'key']) <span data-vinus-en="Application API" data-vinus-fr="API d’application">Application API</span>
                             </a>
                         </li>
-                        <li class="header">MANAGEMENT</li>
+                        <li class="header" data-vinus-en="Management" data-vinus-fr="Infrastructure">Management</li>
                         @yield("blueprint.sidenav")
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.databases') ?: 'active' }}">
                             <a href="{{ route('admin.databases') }}">
-                                <i class="fa fa-database"></i> <span>Databases</span>
+                                @include('layouts.vinus-icon', ['name' => 'database']) <span data-vinus-en="Databases" data-vinus-fr="Bases de données">Databases</span>
                             </a>
                         </li>
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.locations') ?: 'active' }}">
                             <a href="{{ route('admin.locations') }}">
-                                <i class="fa fa-globe"></i> <span>Locations</span>
+                                @include('layouts.vinus-icon', ['name' => 'pin']) <span data-vinus-en="Locations" data-vinus-fr="Emplacements">Locations</span>
                             </a>
                         </li>
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.nodes') ?: 'active' }}">
                             <a href="{{ route('admin.nodes') }}">
-                                <i class="fa fa-sitemap"></i> <span>Nodes</span>
+                                @include('layouts.vinus-icon', ['name' => 'nodes']) <span data-vinus-en="Nodes" data-vinus-fr="Nodes">Nodes</span>
                             </a>
                         </li>
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.servers') ?: 'active' }}">
                             <a href="{{ route('admin.servers') }}">
-                                <i class="fa fa-server"></i> <span>Servers</span>
+                                @include('layouts.vinus-icon', ['name' => 'server']) <span data-vinus-en="Servers" data-vinus-fr="Serveurs">Servers</span>
                             </a>
                         </li>
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.users') ?: 'active' }}">
                             <a href="{{ route('admin.users') }}">
-                                <i class="fa fa-users"></i> <span>Users</span>
+                                @include('layouts.vinus-icon', ['name' => 'users']) <span data-vinus-en="Users" data-vinus-fr="Utilisateurs">Users</span>
                             </a>
                         </li>
-                        <li class="header">SERVICE MANAGEMENT</li>
+                        <li class="header" data-vinus-en="Service Management" data-vinus-fr="Configuration des jeux">Service Management</li>
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.mounts') ?: 'active' }}">
                             <a href="{{ route('admin.mounts') }}">
-                                <i class="fa fa-magic"></i> <span>Mounts</span>
+                                @include('layouts.vinus-icon', ['name' => 'mount']) <span data-vinus-en="Mounts" data-vinus-fr="Montages">Mounts</span>
                             </a>
                         </li>
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.nests') ?: 'active' }}">
                             <a href="{{ route('admin.nests') }}">
-                                <i class="fa fa-th-large"></i> <span>Nests</span>
+                                @include('layouts.vinus-icon', ['name' => 'boxes']) <span data-vinus-en="Nests" data-vinus-fr="Nests">Nests</span>
                             </a>
                         </li>
                     </ul>
                 </section>
             </aside>
-            <div class="content-wrapper">
+            <div class="content-wrapper" id="admin-content" role="main">
                 <section class="content-header">
                     @yield('blueprint.introduction')
                     @yield('content-header')
@@ -224,5 +224,6 @@
             </script>
         @show
         @yield('blueprint.wrappers')
+        <script src="/assets/js/vinus-admin.js?v=3.3.2" defer></script>
     </body>
 </html>

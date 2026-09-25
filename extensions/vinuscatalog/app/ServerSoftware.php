@@ -102,6 +102,6 @@ final class ServerSoftware
             // prepares a separate directory and preserves replaced entries for rollback.
         }
         abort_unless($steps && count($steps) <= 100 && array_sum(array_column($steps, 'size')) <= 2 * 1024 * 1024 * 1024, 422, 'Installation trop volumineuse.');
-        return ['software' => $type, 'version' => $version, 'build' => $id, 'label' => $build['name'], 'java' => $meta['java'], 'steps' => $steps];
+        return ['software' => $type, 'version' => $version, 'build' => $id, 'label' => $build['name'], 'loader_version' => $build['projectVersionId'] ?? null, 'java' => $meta['java'], 'steps' => $steps];
     }
 }

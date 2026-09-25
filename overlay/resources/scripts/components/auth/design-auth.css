@@ -1,0 +1,47 @@
+.vinus-auth-stage { color:var(--vinus-text); font-family:var(--vinus-body-font); }
+.vinus-auth-shell form { width:min(100%,var(--vinus-login-width))!important; }
+.vinus-auth-panel { border-radius:var(--vinus-radius); }
+.vinus-auth-panel h1,.vinus-auth-editorial strong { font-family:var(--vinus-heading-font); }
+html:not([data-vinus-login-backdrop='games']) .vinus-auth-mosaic { display:none; }
+html:not([data-vinus-login-backdrop='games']) .vinus-auth-stage::before,
+html:not([data-vinus-login-backdrop='games']) .vinus-auth-stage::after { display:none; }
+html[data-vinus-login-layout='right'] .vinus-auth-shell form { margin-left:auto; }
+html[data-vinus-login-layout='right'] .vinus-auth-mosaic { inset:-25% auto -25% -4vw; }
+html[data-vinus-login-layout='right'] .vinus-auth-stage::before { background:linear-gradient(270deg,var(--vinus-bg) 0%,var(--vinus-bg) 26%,color-mix(in srgb,var(--vinus-bg) 98%,transparent) 39%,color-mix(in srgb,var(--vinus-bg) 35%,transparent) 70%,transparent 88%); }
+html[data-vinus-login-layout='right'] .vinus-auth-editorial { left:12vw; }
+html[data-vinus-login-layout='center'] .vinus-auth-shell form,
+html[data-vinus-login-layout='top'] .vinus-auth-shell form { margin-inline:auto; transform:none; }
+html[data-vinus-login-layout='center'] .vinus-auth-editorial { display:none; }
+html[data-vinus-login-layout='center'] .vinus-auth-stage::before,
+html[data-vinus-login-layout='top'] .vinus-auth-stage::before { background:color-mix(in srgb,var(--vinus-bg) 88%,transparent); }
+html[data-vinus-login-layout='top'] .vinus-auth-editorial { position:relative; order:1; display:block; left:auto; bottom:auto; width:auto; text-align:center; margin:105px 24px 0; }
+html[data-vinus-login-layout='top'] .vinus-auth-editorial :is(strong,span) { margin-inline:auto; max-width:650px; }
+html[data-vinus-login-layout='top'] .vinus-auth-shell { order:2; padding-top:35px; min-height:0; }
+html[data-vinus-login-layout='top'] .vinus-auth-footer { order:3; }
+html[data-vinus-login-align='center'] .vinus-auth-panel { text-align:center; }
+html[data-vinus-login-surface='card'] .vinus-auth-panel,
+html[data-vinus-login-surface='raised'] .vinus-auth-panel { background:var(--vinus-surface); border:1px solid #ffffff20; padding:28px; }
+html[data-vinus-login-surface='glass'] .vinus-auth-panel { background:#8793a612; border:1px solid #ffffff20; padding:28px; backdrop-filter:blur(20px); }
+html[data-vinus-login-surface='outline'] .vinus-auth-panel { background:transparent; border:1px solid var(--vinus-accent); padding:28px; }
+html[data-vinus-login-surface='raised'] .vinus-auth-panel { box-shadow:0 30px 90px #0009; }
+html[data-vinus-login-backdrop='image'] .vinus-auth-stage { background:var(--vinus-background-image) center/cover; }
+html[data-vinus-login-backdrop='gradient'] .vinus-auth-stage { background:linear-gradient(125deg,var(--vinus-bg),var(--vinus-surface),var(--vinus-accent)); }
+html[data-vinus-login-backdrop='aurora'] .vinus-auth-stage { background:radial-gradient(ellipse at 20% 20%,rgba(var(--vinus-accent-rgb),.35),transparent 55%),var(--vinus-bg); }
+html[data-vinus-login-backdrop='grid'] .vinus-auth-stage { background:linear-gradient(#8881 1px,transparent 1px),linear-gradient(90deg,#8881 1px,transparent 1px),var(--vinus-bg); background-size:40px 40px; }
+html[data-vinus-login-logo='false'] .vinus-auth-brand>img { display:none; }
+html[data-vinus-login-pitch='false'] .vinus-auth-editorial { display:none; }
+html[data-vinus-language-picker='false'] .vinus-auth-language { display:none; }
+html[data-vinus-footer-credit='false'] .vinus-footer-credit { display:none; }
+.vinus-footer-custom { text-align:center; font-size:11px; color:var(--vinus-muted); padding:5px; }
+@media(min-width:901px) {
+ /* Keep the form inset and the caption near the capped mosaic on ultrawide screens. */
+ html[data-vinus-login-layout='left'] .vinus-auth-shell { padding-left:clamp(64px,10vw,360px); }
+ html[data-vinus-login-layout='left'] .vinus-auth-editorial { left:max(48vw,calc(100% - 1560px)); }
+}
+@media(max-width:900px) {
+ html[data-vinus-login-layout='right'] .vinus-auth-mosaic { inset:-10% auto -10% -42%; }
+ html[data-vinus-login-layout='right'] .vinus-auth-stage::before { background:linear-gradient(270deg,var(--vinus-bg),color-mix(in srgb,var(--vinus-bg) 97%,transparent) 52%,color-mix(in srgb,var(--vinus-bg) 79%,transparent)); }
+}
+@media(max-width:600px) {
+ html[data-vinus-login-layout='right'] .vinus-auth-mosaic { inset:-8% auto -8% -130%; }
+}

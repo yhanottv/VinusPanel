@@ -1,5 +1,30 @@
 # VinusPanel changelog
 
+## Unreleased — Live Design Studio
+
+- Add emoji landmarks to the GitBook chapters and update the installation guide to use `main`.
+- Synchronize the latest deployed Activity styling and keep Blueprint navigation, feedback notices and console power controls aligned with the standard theme while preserving extension hooks.
+
+- Persist the post-install VinusPlayers reminder on the panel for seven days, scoped to the installing account and server, so a reload or device change can recover it. Add a Versions-page entry point to reopen the offer.
+- Present an illustrated, animated VinusPlayers offer after a successful Minecraft installation reaches running state. Later keeps Players available; explicit activation gracefully stops, verifies/installs and requests startup, with timeout and existing-file safeguards.
+- Publish [VinusPanel Docs on GitBook](https://vinuspanel.gitbook.io/vinuspanel-docs/) with 13 French chapters, an English quick start, a welcome page and a contents page. Sources remain in `docs/gitbook/`; Git Sync configuration is provided but automatic synchronization is not connected. The GitHub wiki is disabled.
+- Add account email/key icons and independently accessible password visibility buttons.
+- Add outlined administration icons, a sliding active-navigation marker and reduced-motion-aware entrance/hover effects.
+- Bundle verified Bukkit, Fabric, Forge and NeoForge player companions with exact Minecraft/loader selection, checksum-verified stopped-server installation after explicit consent. Native mods provide read-only live snapshots; Bukkit retains actions. See the supported matrix in `docs/PLAYERS.md`.
+
+- Redesign account Overview with separate picture, email, password and two-factor sections. Keep existing authentication forms and browser-local profile pictures.
+- Rebuild the administration shell and home screen with flat surfaces, searchable navigation, responsive tables, clearer forms and shared branding. Preserve server/node actions, permissions and Blueprint hooks.
+
+- Refresh selected live player profiles every second, resume immediately when returning to the tab, and synchronize unchanged XP/game-mode controls with server updates. Preserve unapplied edits and prevent overlapping polls.
+- Add player profiles with read-only inventories, equipment, Ender chests, skins, health, food and XP.
+- Add the optional Bukkit companion for live presence and validated heal/feed/kill, access, game mode and level controls.
+- Label saved data and unavailable capabilities explicitly; document companion installation and optional Minecraft artwork.
+
+- Replace the design form with a full-screen categorized editor and isolated responsive previews.
+- Add shared visual settings for the dashboard, navigation, authentication, server overview and console.
+- Preserve legacy identity settings, private server artwork and Blueprint extension hooks.
+- Validate saved options, navigation URLs and CSS; restrict preview framing to same-origin administrator views.
+
 ## 3.2.0 — 2026-09-24
 
 - Use the full available dashboard width on Full HD and ultrawide screens; retain mobile layout.

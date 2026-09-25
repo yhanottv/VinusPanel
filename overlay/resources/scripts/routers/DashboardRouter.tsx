@@ -1,4 +1,5 @@
 import React from 'react';
+import LoginPreview from '@/components/dashboard/design/LoginPreview';
 import { Route, Switch, useLocation } from 'react-router-dom';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import DashboardContainer from '@/components/dashboard/DashboardContainer';
@@ -14,6 +15,8 @@ export default () => {
     const location = useLocation();
     const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data!.rootAdmin);
 
+    if (rootAdmin && location.pathname.replace(/\/$/, '') === '/design') return <DesignStudio />;
+    if (rootAdmin && location.pathname === '/design/preview/login') return <LoginPreview />;
     return (
         <DashboardShell>
                 <TransitionRouter>

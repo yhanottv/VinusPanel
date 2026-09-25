@@ -4,3 +4,5 @@
 .reveal:hover > .value, .reveal:focus > .value, .reveal:focus-within > .value { filter: none; }
 .reveal:focus-visible { outline: 2px solid var(--dash-accent, #ff9b52); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { .value { transition: none; } }
+
+:global(html[data-vinus-blur-address='false']) .value { filter:none; }

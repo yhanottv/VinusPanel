@@ -1,6 +1,19 @@
 import React from 'react';
+import { iconFamilies } from './iconFamilies';
+import { useDesign } from '@/designRuntime';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBars, faCheck, faChevronDown, faChevronRight, faClone, faCode, faColumns, faComments, faExternalLinkAlt, faFont, faGlobe, faHeartbeat, faIdCard, faInfoCircle, faKey, faLanguage, faLifeRing, faList, faMoon, faPaintBrush, faPalette, faPlus, faSearch, faServer, faShapes, faSignOutAlt, faSlidersH, faSun, faTerminal, faFolderOpen, faCog, faUsers, faPuzzlePiece, faCubes, faArchive, faDatabase, faNetworkWired, faCalendarAlt, faHistory, faThLarge, faTimes, faUser, faWind } from '@fortawesome/free-solid-svg-icons';
 
 const paths = {
+    brand: 'M2 3h5v14H2z M10 5h8 M10 9h6 M4 6h1',
+    type: 'M3 16 10 2l7 14 M6 11h8 M2 19h16',
+    language: 'M2 4h10 M7 2v2 M4 4c0 5 3 8 7 9 M10 4c0 5-3 8-8 10 M10 18l4-10 4 10 M12 15h4',
+    shapes: 'M2 2h6v6H2z M18 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0 M5 11l4 7H1z M12 13h6 M12 17h4',
+    surface: 'M7 2h11v12H7z M3 6H2v12h11v-1',
+    layout: 'M2 3h16v14H2z M7 3v14 M4 6h.01 M4 10h.01',
+    code: 'M6 5l-5 5 5 5 M14 5l5 5-5 5 M12 2 8 18',
+    motion: 'M2 5h8 M2 10h5 M2 15h8 M18 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0',
+
     grid: 'M3 3h5v5H3z M12 3h5v5h-5z M3 12h5v5H3z M12 12h5v5h-5z',
     user: 'M13 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0 M4 18v-3a6 6 0 0 1 12 0v3',
     key: 'M12 3a5 5 0 0 0-4.6 7L2 15.5V18h3v-2h2v-2l3-3a5 5 0 1 0 2-8 M14 6h.01',
@@ -28,7 +41,12 @@ const paths = {
     discord: 'M6 4 3 5 1 14l4 2 1-2 M14 4l3 1 2 9-4 2-1-2 M5 13c3 2 7 2 10 0 M6 5c3-1 5-1 8 0 M7 10h.01 M13 10h.01',
 } as const;
 
-export type DashboardIconName = keyof typeof paths;
-export default function DashboardIcon({ name, className }: { name: DashboardIconName; className?: string }) {
-    return <svg className={className} width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name]} /></svg>;
+export type DashboardIconName = keyof typeof paths | 'folder' | 'settings' | 'users' | 'puzzle' | 'cubes' | 'archive' | 'database' | 'network' | 'calendar' | 'history';
+const solidIcons = {folder:faFolderOpen,settings:faCog,users:faUsers,puzzle:faPuzzlePiece,cubes:faCubes,archive:faArchive,database:faDatabase,network:faNetworkWired,calendar:faCalendarAlt,history:faHistory,grid:faThLarge,user:faUser,key:faKey,terminal:faTerminal,activity:faHeartbeat,chevron:faChevronRight,down:faChevronDown,globe:faGlobe,help:faLifeRing,palette:faPalette,sun:faSun,moon:faMoon,brush:faPaintBrush,logout:faSignOutAlt,search:faSearch,plus:faPlus,controls:faSlidersH,server:faServer,info:faInfoCircle,close:faTimes,check:faCheck,menu:faBars,list:faList,external:faExternalLinkAlt,discord:faComments,brand:faIdCard,type:faFont,language:faLanguage,shapes:faShapes,surface:faClone,layout:faColumns,code:faCode,motion:faWind};
+export default function DashboardIcon({ name, className = '', family }: { name: DashboardIconName; className?: string; family?: string }) {
+    const design = useDesign();
+    if ((family || design.options.icon_family) === 'solid') return <FontAwesomeIcon className={`vinus-interface-icon ${className}`} icon={solidIcons[name]} fixedWidth aria-hidden="true" />;
+    const nodes = (iconFamilies[family || design.options.icon_family] || (!Object.prototype.hasOwnProperty.call(paths,name) ? iconFamilies.lucide : undefined))?.[name];
+    if (nodes) return <svg className={`vinus-interface-icon ${className}`} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{nodes.map(([tag,attrs],i)=>React.createElement(tag,{...attrs,key:i}))}</svg>;
+    return <svg className={`vinus-interface-icon ${className}`} width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name as keyof typeof paths]} /></svg>;
 }

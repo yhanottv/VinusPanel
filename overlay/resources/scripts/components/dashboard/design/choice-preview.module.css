@@ -1,0 +1,39 @@
+.canvas,.sample { --mini-accent:#ff9b52; --mini-ink:#0b0e13; display:flex; width:100%; height:76px; overflow:hidden; align-items:center; justify-content:center; background:#0a0d12; border-radius:7px; color:#303640; }
+.canvas svg { width:100%; height:100%; }
+.sample { flex-direction:column; gap:3px; color:#c4ccd8; }
+.sample strong { font-size:25px; font-weight:500; }.sample small { font-size:10px; color:#758090; }
+.icons { flex-direction:row; gap:14px; }.icons svg { width:23px; height:23px; }
+.icons[data-corners='sharp'] svg { stroke-linecap:square; stroke-linejoin:miter; }
+.dim { opacity:.28; }
+.alignment>rect:first-child { fill:#151a22; }
+.link>rect { opacity:.13; }.link[data-variant='pill']>rect { opacity:.35; }.link[data-variant='solid']>rect { opacity:.6; }
+.link[data-variant='glow']>rect { stroke:var(--mini-accent); stroke-width:1px; filter:drop-shadow(0 0 4px #ff9b5266); }
+.link[data-variant='underline']>rect,.link[data-variant='dot']>rect { opacity:0; }
+.link[data-variant='fade']>rect { opacity:.08; }
+.border>rect:first-child,.shadow>rect:first-child,.search>rect,.form>rect:first-child,.loginSurface>rect:first-child { fill:#151a22; }
+.border[data-variant='subtle']>rect:first-child { stroke:#ffffff25; }.border[data-variant='strong']>rect:first-child { stroke:#ffffff88; stroke-width:2; }.border[data-variant='accent']>rect:first-child { stroke:var(--mini-accent); }
+.shadow[data-variant='soft'] { filter:drop-shadow(0 4px 3px #0009); }.shadow[data-variant='deep'] { filter:drop-shadow(0 9px 6px #000); }
+.loginSurface[data-variant='none']>rect:first-child { fill:none; }.loginSurface[data-variant='glass']>rect:first-child { fill:#a6b5ce20; stroke:#ffffff25; }.loginSurface[data-variant='outline']>rect:first-child { fill:none; stroke:var(--mini-accent); }.loginSurface[data-variant='raised'] { filter:drop-shadow(0 7px 5px #000); }
+.backdrop { fill:#10141b; }.backdrop[data-variant='gradient'] { fill:#704e3c; }.backdrop[data-variant='aurora'] { fill:#5a43354d; filter:drop-shadow(15px 8px 13px #ff9b52); }.backdrop[data-variant='image'] { fill:#1e3036; }
+.notice>rect:first-child { fill:#ff9b5220; }.notice[data-variant='outline']>rect:first-child { fill:none; stroke:var(--mini-accent); }.notice[data-variant='plain']>rect:first-child { fill:#151a22; }.notice[data-variant='edge']>rect:first-child { fill:#151a22; }
+.power[data-variant='status']>g:nth-child(1)>rect { fill:#50c796; }.power[data-variant='status']>g:nth-child(2)>rect { fill:#e2b860; }.power[data-variant='status']>g:nth-child(3)>rect { fill:#e56c78; }.power[data-variant='outline']>g>rect { fill:none; stroke:var(--mini-accent); }.power[data-variant='outline'] path { stroke:var(--mini-accent); }
+.pageMotion,.buttonMotion { transform-box:fill-box; transform-origin:center; }
+/* Run once on selection, then again on hover or keyboard focus. */
+.pageMotion[data-motion='fade'] { animation:fade var(--demo-duration) both; }
+.pageMotion[data-motion='rise'] { animation:rise var(--demo-duration) both; }
+.pageMotion[data-motion='slide'] { animation:slide var(--demo-duration) both; }
+.pageMotion[data-motion='scale'] { animation:scale var(--demo-duration) both; }
+.buttonMotion[data-motion='press'] { animation:press var(--demo-duration) 2 alternate; }
+.buttonMotion[data-motion='lift'] { animation:lift var(--demo-duration) 2 alternate; }
+.buttonMotion[data-motion='grow'] { animation:grow var(--demo-duration) 2 alternate; }
+.buttonMotion[data-motion='glint'] { animation:glint var(--demo-duration) 2 alternate; }
+.buttonMotion[data-motion='pulse'] { animation:pulse calc(var(--demo-duration) * 2) 2 alternate; }
+:global(button:is(:hover,:focus-visible)) :is(.pageMotion,.buttonMotion):not([data-motion='none']) { animation-iteration-count:infinite; animation-direction:alternate; animation-delay:180ms; }
+@keyframes fade { from { opacity:0 } to { opacity:1 } }
+@keyframes rise { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:none } }
+@keyframes slide { from { opacity:0; transform:translateX(18px) } to { opacity:1; transform:none } }
+@keyframes scale { from { opacity:0; transform:scale(.8) } to { opacity:1; transform:none } }
+@keyframes press { to { transform:scale(.92) } } @keyframes lift { to { transform:translateY(-5px) } }
+@keyframes grow { to { transform:scale(1.08) } } @keyframes glint { to { filter:brightness(1.5) } }
+@keyframes pulse { to { filter:drop-shadow(0 0 6px #ff9b5299) } }
+@media(prefers-reduced-motion:reduce) { .canvas * { animation:none!important; transition:none!important; } }

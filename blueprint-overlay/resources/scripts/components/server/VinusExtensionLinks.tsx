@@ -9,6 +9,10 @@ import http from '@/api/http';
 import dash from '@/components/dashboard/dashboard.module.css';
 import routes from '@blueprint/extends/routers/routes';
 
+// The catalog is already embedded in the Mods/Plugins tools. Keep its route
+// registered for those pages, but do not add a duplicate sidebar destination.
+const extensionRoutes = routes.server.filter(route => !(route.identifier === 'vinuscatalog' && route.path === '/vinus-catalog'));
+
 export default () => {
   const match = useRouteMatch();
   const admin = useStoreState((state) => state.user.data!.rootAdmin);
@@ -17,7 +21,7 @@ export default () => {
   useEffect(() => {
     let active = true;
     Promise.all(
-      [...new Set(routes.server.map((route) => route.identifier))].map(async (id) => {
+      [...new Set(extensionRoutes.map((route) => route.identifier))].map(async (id) => {
         const { data } = await http.get('/api/client/extensions/blueprint/eggs', { params: { id } });
         return [id, data.map(String)] as const;
       })
@@ -32,16 +36,16 @@ export default () => {
       active = false;
     };
   }, []);
-  return (
-    <div><p className={dash.sectionToggle}>EXTENSIONS</p><div>
-      {routes.server
-        .filter(
+  const visibleRoutes = extensionRoutes.filter(
           (route) =>
             route.name &&
             (!route.adminOnly || admin) &&
             (allowed[route.identifier]?.includes('-1') || allowed[route.identifier]?.includes(String(egg)))
-        )
-        .map((route) => {
+        );
+  if (!visibleRoutes.length) return null;
+  return (
+    <div><p className={dash.sectionToggle}>EXTENSIONS</p><div>
+      {visibleRoutes.map((route) => {
           const link = (
             <NavLink to={`${match.url.replace(/\/$/, '')}/${route.path.replace(/^\//, '')}`} exact={route.exact}>
               <FontAwesomeIcon icon={faPuzzlePiece} fixedWidth />

@@ -1,8 +1,10 @@
-export type PanelLanguage = 'fr' | 'en';
+import { vinusDesign } from '@/vinusDesign';
+import { languages, PanelLanguage } from './languages';
+export type { PanelLanguage } from './languages';
 export const LANGUAGE_STORAGE_KEY = 'vinus:language';
 
 export function validLanguage(value: string | null | undefined): PanelLanguage | null {
-    return value === 'fr' || value === 'en' ? value : null;
+    return languages.some(language => language.code === value) ? value as PanelLanguage : null;
 }
 
 export function readLanguage(): PanelLanguage {
@@ -10,14 +12,14 @@ export function readLanguage(): PanelLanguage {
     const requested = validLanguage(new URL(window.location.href).searchParams.get('lang'));
     if (requested) return requested;
     try {
-        return validLanguage(window.localStorage.getItem(LANGUAGE_STORAGE_KEY)) || 'fr';
+        return validLanguage(window.localStorage.getItem(LANGUAGE_STORAGE_KEY)) || validLanguage(vinusDesign.options.default_language) || 'fr';
     } catch {
         return 'fr';
     }
 }
 
 export const panelLanguage = readLanguage();
-export const formatLocale = panelLanguage === 'fr' ? 'fr-FR' : 'en-US';
+export const formatLocale = languages.find(language => language.code === panelLanguage)!.locale;
 
 // A navigation also refreshes module-level labels, form schemas and the terminal.
 // The URL fallback keeps switching usable when browser storage is disabled.

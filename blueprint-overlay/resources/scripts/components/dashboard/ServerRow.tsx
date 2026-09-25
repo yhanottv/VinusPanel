@@ -58,16 +58,16 @@ export default function ServerRow({ server, view = 'list', className = '', onSta
     };
     const statusLabel = server.isTransferring ? vt('Transfert') : server.status === 'installing' ? vt('Installation')
         : server.status === 'restoring_backup' ? vt('Restauration') : labels[status];
-    const statusColor = status === 'running' ? '#43d6a3' : status === 'offline' || status === 'loading' ? '#8793a6'
-        : status === 'unavailable' || status === 'suspended' ? '#fb7185' : '#fbbf24';
+    const statusColor = status === 'running' ? 'var(--vinus-success)' : status === 'offline' || status === 'loading' ? '#8793a6'
+        : status === 'unavailable' || status === 'suspended' ? 'var(--vinus-danger)' : 'var(--vinus-warning)';
     useEffect(() => { onStatusChange?.(server.uuid, status); }, [server.uuid, status, onStatusChange]);
 
     const appearance = design ? (design.servers[server.uuid] || {}) : serverDesign(server.uuid);
     const baseColor = design?.server_card || vinusDesign.server_card;
-    const customColor = appearance.color || (baseColor !== vinusDesign.server_card ? baseColor : 'var(--dash-surface, ' + baseColor + ')');
+    const customColor = appearance.color || baseColor;
     const rowStyle = {
         '--status-color': statusColor,
-        '--row-background': appearance.banner
+        '--row-background': (design || vinusDesign).options.row_artwork && appearance.banner
             ? `linear-gradient(90deg, rgba(9,12,17,.88), rgba(9,12,17,.76)), url(${JSON.stringify(appearance.banner)}) center / cover, ${customColor}`
             : customColor,
     } as React.CSSProperties;

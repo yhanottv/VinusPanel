@@ -1,3 +1,4 @@
+import MessageBox from '@/components/MessageBox';
 import React, { useEffect, useState } from 'react';
 import { Link, Prompt } from 'react-router-dom';
 import { ServerContext } from '@/state/server';
@@ -77,7 +78,7 @@ export default function ServerProperties() {
             <Link className={styles.action} to={`/server/${server.id}/files/edit#/server.properties`}>{vt('Éditeur de fichier')}</Link>
             {canUpdate && <button className={styles.action} type="button" disabled={!dirty || busy} onClick={save}>{busy ? vt('Enregistrement…') : vt('Enregistrer')}</button>}
         </div></div>
-        {error && <div role="alert" className={styles.error}>{error}</div>}
+        {error && <MessageBox type="error" dismissible key={error}>{error}</MessageBox>}
         {saved && <p role="status" className={styles.note}>{vt('Propriétés enregistrées. Redémarrez le serveur pour les appliquer.')}</p>}
         {source === null && !error && <p role="status">{vt('Chargement…')}</p>}
         {source !== null && <>

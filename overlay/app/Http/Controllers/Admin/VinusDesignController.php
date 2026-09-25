@@ -29,6 +29,9 @@ class VinusDesignController extends Controller
     public function update(Request $request): RedirectResponse|JsonResponse
     {
         $input = $request->validate([
+            'option_images' => ['nullable', 'array:logo_light,logo_square,favicon,social_image'],
+            'option_images.*' => ['file','mimes:png,jpg,jpeg,webp','max:4096'],
+            'studio' => ['nullable', 'json', 'max:100000'],
             'brand_name' => ['required', 'string', 'max:40'],
             'accent' => ['required', 'regex:/^#[0-9a-fA-F]{6}$/'],
             'background' => ['required', 'regex:/^#[0-9a-fA-F]{6}$/'],
@@ -41,7 +44,9 @@ class VinusDesignController extends Controller
             'remove_background' => ['nullable', 'boolean'],
         ]);
 
+        $studio = isset($input['studio']) ? VinusDesign::validateStudio(json_decode($input['studio'], true, 512, JSON_THROW_ON_ERROR)) : null;
         $design = VinusDesign::read();
+        if ($studio) $design = array_replace($design, $studio);
         foreach (['brand_name', 'accent', 'background', 'surface', 'server_card', 'text'] as $key) {
             $design[$key] = trim($input[$key]);
         }
@@ -59,6 +64,9 @@ class VinusDesignController extends Controller
             $design['background_image'] = $this->saveImage($request->file('background_file'));
         }
 
+        foreach ($request->file('option_images', []) as $key => $image) {
+            $design['options'][$key] = $this->saveImage($image);
+        }
         VinusDesign::write($design);
         if ($request->expectsJson()) {
             return response()->json(['design' => VinusDesign::read()]);

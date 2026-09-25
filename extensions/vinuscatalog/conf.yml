@@ -2,7 +2,7 @@ info:
   name: 'Vinus Catalog'
   identifier: 'vinuscatalog'
   description: 'Minecraft catalogs, software, modpacks, worlds and BlueMap tools.'
-  version: '1.3.0'
+  version: '1.4.0'
   target: 'beta-2026-06'
   flags: 'ignorePlaceholders'
   author: 'yhanottv'

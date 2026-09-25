@@ -1,0 +1,16 @@
+.root { position:relative; color:var(--dash-text,var(--vinus-text,#e2e8f0)); flex:none; }
+.trigger { display:flex; align-items:center; gap:9px; min-height:40px; padding:9px 12px; border:1px solid transparent; border-radius:24px; background:var(--dash-raised,var(--vinus-raised,#191e27)); color:inherit; font-size:12px; cursor:pointer; }
+.trigger:hover,.trigger[aria-expanded='true'] { border-color:var(--dash-accent,var(--vinus-accent,#ff9b52)); }
+.flag { display:block; width:22px; height:15px; border-radius:3px; overflow:hidden; flex:none; box-shadow:0 0 0 1px #80808025; }
+.chevron { width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:1.5; transition:transform .15s; }
+.trigger[aria-expanded='true'] .chevron { transform:rotate(180deg); }
+.menu { position:absolute; z-index:100; inset-inline-end:0; top:calc(100% + 8px); width:240px; max-width:calc(100vw - 32px); max-height:min(420px,65dvh); overflow:auto; overscroll-behavior:contain; padding:7px; border:1px solid #80808035; border-radius:14px; background:var(--dash-surface,var(--vinus-surface,#101319)); box-shadow:0 14px 40px #0006; }
+.heading { margin:3px 9px 8px; color:var(--dash-muted,var(--vinus-muted,#94a3b8)); font-size:11px; }
+.menu button { display:flex; align-items:center; gap:11px; width:100%; min-height:42px; padding:9px; border-radius:8px; background:transparent; color:inherit; text-align:start; font-size:13px; cursor:pointer; }
+.menu button small { margin-inline-start:auto; color:var(--dash-muted,var(--vinus-muted,#94a3b8)); font-size:10px; }
+.menu button:hover,.menu button:focus-visible { background:#80808020; }
+.menu button[aria-checked='true'] { background:rgba(var(--dash-accent-rgb,var(--vinus-accent-rgb,255,155,82)),.13); }
+.check { width:12px; color:var(--dash-accent,var(--vinus-accent,#ff9b52)); }
+.trigger:focus-visible,.menu button:focus-visible { outline:2px solid var(--dash-accent,var(--vinus-accent,#ff9b52)); outline-offset:2px; }
+:global(html[data-vinus-language-picker='false']) .root { display:none; }
+@media (prefers-reduced-motion:reduce) { .chevron { transition:none; } }

@@ -24,9 +24,13 @@
 
 </div>
 
+[Complete documentation on GitBook](https://vinuspanel.gitbook.io/vinuspanel-docs/) — installation, Design Studio, Minecraft tools, player companions, administration and troubleshooting. The documentation identifies development-branch features separately from older releases. [Markdown sources](docs/gitbook/README.md).
+
 VinusPanel gives self-hosted game server panels a consistent black-and-orange interface, from the server dashboard to the console, files and account pages. Liquid Glass is limited to navigation, leaving logs and resource data on stable, readable backgrounds.
 
 This repository contains a **theme overlay and installation tools**, not a complete Pterodactyl distribution. You need an existing Pterodactyl panel. The theme can manage servers for other games; only the optional catalog is Minecraft-specific.
+
+The development branch also includes a redesigned account Overview and administration area. Account pictures use the existing browser-local profile storage and do not synchronize between devices. Administration keeps Pterodactyl's original forms, permissions and actions, with searchable navigation, responsive tables and a new overview. Navigation and overview labels support French and English; upstream form text retains its original language.
 
 > **French / English:** use the language selector on the sign-in screen or at the top of client pages. VinusPanel labels and catalog controls are available in both languages. Switching reloads the current page; save any edits first. Your preference is stored in this browser, with a `?lang=fr` / `?lang=en` fallback when storage is unavailable. Server content, game logs, provider errors, original upstream screens and third-party extensions keep their own language; this is not a translation of the legacy administration area.
 
@@ -295,6 +299,10 @@ VinusPanel/
 ├── README.fr.md              # French documentation
 └── CHANGELOG.md               # Version history
 ```
+
+## Minecraft players
+
+The player workspace supports read-only inventories and an optional companion for live controls. See [installation, supported servers and limitations](docs/PLAYERS.md).
 
 ## 📄 License and credits
 

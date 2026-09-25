@@ -1,11 +1,10 @@
-import { panelLanguage } from '@/locales/preferences';
 import { vt } from '@/locales/translate';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Tooltip from '@/components/elements/tooltip/Tooltip';
 import Translate from '@/components/elements/Translate';
 import { format, formatDistanceToNowStrict } from 'date-fns';
-import { fr, enUS } from 'date-fns/locale';
+import { dateLocale } from '@/locales/dates';
 import { ActivityLog } from '@definitions/user';
 import ActivityLogMetaButton from '@/components/elements/activity/ActivityLogMetaButton';
 import classNames from 'classnames';
@@ -70,10 +69,10 @@ export default ({ activity, children }: Props) => {
                     </div>
                     <Tooltip
                         placement={'left'}
-                        content={format(activity.timestamp, (panelLanguage === 'fr' ? "dd MMMM yyyy 'à' HH:mm:ss" : "MMM dd yyyy 'at' HH:mm:ss"), { locale: panelLanguage === 'fr' ? fr : enUS })}
+                        content={format(activity.timestamp, 'PPpp', { locale: dateLocale })}
                     >
                         <time className={style.event_time}>
-                            {formatDistanceToNowStrict(activity.timestamp, { addSuffix: true, locale: panelLanguage === 'fr' ? fr : enUS })}
+                            {formatDistanceToNowStrict(activity.timestamp, { addSuffix: true, locale: dateLocale })}
                         </time>
                     </Tooltip>
                 </div>

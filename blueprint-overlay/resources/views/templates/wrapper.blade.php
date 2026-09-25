@@ -20,8 +20,10 @@
             <meta content="width=device-width, initial-scale=1" name="viewport">
             <meta name="csrf-token" content="{{ csrf_token() }}">
             <meta name="robots" content="noindex">
+            <meta name="description" content="{{ $vinusDesign['options']['description'] ?? '' }}">
+            @if(!empty($vinusDesign['options']['social_image']))<meta property="og:image" content="{{ $vinusDesign['options']['social_image'] }}">@endif
             <link rel="apple-touch-icon" href="{{ $vinusDesign['logo'] }}">
-            <link rel="icon" href="{{ $vinusDesign['logo'] }}">
+            <link rel="icon" href="{{ $vinusDesign['options']['favicon'] ?: $vinusDesign['logo'] }}">
             <link rel="manifest" href="/favicons/manifest.json">
             <link rel="mask-icon" href="/favicons/safari-pinned-tab.svg" color="#bc6e3c">
             <link rel="shortcut icon" href="/favicons/favicon.ico">
