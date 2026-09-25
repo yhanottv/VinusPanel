@@ -73,3 +73,9 @@ it('keeps the dialog visible if dismissal cannot be saved',async()=>{
  mockPost.mockRejectedValueOnce(new Error('Network unavailable'));fireEvent.click(screen.getByRole('button',{name:'Plus tard'}));
  await screen.findByText('Request failed');expect(screen.getByRole('dialog')).toBeTruthy();expect(pendingCompanion('user','server')).not.toBeNull();
 });
+
+it('forgets a server reminder dismissed on another device before the next start',async()=>{
+ const token=`${Date.now()}:${'a'.repeat(32)}`;queueCompanion('user','server',token);
+ mockGet.mockResolvedValue({data:{pending:null}});render(<PlayerCompanionPrompt/>);
+ await waitFor(()=>expect(pendingCompanion('user','server')).toBeNull());expect(screen.queryByRole('dialog')).toBeNull();expect(mockPost).not.toHaveBeenCalled();
+});

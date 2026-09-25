@@ -6,7 +6,7 @@ import http, { httpErrorToHuman } from '@/api/http';
 import { designPreview } from '@/designRuntime';
 import { vt } from '@/locales/translate';
 import CompanionChoice, { CompanionOffer } from './CompanionChoice';
-import { activateCompanion, CompanionStage, companionEvent, pendingCompanion, dismissCompanion } from './companionFollowup';
+import { activateCompanion, CompanionStage, companionEvent, pendingCompanion, dismissCompanion, queueCompanion } from './companionFollowup';
 
 export default function PlayerCompanionPrompt() {
     const server = ServerContext.useStoreState(s => s.server.data!);
@@ -21,6 +21,7 @@ export default function PlayerCompanionPrompt() {
     const [stage, setStage] = useState<CompanionStage>('');
     const [result, setResult] = useState('');
     const seen = useRef(''), alive = useRef(true), working = useRef(false);
+    const reminderRead = useRef(0);
     useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
     useEffect(() => {
         const sync = () => setPending(pendingCompanion(user, server.uuid));
@@ -30,12 +31,25 @@ export default function PlayerCompanionPrompt() {
     useEffect(() => {
         if (designPreview || !canRead) return;
         let active = true;
-        const restore = () => http.get(`/api/client/extensions/vinuscatalog/servers/${server.uuid}/players/companion/followup`)
-            .then(({ data }) => { if (active && typeof data.pending === 'string') setPending(data.pending); })
-            .catch(() => { /* The browser reminder remains available if this request fails. */ });
+        const restore = () => {
+            if (working.current) return;
+            const request = ++reminderRead.current;
+            const local = pendingCompanion(user, server.uuid);
+            http.get(`/api/client/extensions/vinuscatalog/servers/${server.uuid}/players/companion/followup`)
+                .then(({ data }) => {
+                    if (!active || request !== reminderRead.current) return;
+                    if (typeof data.pending === 'string') queueCompanion(user, server.uuid, data.pending);
+                    // Clear an acknowledged server token, but preserve a manual/local-only invitation.
+                    else if (data.pending === null && local && /^\d+:[a-zA-Z0-9]{32}$/.test(local)) dismissCompanion(user, server.uuid, local);
+                })
+                .catch(() => { /* The browser reminder remains available if this request fails. */ });
+        };
         restore(); window.addEventListener('focus', restore);
         return () => { active = false; window.removeEventListener('focus', restore); };
     }, [user, server.uuid, status, canRead]);
+    useEffect(() => {
+        if (!pending && !working.current && !result) setOpen(false);
+    }, [pending, result]);
     useEffect(() => {
         if (designPreview || !pending || status !== 'running' || seen.current === pending) return;
         seen.current = pending; setOpen(true); setOffer(null); setError(''); setStage(''); setResult('');
@@ -50,6 +64,7 @@ export default function PlayerCompanionPrompt() {
     }, [open, pending, server.uuid]);
     const acknowledge = async () => {
         if (!pending) return;
+        ++reminderRead.current;
         await http.post(`/api/client/extensions/vinuscatalog/servers/${server.uuid}/players/companion/followup/dismiss`, { token: pending });
         dismissCompanion(user, server.uuid, pending);
     };
