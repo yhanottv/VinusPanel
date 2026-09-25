@@ -35,4 +35,4 @@ Les réglages globaux sont stockés dans `storage/app/vinuspanel/design.json`, l
 
 Les options du studio s’appliquent sans rebuild. Modifier le code dans `overlay/resources/scripts` exige de recompiler/réinstaller. Les modules absents ne sont pas annoncés comme déjà installés.
 
-[Guide technique](https://github.com/yhanottv/VinusPanel/blob/codex/live-design-studio/docs/live-design-studio.md) · [Sommaire](Home)
+[Guide technique](https://github.com/yhanottv/VinusPanel/blob/codex/live-design-studio/docs/live-design-studio.md) · [Sommaire](README.md)

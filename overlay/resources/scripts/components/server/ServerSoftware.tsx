@@ -77,12 +77,13 @@ export default function ServerSoftware() {
         setBusy(true); setError(''); setMessage('');
         try {
             const { data } = await http.post(`${endpoint}/install`, { token: plan.token, install_players: false }, { timeout: 660000 });
-            if (operation.current()) { queueCompanion(user, server.uuid); setMessage(data.message); setBackup(data.backup); setPlan(null); setSelected(''); await refreshServer(server.id); }
+            if (operation.current()) { queueCompanion(user, server.uuid, data.companion_followup); setMessage(data.message); setBackup(data.backup); setPlan(null); setSelected(''); await refreshServer(server.id); }
         } catch (e) { if (operation.current()) { setError(httpErrorToHuman(e)); setPlan(null); } } finally { operation.reconnect(); if (operation.current()) setBusy(false); }
     };
     return <PageContentBlock title={`${server.name} | Version`} className={styles.page}>
         <header className={styles.heading}><div><h2>{vt('Version du serveur')}</h2><p>{vt('Choisissez votre logiciel, sa version et le build à installer.')}</p></div><span className={styles.current}><SoftwareIcon software={server.softwareProfile?.software} size={24} />{softwareName(server.softwareProfile?.software)} · {server.softwareProfile?.game_version || '—'}</span></header>
         <div className={styles.warning}>{vt('Un changement de logiciel peut rendre vos mondes, plugins ou mods incompatibles. Les fichiers remplacés sont conservés dans un dossier de récupération. Créez aussi une sauvegarde de vos mondes avant de changer de version.')}</div>
+        {status === 'running' && <button className={styles.primary} type="button" onClick={() => queueCompanion(user, server.uuid)}>{vt('Découvrir VinusPlayers')}</button>}
         {error && !selected && <MessageBox type="error" dismissible key={error}>{error}</MessageBox>}
         {message && <div className={styles.success} role="status">{message}{backup && <Link to={`/server/${server.id}/files#/${backup}`}>{vt('Ouvrir les fichiers de récupération')} ↗</Link>}</div>}
         <input className={styles.search} value={query} onChange={e => setQuery(e.target.value)} placeholder={vt('Rechercher un logiciel…')} aria-label={vt('Rechercher un logiciel…')} />

@@ -22,4 +22,4 @@ En cas d’erreur, comparer loader, Minecraft, Java et dépendances exigées par
 
 CurseForge exige la clé privée de l’administrateur et ne donne pas accès aux ressources payantes/privées. VinusPanel ne contourne pas les restrictions de téléchargement.
 
-[Sommaire](Home)
+[Sommaire](README.md)

@@ -13,6 +13,7 @@ export default function PlayerCompanionPrompt() {
     const status = ServerContext.useStoreState(s => s.status.value);
     const user = useStoreState(s => s.user.data!.uuid);
     const canPower = usePermissions(['control.start', 'control.stop']).every(Boolean);
+    const canRead = usePermissions(['file.read-content'])[0];
     const [pending, setPending] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
     const [offer, setOffer] = useState<CompanionOffer | null>(null);
@@ -27,6 +28,15 @@ export default function PlayerCompanionPrompt() {
         return () => { window.removeEventListener(companionEvent, sync); window.removeEventListener('storage', sync); };
     }, [user, server.uuid]);
     useEffect(() => {
+        if (designPreview || !canRead) return;
+        let active = true;
+        const restore = () => http.get(`/api/client/extensions/vinuscatalog/servers/${server.uuid}/players/companion/followup`)
+            .then(({ data }) => { if (active && typeof data.pending === 'string') setPending(data.pending); })
+            .catch(() => { /* The browser reminder remains available if this request fails. */ });
+        restore(); window.addEventListener('focus', restore);
+        return () => { active = false; window.removeEventListener('focus', restore); };
+    }, [user, server.uuid, status, canRead]);
+    useEffect(() => {
         if (designPreview || !pending || status !== 'running' || seen.current === pending) return;
         seen.current = pending; setOpen(true); setOffer(null); setError(''); setStage(''); setResult('');
     }, [pending, status, server.uuid]);
@@ -38,17 +48,24 @@ export default function PlayerCompanionPrompt() {
             .catch(e => { if (active) setError(httpErrorToHuman(e)); });
         return () => { active = false; };
     }, [open, pending, server.uuid]);
-    const close = () => {
+    const acknowledge = async () => {
+        if (!pending) return;
+        await http.post(`/api/client/extensions/vinuscatalog/servers/${server.uuid}/players/companion/followup/dismiss`, { token: pending });
+        dismissCompanion(user, server.uuid, pending);
+    };
+    const close = async () => {
         if (working.current) return;
-        if (pending) dismissCompanion(user, server.uuid, pending);
-        setOpen(false);
+        working.current = true;
+        try { await acknowledge(); if (alive.current) { setPending(null); setOpen(false); } }
+        catch (e) { if (alive.current) setError(httpErrorToHuman(e)); }
+        finally { working.current = false; }
     };
     const install = async () => {
         if (working.current || !offer?.supported || !offer.can_install || !canPower || designPreview) return;
         working.current = true; setError('');
         try {
             const outcome = await activateCompanion(server.uuid, value => { if (alive.current) setStage(value); });
-            if (pending) dismissCompanion(user, server.uuid, pending);
+            await acknowledge();
             if (alive.current) setResult(outcome);
         } catch (e) {
             if (alive.current) setError(e instanceof Error && e.message.startsWith('companion_')

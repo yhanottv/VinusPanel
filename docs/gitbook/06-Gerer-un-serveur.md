@@ -24,4 +24,4 @@ Un sous-utilisateur reçoit seulement les permissions nécessaires à sa tâche.
 
 Les variables de démarrage restent liées à l’egg et au logiciel. Changer Java ou le JAR sans vérifier les fichiers peut empêcher le démarrage. Les traitements et validations Pterodactyl restent en place derrière l’interface.
 
-[Sommaire](Home) · [Versions et modpacks](07-Versions-et-Modpacks)
+[Sommaire](README.md) · [Versions et modpacks](07-Versions-et-Modpacks.md)

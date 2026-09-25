@@ -1,5 +1,6 @@
 // VinusPanel UI translations. Server content and logs are never translated.
 export default {
+    "Découvrir VinusPlayers": "Discover VinusPlayers",
     "Informations sur les joueurs": "Player information",
     "La liaison VinusPlayers transmet au panel les joueurs connectés, leur inventaire, leur vie, leur nourriture et leur expérience en direct.": "The VinusPlayers bridge sends online players, inventory, health, food and experience to the panel in real time.",
     "Cette version utilise un mod serveur en lecture seule. Les joueurs n’ont rien à installer sur leur ordinateur.": "This version uses a read-only server mod. Players do not need to install anything on their computer.",

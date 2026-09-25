@@ -64,6 +64,18 @@ final class PlayerController extends Controller
         foreach (['file.create', 'file.update'] as $permission) abort_unless($request->user()->can($permission, $server), 403);
         return app(PlayerCompanion::class)->install($server);
     }
+    public function followup(Request $request, Server $server): array
+    {
+        abort_unless($request->user()->can('file.read-content', $server), 403);
+        return ['pending' => CompanionReminder::pending($request->user()->id, $server->uuid)];
+    }
+    public function dismissFollowup(Request $request, Server $server): array
+    {
+        abort_unless($request->user()->can('file.read-content', $server), 403);
+        $data = $request->validate(['token' => 'required|string|max:100']);
+        CompanionReminder::dismiss($request->user()->id, $server->uuid, $data['token']);
+        return ['dismissed' => true];
+    }
     public static function command(string $action,string $uuid,string $request,mixed $value): string
     {
         abort_unless(PlayerFiles::uuid($uuid)&&preg_match('/^[a-f0-9]{32}$/D',$request),422,'Identifiant invalide.');

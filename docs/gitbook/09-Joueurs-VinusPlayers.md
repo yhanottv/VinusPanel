@@ -46,4 +46,4 @@ python3 scripts/fetch-player-textures.py /var/www/pterodactyl/public/assets/imag
 
 Le script utilise le client officiel et vérifie ses empreintes. Garder les crédits générés. Les modèles ItemsAdder/textures moddés ne sont pas inclus. Les skins passent par les services Mojang et le cache du panel ; les UUID hors ligne peuvent ne pas avoir de skin officiel.
 
-[Guide technique détaillé](https://github.com/yhanottv/VinusPanel/blob/codex/live-design-studio/docs/PLAYERS.md) · [Sommaire](Home)
+[Guide technique détaillé](https://github.com/yhanottv/VinusPanel/blob/codex/live-design-studio/docs/PLAYERS.md) · [Sommaire](README.md)

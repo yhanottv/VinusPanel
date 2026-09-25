@@ -10,7 +10,7 @@
 
 </div>
 
-[Wiki GitHub complet](https://github.com/yhanottv/VinusPanel/wiki) — installation, Design Studio, outils Minecraft, joueurs, administration et dépannage. Le wiki distingue les fonctions de la branche de développement des anciennes versions publiées.
+[Documentation complète — sources GitBook](docs/gitbook/README.md) — installation, Design Studio, outils Minecraft, joueurs, administration et dépannage. La documentation distingue les fonctions de la branche de développement des anciennes versions publiées.
 
 ## Interface
 

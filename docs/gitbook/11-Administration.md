@@ -30,4 +30,4 @@ Un onglet visible ne rend pas un sous-utilisateur administrateur. Les API contr�
 
 Le redesign n’ajoute pas de facturation, de déploiement de machines ou de gestion DNS. Ces fonctions demandent des intégrations distinctes.
 
-[Sommaire](Home)
+[Sommaire](README.md)

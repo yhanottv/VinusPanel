@@ -22,4 +22,4 @@ Si la carte est vide, vérifier le chargement de BlueMap dans la console, les re
 
 Les informations d’instance, mondes et joueurs restent privées. Masquer ces données dans les tickets publics.
 
-[Sommaire](Home)
+[Sommaire](README.md)

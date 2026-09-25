@@ -1,6 +1,6 @@
 # English quick start
 
-This wiki documents the **codex/live-design-studio development branch**, including features not yet included in older archives or main. Detailed chapters are currently in French. The repository also has an [English README](https://github.com/yhanottv/VinusPanel/blob/codex/live-design-studio/README.md) and [player documentation](https://github.com/yhanottv/VinusPanel/blob/codex/live-design-studio/docs/PLAYERS.md).
+This documentation documents the **codex/live-design-studio development branch**, including features not yet included in older archives or main. Detailed chapters are currently in French. The repository also has an [English README](https://github.com/yhanottv/VinusPanel/blob/codex/live-design-studio/README.md) and [player documentation](https://github.com/yhanottv/VinusPanel/blob/codex/live-design-studio/docs/PLAYERS.md).
 
 ## Install
 
@@ -29,4 +29,4 @@ Back up before updating, use `git pull --ff-only`, run the preflight and reinsta
 
 Support reports should contain versions, reproduction steps and redacted logs/screenshots. Never publish credentials, private configuration or player data. No universal compatibility or fifty-player production capacity guarantee is claimed.
 
-[Chapter index](Home)
+[Chapter index](README.md)

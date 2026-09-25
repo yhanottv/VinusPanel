@@ -62,7 +62,7 @@ export default function ServerModpacks() {
         if (!plan || busy || !replace) return; setBusy(true); setModalError(''); setResult(null);
         try {
             const {data} = await http.post(`${endpoint}/install`, { token: plan.token, optional, replace, install_players: false }, { timeout: 660000 });
-            if (operation.current()) { queueCompanion(user, server.uuid); setResult(data); setSelected(null); setPlan(null); await refreshServer(server.id); }
+            if (operation.current()) { queueCompanion(user, server.uuid, data.companion_followup); setResult(data); setSelected(null); setPlan(null); await refreshServer(server.id); }
         } catch (e) { if (operation.current()) { setModalError(httpErrorToHuman(e)); setPlan(null); } } finally { operation.reconnect(); if (operation.current()) setBusy(false); }
     };
     return <PageContentBlock title={`${server.name} | Modpacks`} className={form.page}>

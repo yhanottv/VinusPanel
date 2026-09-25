@@ -9,7 +9,7 @@
 5. Attendre le résultat. Le serveur reste arrêté : le démarrer normalement et consulter la console.
 6. Une fois l’état **En ligne** atteint, une fenêtre distincte présente VinusPlayers.
 
-La confirmation de Minecraft ne demande plus de choisir immédiatement la liaison. La proposition est mémorisée pour ce compte/serveur dans ce navigateur pendant sept jours. Elle peut apparaître après une navigation ou un rechargement. Si le stockage est bloqué, seule la session courante la conserve.
+La confirmation de Minecraft ne demande plus de choisir immédiatement la liaison. La proposition est mémorisée pendant sept jours dans le cache du panel pour le compte ayant installé la version et pour ce serveur. Elle est retrouvée après rechargement, changement d’état du serveur ou retour sur la fenêtre, y compris depuis un autre appareil avec le même compte. Le navigateur conserve aussi un rappel de secours. Une purge du cache du panel peut effacer son rappel. Les installations antérieures à cette mise à jour ne créent pas de rappel rétroactif. Serveur en ligne, le bouton **Découvrir VinusPlayers** de la page Version permet de rouvrir la présentation sans réinstaller Minecraft.
 
 ## Proposition après démarrage
 
@@ -27,4 +27,4 @@ Examiner la publication, les fichiers requis/optionnels et les fichiers exclus c
 
 Forge 1.20.1 dans le catalogue ne signifie pas que tous ses builds sont vérifiés pour VinusPlayers. La liaison Forge actuelle cible **47.3.0**. Un autre build peut être utilisé sans liaison ; l’absence de combinaison vérifiée est expliquée. Consulter la matrice du chapitre suivant avant de choisir.
 
-[Sommaire](Home) · [Joueurs et compatibilité](09-Joueurs-VinusPlayers)
+[Sommaire](README.md) · [Joueurs et compatibilité](09-Joueurs-VinusPlayers.md)

@@ -24,4 +24,4 @@ Les descriptions avancées non traduites peuvent utiliser l’anglais. Les journ
 
 Lire le contexte et l’éventuelle référence de diagnostic. Réessayer convient à une connexion temporairement interrompue. Après l’expiration d’une installation longue, vérifier d’abord l’état et les fichiers avant de relancer. Fermer une notification ne corrige pas sa cause.
 
-[Sommaire](Home) · [Design Studio](05-Design-Studio)
+[Sommaire](README.md) · [Design Studio](05-Design-Studio.md)

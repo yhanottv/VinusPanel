@@ -29,4 +29,4 @@ Les autres versions, forks et extensions ne sont pas automatiquement certifiés.
 
 La licence du code VinusPanel est MIT. Les licences des composants tiers sont conservées dans le dépôt. Les images Minecraft conservent leurs droits propres. Les modules absents du projet ne deviennent pas disponibles par une simple option visuelle.
 
-[Sommaire](Home) · [Installation](02-Installation)
+[Sommaire](README.md) · [Installation](02-Installation.md)

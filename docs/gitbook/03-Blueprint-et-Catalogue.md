@@ -40,4 +40,4 @@ php artisan config:clear
 
 Si une catégorie manque, vérifier Blueprint, l’extension, les permissions, la détection du logiciel et la version exacte. Les proxys et Vanilla n’offrent pas les mêmes outils que les serveurs moddés.
 
-[Guide technique de l’extension](https://github.com/yhanottv/VinusPanel/blob/codex/live-design-studio/extensions/vinuscatalog/README.md) · [Sommaire](Home)
+[Guide technique de l’extension](https://github.com/yhanottv/VinusPanel/blob/codex/live-design-studio/extensions/vinuscatalog/README.md) · [Sommaire](README.md)

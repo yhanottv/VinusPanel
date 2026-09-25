@@ -42,4 +42,4 @@ Ne pas interrompre la compilation ni lancer deux installations en parallèle. Le
 
 Une installation complète sur un panel entièrement neuf n’est pas une validation acquise du projet : les tests incluent des builds isolés et un panel existant. Prévoir une première installation sur un environnement de test.
 
-[Sommaire](Home) · [Blueprint et catalogue](03-Blueprint-et-Catalogue)
+[Sommaire](README.md) · [Blueprint et catalogue](03-Blueprint-et-Catalogue.md)

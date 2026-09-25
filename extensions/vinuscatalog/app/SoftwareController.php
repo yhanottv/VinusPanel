@@ -64,6 +64,7 @@ final class SoftwareController extends Controller
             $server->validateCurrentState();
             Cache::forget('vinussoftware:plan:'.$token);
             $result = $this->installer->install($server, $saved['plan']);
+            if (!$accepted) $result['companion_followup'] = CompanionReminder::queue($request->user()->id, $server->uuid);
         } finally { $lock->release(); }
         $result['companion'] = app(PlayerCompanion::class)->automatic($server->fresh(), $accepted);
         return $result;

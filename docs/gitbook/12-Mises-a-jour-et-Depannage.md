@@ -51,4 +51,4 @@ Les données Design et images personnelles restent à sauvegarder séparément. 
 
 Dans une [issue GitHub](https://github.com/yhanottv/VinusPanel/issues), indiquer les versions thème/panel/Blueprint/Minecraft/loader/Java, le navigateur, les étapes, le comportement attendu, l’heure et la référence d’erreur. Expurger les logs et captures. Ne jamais publier mots de passe, tokens, clés, configuration privée ou données de joueurs.
 
-[Sommaire](Home)
+[Sommaire](README.md)

@@ -11,8 +11,8 @@ export function pendingCompanion(user: string, server: string): string | null {
     const timestamp = Number(value?.split(':')[0]);
     return timestamp > 0 && Date.now() - timestamp < 7 * 86400000 ? value : null;
 }
-export function queueCompanion(user: string, server: string) {
-    const key = keyFor(user, server), value = `${Date.now()}:${Math.random().toString(36).slice(2)}`;
+export function queueCompanion(user: string, server: string, token?: string) {
+    const key = keyFor(user, server), value = token || `${Date.now()}:${Math.random().toString(36).slice(2)}`;
     memory.set(key, value);
     try { localStorage.setItem(key, value); } catch (_) { /* Memory fallback. */ }
     window.dispatchEvent(new Event(companionEvent));

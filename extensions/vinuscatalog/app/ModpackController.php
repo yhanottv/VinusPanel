@@ -110,6 +110,7 @@ final class ModpackController extends Controller
             abort_unless($server->startup === $saved['startup'] && $server->image === $saved['image'], 409, 'Le démarrage du serveur a changé.');
             $server->validateCurrentState(); Cache::forget('vinusmodpacks:plan:'.$data['token']);
             $result = $this->installer->install($server, $saved['plan'], $data['optional']);
+            if (!$accepted) $result['companion_followup'] = CompanionReminder::queue($request->user()->id, $server->uuid);
         } finally { $lock->release(); }
         $result['companion'] = app(PlayerCompanion::class)->automatic($server->fresh(), $accepted);
         return $result;

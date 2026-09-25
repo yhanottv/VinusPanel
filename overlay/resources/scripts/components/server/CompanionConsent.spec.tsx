@@ -20,7 +20,7 @@ let offer:any;
 beforeEach(()=>{
  offer={supported:true,can_install:true,kind:'plugin',read_only:false};mockGet.mockReset();mockPost.mockReset();mockRefresh.mockReset();mockRefresh.mockResolvedValue(undefined);mockQueue.mockReset();
  mockGet.mockImplementation((url:string)=>Promise.resolve({data:url.endsWith('/types')?{groups:{recommended:{PAPER:{name:'Paper',description:'Server software'}}}}:url.endsWith('/search')?{hits:[{id:'pack',title:'Test pack',description:'Test',author:'Author',downloads:1,page_url:'https://example.com'}],total:1}:url.endsWith('/builds')?{builds:[{id:1,name:'Build 1'}]}:{versions:[{id:'1.21.1',name:'Release',java:21,channel:'RELEASE',games:['1.21.1'],loaders:['fabric'],published:'2026-01-01'}]}}));
- mockPost.mockImplementation((url:string,payload:any)=>Promise.resolve({data:url.endsWith('/plan')?{token:'a'.repeat(48),java:21,image:'java_21',label:'Build 1',size:1,companion:offer,optional:[],files:1,skipped:0,minecraft:'1.21.1',software:'FABRIC'}:{message:'Software installed',backup:'backup-test',companion:{status:payload.install_players?'installed':'declined'}}}));
+ mockPost.mockImplementation((url:string,payload:any)=>Promise.resolve({data:url.endsWith('/plan')?{token:'a'.repeat(48),java:21,image:'java_21',label:'Build 1',size:1,companion:offer,optional:[],files:1,skipped:0,minecraft:'1.21.1',software:'FABRIC'}:{message:'Software installed',backup:'backup-test',companion_followup:'saved-token',companion:{status:payload.install_players?'installed':'declined'}}}));
 });
 afterEach(cleanup);
 async function prepare(modpack=false){
@@ -34,7 +34,7 @@ it('installs software alone and queues a separate offer only after success',asyn
  await prepare();expect(screen.queryByRole('radio')).toBeNull();expect(mockQueue).not.toHaveBeenCalled();
  fireEvent.click(screen.getByRole('button',{name:'Confirmer l’installation'}));
  await waitFor(()=>expect(mockPost).toHaveBeenLastCalledWith(expect.stringContaining('/install'),{token:'a'.repeat(48),install_players:false},{timeout:660000}));
- await waitFor(()=>expect(mockQueue).toHaveBeenCalledWith('user','test-server'));
+ await waitFor(()=>expect(mockQueue).toHaveBeenCalledWith('user','test-server','saved-token'));
 });
 it('does not offer a companion when the software installation fails',async()=>{
  await prepare();mockPost.mockRejectedValueOnce(new Error('failed'));fireEvent.click(screen.getByRole('button',{name:'Confirmer l’installation'}));
@@ -44,5 +44,5 @@ it('preserves the modpack replacement confirmation and defers the companion',asy
  await prepare(true);const button=screen.getByRole('button',{name:'Remplacer le serveur et installer'}) as HTMLButtonElement;
  expect(button.disabled).toBe(true);fireEvent.click(screen.getByRole('checkbox',{name:'Je confirme le remplacement de ce serveur par ce modpack.'}));fireEvent.click(button);
  await waitFor(()=>expect(mockPost).toHaveBeenLastCalledWith(expect.stringContaining('/install'),expect.objectContaining({install_players:false,replace:true,optional:[]}),expect.anything()));
- await waitFor(()=>expect(mockQueue).toHaveBeenCalledWith('user','test-server'));
+ await waitFor(()=>expect(mockQueue).toHaveBeenCalledWith('user','test-server','saved-token'));
 });

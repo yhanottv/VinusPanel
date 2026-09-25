@@ -1,8 +1,8 @@
-# Développement et entretien du wiki
+# Développement et entretien de la documentation
 
 ## Structure
 
-`overlay/` contient les sources appliquées au panel. `blueprint-overlay/` adapte les intégrations Blueprint. `extensions/vinuscatalog/` contient le catalogue et ses tests. `integrations/` contient les compagnons Bukkit/mods. `docs/wiki/` conserve la copie éditable de ce wiki.
+`overlay/` contient les sources appliquées au panel. `blueprint-overlay/` adapte les intégrations Blueprint. `extensions/vinuscatalog/` contient le catalogue et ses tests. `integrations/` contient les compagnons Bukkit/mods. `docs/gitbook/` conserve la copie éditable de cette documentation.
 
 Reporter les modifications dans les sources plutôt que de modifier seulement la production. Le dépôt n’inclut pas tout Pterodactyl : les builds frontend ont besoin d’un arbre Pterodactyl compatible et de ses dépendances.
 
@@ -28,20 +28,12 @@ Pour une nouvelle combinaison VinusPlayers, construire le JAR, vérifier le char
 
 Ne jamais déposer de configuration d’instance, credentials, snapshots `.vinus/`, mondes ou captures privées. Les captures de documentation doivent utiliser des données de démonstration.
 
-## Publier les pages
+## Publier les pages sur GitBook
 
-Les chapitres vivent dans `docs/wiki/` pour révision et dans le dépôt wiki GitHub pour lecture. Récupérer les changements avant de publier afin de préserver les contributions faites dans l’éditeur web.
+Les chapitres Markdown sont conservés dans `docs/gitbook/` pour révision. Importez ce dossier dans l’espace GitBook de VinusPanel, ou configurez Git Sync sur cette branche et ce dossier. Avec Git Sync, choisissez explicitement la source à conserver lors de la première synchronisation.
 
-```bash
-git clone https://github.com/yhanottv/VinusPanel.wiki.git
-# Copier les pages Markdown vérifiées de docs/wiki/ dans ce checkout.
-cd VinusPanel.wiki
-git diff
-git add '*.md'
-git commit -m "Update documentation"
-git push
-```
+`README.md` est l’accueil et `SUMMARY.md` définit l’ordre des chapitres. Utilisez des liens relatifs vers les fichiers `.md`. Relisez et publiez les modifications dans GitBook après validation.
 
-`Home.md` est l’accueil, `_Sidebar.md` le sommaire et `_Footer.md` les liens de pied de page. Garder les noms stables. Le wiki distingue les versions publiées de la branche de développement et documente les limites vérifiées, sans promesse de compatibilité universelle ou de capacité non mesurée.
+La documentation distingue les versions publiées de la branche de développement et documente les limites vérifiées, sans promesse de compatibilité universelle ou de capacité non mesurée.
 
-[Sommaire](Home)
+[Sommaire](README.md)

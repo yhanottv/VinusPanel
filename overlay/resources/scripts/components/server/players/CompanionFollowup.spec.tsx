@@ -21,10 +21,10 @@ jest.mock('react-router-dom',()=>({Link:({children,...props}:any)=><a {...props}
 beforeEach(()=>{localStorage.clear();mockStatus='offline';mockAllowed=true;mockGet.mockReset();mockPost.mockReset();mockStats.mockReset();mockGet.mockResolvedValue({data:{supported:true,can_install:true,kind:'mod',read_only:true,software:'forge',minecraft:'1.20.1'}});mockPost.mockResolvedValue({data:{status:'installed'}});mockStats.mockResolvedValue({status:'offline'});});
 afterEach(()=>{cleanup();jest.useRealTimers();});
 it('waits for running status and Later never sends a mutation',async()=>{
- queueCompanion('user','server');const view=render(<PlayerCompanionPrompt/>);expect(screen.queryByRole('dialog')).toBeNull();expect(mockGet).not.toHaveBeenCalled();
+ queueCompanion('user','server');const view=render(<PlayerCompanionPrompt/>);expect(screen.queryByRole('dialog')).toBeNull();expect(mockGet.mock.calls.every(c=>c[0].endsWith('/followup'))).toBe(true);
  mockStatus='starting';view.rerender(<PlayerCompanionPrompt/>);expect(screen.queryByRole('dialog')).toBeNull();
  mockStatus='running';view.rerender(<PlayerCompanionPrompt/>);await screen.findByText('Mod compatible',{exact:false});
- fireEvent.click(screen.getByRole('button',{name:'Plus tard'}));expect(pendingCompanion('user','server')).toBeNull();expect(mockPost).not.toHaveBeenCalled();await waitFor(()=>expect(screen.queryByRole('dialog')).toBeNull());
+ fireEvent.click(screen.getByRole('button',{name:'Plus tard'}));await waitFor(()=>expect(screen.queryByRole('dialog')).toBeNull());expect(pendingCompanion('user','server')).toBeNull();expect(mockPost.mock.calls.every(c=>c[0].endsWith('/followup/dismiss'))).toBe(true);
 });
 it('keeps pending offers scoped to the user/server, survives remount and does not clear newer installs',()=>{
  queueCompanion('user','server');const first=pendingCompanion('user','server')!;expect(pendingCompanion('another','server')).toBeNull();expect(pendingCompanion('user','other')).toBeNull();
@@ -59,4 +59,17 @@ it('never force-stops after the shutdown timeout',async()=>{
  await act(async()=>{await Promise.resolve();await Promise.resolve();});
  for(let i=0;i<81;i++)await act(async()=>{jest.advanceTimersByTime(1500);await Promise.resolve();});
  await assertion;expect(mockPost.mock.calls.map(c=>c[1])).toEqual([{signal:'stop'}]);
+});
+
+it('restores a server reminder after browser storage was cleared',async()=>{
+ const token=`${Date.now()}:server-reminder`;
+ mockGet.mockImplementation((url:string)=>Promise.resolve({data:url.endsWith('/followup')?{pending:token}:{supported:true,can_install:true,kind:'mod',read_only:true,software:'forge',minecraft:'1.20.1'}}));
+ mockStatus='running';render(<PlayerCompanionPrompt/>);await screen.findByText('Mod compatible',{exact:false});
+ fireEvent.click(screen.getByRole('button',{name:'Plus tard'}));await waitFor(()=>expect(screen.queryByRole('dialog')).toBeNull());
+ expect(mockPost).toHaveBeenCalledWith('/api/client/extensions/vinuscatalog/servers/server/players/companion/followup/dismiss',{token});
+});
+it('keeps the dialog visible if dismissal cannot be saved',async()=>{
+ mockStatus='running';queueCompanion('user','server');render(<PlayerCompanionPrompt/>);await screen.findByText('Mod compatible',{exact:false});
+ mockPost.mockRejectedValueOnce(new Error('Network unavailable'));fireEvent.click(screen.getByRole('button',{name:'Plus tard'}));
+ await screen.findByText('Request failed');expect(screen.getByRole('dialog')).toBeTruthy();expect(pendingCompanion('user','server')).not.toBeNull();
 });
