@@ -4,7 +4,7 @@
 
 - Persist the post-install VinusPlayers reminder on the panel for seven days, scoped to the installing account and server, so a reload or device change can recover it. Add a Versions-page entry point to reopen the offer.
 - Present an illustrated, animated VinusPlayers offer after a successful Minecraft installation reaches running state. Later keeps Players available; explicit activation gracefully stops, verifies/installs and requests startup, with timeout and existing-file safeguards.
-- Prepare chapter-based GitBook documentation covering installation, daily use, Design Studio, Minecraft, player compatibility, administration and recovery in `docs/gitbook/`, with import-ready navigation and Git Sync configuration.
+- Publish [VinusPanel Docs on GitBook](https://vinuspanel.gitbook.io/vinuspanel-docs/) with 13 French chapters, an English quick start, a welcome page and a contents page. Sources remain in `docs/gitbook/`; Git Sync configuration is provided but automatic synchronization is not connected. The GitHub wiki is disabled.
 - Add account email/key icons and independently accessible password visibility buttons.
 - Add outlined administration icons, a sliding active-navigation marker and reduced-motion-aware entrance/hover effects.
 - Bundle verified Bukkit, Fabric, Forge and NeoForge player companions with exact Minecraft/loader selection, checksum-verified stopped-server installation after explicit consent. Native mods provide read-only live snapshots; Bukkit retains actions. See the supported matrix in `docs/PLAYERS.md`.

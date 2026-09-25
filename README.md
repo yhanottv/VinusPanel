@@ -24,7 +24,7 @@
 
 </div>
 
-[Complete documentation — GitBook source](docs/gitbook/README.md) — installation, Design Studio, Minecraft tools, player companions, administration and troubleshooting. The documentation identifies development-branch features separately from older releases.
+[Complete documentation on GitBook](https://vinuspanel.gitbook.io/vinuspanel-docs/) — installation, Design Studio, Minecraft tools, player companions, administration and troubleshooting. The documentation identifies development-branch features separately from older releases. [Markdown sources](docs/gitbook/README.md).
 
 VinusPanel gives self-hosted game server panels a consistent black-and-orange interface, from the server dashboard to the console, files and account pages. Liquid Glass is limited to navigation, leaving logs and resource data on stable, readable backgrounds.
 

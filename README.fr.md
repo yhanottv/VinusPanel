@@ -10,7 +10,7 @@
 
 </div>
 
-[Documentation complète — sources GitBook](docs/gitbook/README.md) — installation, Design Studio, outils Minecraft, joueurs, administration et dépannage. La documentation distingue les fonctions de la branche de développement des anciennes versions publiées.
+[Documentation complète sur GitBook](https://vinuspanel.gitbook.io/vinuspanel-docs/) — installation, Design Studio, outils Minecraft, joueurs, administration et dépannage. La documentation distingue les fonctions de la branche de développement des anciennes versions publiées. [Sources Markdown](docs/gitbook/README.md).
 
 ## Interface
 
