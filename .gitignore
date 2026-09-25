@@ -19,3 +19,4 @@ config/vinuscatalog.php
 integrations/**/target/
 integrations/**/build/
 integrations/**/.gradle/
+extensions/vinuscatalog/vinuscatalog.blueprint
