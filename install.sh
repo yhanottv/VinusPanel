@@ -177,6 +177,7 @@ detect_public_ip() {
 }
 
 panel_host() { local h="${PANEL_URL#*://}"; printf '%s' "${h%%/*}"; }
+panel_hostname() { local h; h="$(panel_host)"; printf '%s' "${h%%:*}"; }
 
 wings_enabled() {
     case "$WITH_WINGS" in
@@ -285,8 +286,24 @@ generate_secrets() {
     [[ -n "$PANEL_URL" ]]   || PANEL_URL="http://${ip}"
     [[ -n "$DB_PASS" ]]     || DB_PASS="$(generate_password)"
     [[ -n "$ADMIN_PASS" ]]  || ADMIN_PASS="$(generate_password)"
-    [[ -n "$ADMIN_EMAIL" ]] || ADMIN_EMAIL="admin@${ip}"
-    [[ -n "$NODE_FQDN" ]]   || NODE_FQDN="$(panel_host)"
+
+    # Pterodactyl refuse un e-mail dont le domaine est une adresse IP :
+    # on prend le nom d'hote complet quand le panel est accede par IP.
+    if [[ -z "$ADMIN_EMAIL" ]]; then
+        local mailhost fqdn
+        mailhost="$(panel_hostname)"
+        if [[ "$mailhost" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ || "$mailhost" == \[* ]]; then
+            fqdn="$(hostname -f 2>/dev/null || true)"
+            if [[ -n "$fqdn" && "$fqdn" == *.* && ! "$fqdn" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                mailhost="$fqdn"
+            else
+                mailhost="vinuspanel.local"
+            fi
+        fi
+        ADMIN_EMAIL="admin@${mailhost}"
+    fi
+
+    [[ -n "$NODE_FQDN" ]] || NODE_FQDN="$(panel_hostname)"
 }
 
 configure_database() {
@@ -349,7 +366,7 @@ create_admin_user_if_missing() {
 
 configure_webserver() {
     log "Configuration de Nginx..."
-    local host; host="$(panel_host)"
+    local host; host="$(panel_hostname)"
     cat > /etc/nginx/sites-available/pterodactyl.conf <<'NGINX'
 server {
     listen 80;
