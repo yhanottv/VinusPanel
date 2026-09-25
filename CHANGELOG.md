@@ -2,8 +2,8 @@
 
 ## Unreleased — Live Design Studio
 
-- Ask for an explicit Yes/No before adding the player companion with a version or modpack. Explain its live data and controls, preserve Players after refusal, report bridge outcomes separately, and disable unattended companion installation.
-
+- Present an illustrated, animated VinusPlayers offer after a successful Minecraft installation reaches running state. Later keeps Players available; explicit activation gracefully stops, verifies/installs and requests startup, with timeout and existing-file safeguards.
+- Publish a chapter-based GitHub wiki covering installation, daily use, Design Studio, Minecraft, player compatibility, administration and recovery; maintain its editable source in `docs/wiki/`.
 - Add account email/key icons and independently accessible password visibility buttons.
 - Add outlined administration icons, a sliding active-navigation marker and reduced-motion-aware entrance/hover effects.
 - Bundle verified Bukkit, Fabric, Forge and NeoForge player companions with exact Minecraft/loader selection, checksum-verified stopped-server installation after explicit consent. Native mods provide read-only live snapshots; Bukkit retains actions. See the supported matrix in `docs/PLAYERS.md`.

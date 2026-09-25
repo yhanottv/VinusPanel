@@ -10,6 +10,8 @@
 
 </div>
 
+[Wiki GitHub complet](https://github.com/yhanottv/VinusPanel/wiki) — installation, Design Studio, outils Minecraft, joueurs, administration et dépannage. Le wiki distingue les fonctions de la branche de développement des anciennes versions publiées.
+
 ## Interface
 
 Le dashboard utilise la largeur disponible, y compris en 1920 et 3440 px. Les logos identifient le logiciel déclaré des serveurs. La navigation regroupe l’aperçu, la console, les fichiers et les outils disponibles selon les permissions et le logiciel.

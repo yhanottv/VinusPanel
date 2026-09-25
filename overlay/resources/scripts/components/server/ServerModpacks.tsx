@@ -1,4 +1,6 @@
-import CompanionChoice, { CompanionOffer, CompanionDecision, decisionReady, acceptsCompanion, companionResult } from './players/CompanionChoice';
+import { CompanionOffer } from './players/CompanionChoice';
+import { queueCompanion } from './players/companionFollowup';
+import { useStoreState } from 'easy-peasy';
 import MessageBox from '@/components/MessageBox';
 import useServerOperation from './useServerOperation';
 import React, { useEffect, useState } from 'react';
@@ -20,6 +22,7 @@ interface Plan { companion: CompanionOffer; token: string; title: string; releas
 
 export default function ServerModpacks() {
     const server = ServerContext.useStoreState(s => s.server.data!);
+    const user = useStoreState(s => s.user.data!.uuid);
     const status = ServerContext.useStoreState(s => s.status.value);
     const refreshServer = ServerContext.useStoreActions(a => a.server.getServer);
     const operation = useServerOperation(server.uuid);
@@ -29,8 +32,6 @@ export default function ServerModpacks() {
     const [query, setQuery] = useState(''); const [search, setSearch] = useState(''); const [sort, setSort] = useState('downloads');
     const [offset, setOffset] = useState(0); const [total, setTotal] = useState(0); const [packs, setPacks] = useState<Pack[]>([]);
     const [selected, setSelected] = useState<Pack | null>(null); const [versions, setVersions] = useState<Release[]>([]); const [version, setVersion] = useState('');
-    const [companionChoice, setCompanionChoice] = useState<CompanionDecision>(null);
-    const [companionStatus, setCompanionStatus] = useState('');
     const [plan, setPlan] = useState<Plan | null>(null); const [optional, setOptional] = useState<string[]>([]); const [replace, setReplace] = useState(false);
     const [loading, setLoading] = useState(true); const [versionLoading, setVersionLoading] = useState(false); const [busy, setBusy] = useState(false);
     const [error, setError] = useState(''); const [modalError, setModalError] = useState(''); const [result, setResult] = useState<{message: string; backup: string} | null>(null);
@@ -53,16 +54,15 @@ export default function ServerModpacks() {
         return () => { active = false; };
     }, [endpoint, source, selected?.id]);
     const prepare = async () => {
-        setCompanionChoice(null);
         if (!selected || busy) return; setBusy(true); setModalError('');
         try { const {data} = await http.post(`${endpoint}/plan`, { source, project: selected.id, version }, { timeout: 240000 }); setPlan(data); setOptional([]); setReplace(false); }
         catch (e) { setModalError(httpErrorToHuman(e)); } finally { setBusy(false); }
     };
     const install = async () => {
-        if (!plan || busy || !replace || !decisionReady(plan.companion, companionChoice)) return; setBusy(true); setModalError(''); setResult(null); setCompanionStatus('');
+        if (!plan || busy || !replace) return; setBusy(true); setModalError(''); setResult(null);
         try {
-            const {data} = await http.post(`${endpoint}/install`, { token: plan.token, optional, replace, install_players: acceptsCompanion(plan.companion, companionChoice) }, { timeout: 660000 });
-            if (operation.current()) { setCompanionStatus(data.companion?.status || 'declined'); setResult(data); setSelected(null); setPlan(null); await refreshServer(server.id); }
+            const {data} = await http.post(`${endpoint}/install`, { token: plan.token, optional, replace, install_players: false }, { timeout: 660000 });
+            if (operation.current()) { queueCompanion(user, server.uuid); setResult(data); setSelected(null); setPlan(null); await refreshServer(server.id); }
         } catch (e) { if (operation.current()) { setModalError(httpErrorToHuman(e)); setPlan(null); } } finally { operation.reconnect(); if (operation.current()) setBusy(false); }
     };
     return <PageContentBlock title={`${server.name} | Modpacks`} className={form.page}>
@@ -72,7 +72,6 @@ export default function ServerModpacks() {
         {!curseforge&&<p className={styles.sourceNote}>{vt('CurseForge indisponible : clé API non configurée.')}</p>}{source==='curseforge'&&<p className={styles.sourceNote}>{vt('Seules les publications accompagnées d’un pack serveur fourni par l’auteur sont proposées.')}</p>}
         {error && <MessageBox type="error" dismissible key={error}>{error}</MessageBox>}
         {result && <div role="status" className={form.success}>{result.message}<Link to={`/server/${server.id}/files#/${result.backup}`}>{vt('Ouvrir les fichiers de récupération')} ↗</Link></div>}
-        {companionStatus && <MessageBox type={companionStatus === 'failed' ? 'warning' : 'info'}>{companionResult(companionStatus)}</MessageBox>}
         {loading ? <p role="status">{vt('Chargement des modpacks…')}</p> : <div className={styles.list}>{packs.map(pack => <article key={pack.id} className={styles.row}>
             {pack.icon ? <img src={pack.icon} alt="" loading="lazy" referrerPolicy="no-referrer"/> : <span className={styles.fallback}><FontAwesomeIcon icon={faCubes}/></span>}
             <div className={styles.info}><h3>{pack.title}</h3><p>{pack.description}</p><small>{new Intl.NumberFormat(undefined, {notation:'compact'}).format(pack.downloads)} {vt('installations')} · {pack.author}</small></div>
@@ -89,10 +88,10 @@ export default function ServerModpacks() {
             {plan ? <><p>Minecraft {plan.minecraft} · {plan.software} {plan.loader} · Java {plan.java}</p><p>{plan.files} {vt('fichiers requis')} · {(plan.size / 1048576).toFixed(1)} Mio · {plan.skipped} {vt('fichiers client exclus')}</p>
                 {!!plan.optional.length && <details className={styles.optional}><summary>{plan.optional.length} {vt('fichiers optionnels')}</summary>{plan.optional.map(path => <label key={path}><input type="checkbox" disabled={busy} checked={optional.includes(path)} onChange={e => setOptional(current => e.target.checked ? [...current,path] : current.filter(p => p !== path))}/><span>{path}</span></label>)}</details>}
                 <div className={form.warning}>{vt('Cette installation remplace les fichiers actifs du serveur et son monde. Les anciens fichiers sont conservés dans un dossier de récupération. Le serveur reste arrêté après l’installation.')}</div>
-                <CompanionChoice offer={plan.companion} value={companionChoice} onChange={setCompanionChoice} disabled={busy}/>
+                <p>{vt('Après l’installation, démarrez le serveur. Une fenêtre vous proposera ensuite d’activer les informations Joueurs.')}</p>
                 <label className={styles.confirm}><input type="checkbox" disabled={busy} checked={replace} onChange={e => setReplace(e.target.checked)}/><span>{vt('Je confirme le remplacement de ce serveur par ce modpack.')}</span></label>
                 {status !== 'offline' && <p>{vt('Arrêtez le serveur depuis la console pour continuer.')}</p>}
-                <button type="button" className={form.primary} disabled={busy || !replace || status !== 'offline' || !decisionReady(plan.companion, companionChoice)} onClick={install}>{busy ? vt('Téléchargement, vérification et installation…') : vt('Remplacer le serveur et installer')}</button>
+                <button type="button" className={form.primary} disabled={busy || !replace || status !== 'offline'} onClick={install}>{busy ? vt('Téléchargement, vérification et installation…') : vt('Remplacer le serveur et installer')}</button>
                 {busy && <p role="status">{vt('L’opération peut prendre plusieurs minutes. Gardez cette fenêtre ouverte jusqu’au résultat.')}</p>}
             </> : <button type="button" className={form.primary} disabled={busy || versionLoading || !version || !permitted} onClick={prepare}>{busy ? vt('Analyse du modpack…') : vt('Préparer l’installation')}</button>}
         </div></Dialog>

@@ -182,12 +182,15 @@ resources/scripts/components/server/motd.ts
 resources/scripts/components/server/network/AllocationRow.tsx
 resources/scripts/components/server/network/NetworkContainer.tsx
 resources/scripts/components/server/players/CompanionChoice.tsx
+resources/scripts/components/server/players/CompanionFollowup.spec.tsx
 resources/scripts/components/server/players/PlayerCompanion.spec.tsx
 resources/scripts/components/server/players/PlayerCompanion.tsx
+resources/scripts/components/server/players/PlayerCompanionPrompt.tsx
 resources/scripts/components/server/players/PlayerInventory.spec.tsx
 resources/scripts/components/server/players/PlayerInventory.tsx
 resources/scripts/components/server/players/PlayerSkin.tsx
 resources/scripts/components/server/players/companion-choice.module.css
+resources/scripts/components/server/players/companionFollowup.ts
 resources/scripts/components/server/players/players.module.css
 resources/scripts/components/server/players/types.ts
 resources/scripts/components/server/properties.module.css

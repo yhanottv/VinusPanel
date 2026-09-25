@@ -24,6 +24,8 @@
 
 </div>
 
+[Complete GitHub wiki](https://github.com/yhanottv/VinusPanel/wiki) — installation, Design Studio, Minecraft tools, player companions, administration and troubleshooting. The wiki identifies development-branch features separately from older releases.
+
 VinusPanel gives self-hosted game server panels a consistent black-and-orange interface, from the server dashboard to the console, files and account pages. Liquid Glass is limited to navigation, leaving logs and resource data on stable, readable backgrounds.
 
 This repository contains a **theme overlay and installation tools**, not a complete Pterodactyl distribution. You need an existing Pterodactyl panel. The theme can manage servers for other games; only the optional catalog is Minecraft-specific.

@@ -1,3 +1,4 @@
+import PlayerCompanionPrompt from '@/components/server/players/PlayerCompanionPrompt';
 import ServerPageTransition from '@/components/server/ServerPageTransition';
 import NavigationBar from '@/components/NavigationBar';
 import { useDesign } from '@/designRuntime';
@@ -49,6 +50,7 @@ export default () => {
             {design.options.server_nav === 'top' && <div className="vinus-server-topnav">{navigation}</div>}
             <InstallListener /><TransferListener /><WebsocketHandler /><ServerStatusBootstrap />
             <ServerShellHeader />
+            {!conflict && <PlayerCompanionPrompt key={server.uuid} />}
             {conflict && !(admin && consolePath) ? <ConflictStateRenderer /> : <ServerPageTransition><ErrorBoundary>
                 <NavigationRouter />
             </ErrorBoundary></ServerPageTransition>}
