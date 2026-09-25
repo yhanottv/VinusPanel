@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
-# VinusPanel - installeur tout-en-un
+# VinusPanel - installeur (menu interactif + mode automatise)
 #
-# Deux modes automatiques :
-#   * VPS nu      : installe Pterodactyl (+ Wings) puis applique le theme.
-#   * panel existant : applique / met a jour le theme uniquement.
+#   Sans argument dans un terminal  -> menu interactif
+#   Avec arguments / hors terminal  -> execution automatisee d'une action
 #
-# Toutes les valeurs sont surchargeables par variables d'environnement VINUS_*
-# ou par options de commande. Aucune saisie interactive n'est demandee.
+# Credit / Author : Yhano
+# Repo            : https://github.com/yhanottv/VinusPanel
 set -Eeuo pipefail
 
 THEME_VERSION="3.2.0"
@@ -14,8 +13,10 @@ PTERODACTYL_VERSION="1.15.1"
 DEFAULT_PANEL_DIR="/var/www/pterodactyl"
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PANEL_DIR="$DEFAULT_PANEL_DIR"
-CHECK_ONLY=0
 PHP_BIN="${VINUS_PHP_BIN:-php8.3}"
+
+AUTHOR="Yhano"
+REPO_URL="https://github.com/yhanottv/VinusPanel"
 
 STATE_DIR="/var/lib/vinuspanel"
 BACKUP_ROOT="/var/backups/vinuspanel"
@@ -25,7 +26,12 @@ MAINTENANCE_ENABLED=0
 INSTALL_STARTED=0
 CREDENTIALS_FILE="$STATE_DIR/credentials.txt"
 
-# Parametres de deploiement.
+BUILD_MODE="production"
+ACTION=""
+MENU_FORCE=0
+CHECK_ONLY=0
+FRESH_PANEL=0
+
 PANEL_URL="${VINUS_PANEL_URL:-}"
 PANEL_TIMEZONE="${VINUS_TIMEZONE:-Europe/Paris}"
 DB_HOST="${VINUS_DB_HOST:-127.0.0.1}"
@@ -42,69 +48,126 @@ NODE_FQDN="${VINUS_NODE_FQDN:-}"
 NODE_NAME="${VINUS_NODE_NAME:-$(hostname -s 2>/dev/null || echo node)}"
 ALLOC_START="${VINUS_ALLOC_START:-25565}"
 ALLOC_END="${VINUS_ALLOC_END:-25584}"
-WITH_WINGS="${VINUS_WITH_WINGS:-auto}"        # auto | yes | no
-PROXY_MODE="${VINUS_PROXY_MODE:-auto}"        # auto | keep
+WITH_WINGS="${VINUS_WITH_WINGS:-auto}"
+PROXY_MODE="${VINUS_PROXY_MODE:-auto}"
+
+# ---------------------------------------------------------------------------
+# Style
+# ---------------------------------------------------------------------------
+C_ACCENT=$'\033[1;38;5;208m'
+C_GREY=$'\033[38;5;245m'
+C_RESET=$'\033[0m'
+C_OK=$'\033[1;32m'
+C_WARN=$'\033[1;33m'
+C_ERR=$'\033[1;31m'
+
+BANNER_B64="4paI4paI4pWXICAg4paI4paI4pWX4paI4paI4pWX4paI4paI4paI4pWXICAg4paI4paI4pWX4paI4paI4pWXICAg4paI4paI4pWX4paI4paI4paI4paI4paI4paI4paI4pWXICAgIOKWiOKWiOKWiOKWiOKWiOKWiOKVlyAg4paI4paI4paI4paI4paI4pWXIOKWiOKWiOKWiOKVlyAgIOKWiOKWiOKVl+KWiOKWiOKWiOKWiOKWiOKWiOKWiOKVl+KWiOKWiOKVlyAgICAgCuKWiOKWiOKVkSAgIOKWiOKWiOKVkeKWiOKWiOKVkeKWiOKWiOKWiOKWiOKVlyAg4paI4paI4pWR4paI4paI4pWRICAg4paI4paI4pWR4paI4paI4pWU4pWQ4pWQ4pWQ4pWQ4pWdICAgIOKWiOKWiOKVlOKVkOKVkOKWiOKWiOKVl+KWiOKWiOKVlOKVkOKVkOKWiOKWiOKVl+KWiOKWiOKWiOKWiOKVlyAg4paI4paI4pWR4paI4paI4pWU4pWQ4pWQ4pWQ4pWQ4pWd4paI4paI4pWRICAgICAK4paI4paI4pWRICAg4paI4paI4pWR4paI4paI4pWR4paI4paI4pWU4paI4paI4pWXIOKWiOKWiOKVkeKWiOKWiOKVkSAgIOKWiOKWiOKVkeKWiOKWiOKWiOKWiOKWiOKWiOKWiOKVlyAgICDilojilojilojilojilojilojilZTilZ3ilojilojilojilojilojilojilojilZHilojilojilZTilojilojilZcg4paI4paI4pWR4paI4paI4paI4paI4paI4pWXICDilojilojilZEgICAgIArilZrilojilojilZcg4paI4paI4pWU4pWd4paI4paI4pWR4paI4paI4pWR4pWa4paI4paI4pWX4paI4paI4pWR4paI4paI4pWRICAg4paI4paI4pWR4pWa4pWQ4pWQ4pWQ4pWQ4paI4paI4pWRICAgIOKWiOKWiOKVlOKVkOKVkOKVkOKVnSDilojilojilZTilZDilZDilojilojilZHilojilojilZHilZrilojilojilZfilojilojilZHilojilojilZTilZDilZDilZ0gIOKWiOKWiOKVkSAgICAgCiDilZrilojilojilojilojilZTilZ0g4paI4paI4pWR4paI4paI4pWRIOKVmuKWiOKWiOKWiOKWiOKVkeKVmuKWiOKWiOKWiOKWiOKWiOKWiOKVlOKVneKWiOKWiOKWiOKWiOKWiOKWiOKWiOKVkSAgICDilojilojilZEgICAgIOKWiOKWiOKVkSAg4paI4paI4pWR4paI4paI4pWRIOKVmuKWiOKWiOKWiOKWiOKVkeKWiOKWiOKWiOKWiOKWiOKWiOKWiOKVl+KWiOKWiOKWiOKWiOKWiOKWiOKWiOKVlwogIOKVmuKVkOKVkOKVkOKVnSAg4pWa4pWQ4pWd4pWa4pWQ4pWdICDilZrilZDilZDilZDilZ0g4pWa4pWQ4pWQ4pWQ4pWQ4pWQ4pWdIOKVmuKVkOKVkOKVkOKVkOKVkOKVkOKVnSAgICDilZrilZDilZ0gICAgIOKVmuKVkOKVnSAg4pWa4pWQ4pWd4pWa4pWQ4pWdICDilZrilZDilZDilZDilZ3ilZrilZDilZDilZDilZDilZDilZDilZ3ilZrilZDilZDilZDilZDilZDilZDilZ0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAo="
+
+supports_utf8() {
+    local lc="${LC_ALL:-${LC_CTYPE:-${LANG:-}}}"
+    [[ -z "$lc" ]] && return 0                 # pas d'information : on suppose UTF-8
+    [[ "$lc" == "C" || "$lc" == "POSIX" ]] && return 1
+    [[ "$lc" == *[Uu][Tt][Ff]8* || "$lc" == *[Uu][Tt][Ff]-8* ]] && return 0
+    return 1
+}
+
+banner() {
+    local decoded=""
+    if supports_utf8; then
+        decoded="$(printf '%s' "$BANNER_B64" | base64 -d 2>/dev/null || true)"
+    fi
+    if [[ -n "$decoded" ]]; then
+        local i=0 line
+        local -a shades=(215 214 208 209 202 166)
+        while IFS= read -r line; do
+            [[ -z "${line// /}" ]] && continue
+            printf '%s%s%s\n' "$(printf '\033[1;38;5;%sm' "${shades[i]:-208}")" "$line" "$C_RESET"
+            i=$((i+1))
+        done <<< "$decoded"
+    else
+        cat <<'ASCII'
+__     ___ _   _ _   _ ____    ____   _    _   _ _____ _
+\ \   / (_) \ | | | | / ___|  |  _ \ / \  | \ | | ____| |
+ \ \ / /| |  \| | | | \___ \  | |_) / _ \ |  \| |  _| | |
+  \ V / | | |\  | |_| |___) | |  __/ ___ \| |\  | |___| |___
+   \_/  |_|_| \_|\___/|____/  |_| /_/   \_\_| \_|_____|_____|
+ASCII
+    fi
+}
+
+header() {
+    local host line title sub credit repo
+    host="${HOSTNAME:-$(hostname -s 2>/dev/null || echo node)}"
+    line="$(printf '─%.0s' {1..62})"
+    title="${host} - VINUS PANEL (v${THEME_VERSION})"
+    sub="Theme Pterodactyl - Design Studio & catalogue Minecraft"
+    credit="Credit / Author: ${AUTHOR}"
+    repo="Repo: ${REPO_URL}"
+
+    printf '%s┌%s┐%s\n' "$C_ACCENT" "$line" "$C_RESET"
+    printf '%s│%s %-60s %s│%s\n' "$C_ACCENT" "$C_RESET" "$title"  "$C_ACCENT" "$C_RESET"
+    printf '%s│%s %-60s %s│%s\n' "$C_ACCENT" "$C_RESET" "$sub"    "$C_ACCENT" "$C_RESET"
+    printf '%s│%s %-60s %s│%s\n' "$C_ACCENT" "$C_GREY"  "$credit" "$C_ACCENT" "$C_RESET"
+    printf '%s│%s %-60s %s│%s\n' "$C_ACCENT" "$C_GREY"  "$repo"   "$C_ACCENT" "$C_RESET"
+    printf '%s└%s┘%s\n' "$C_ACCENT" "$line" "$C_RESET"
+}
+
+menu() {
+    printf '\n'
+    printf ' %s[ 1 ]%s Install VINUS PANEL (Production)\n'    "$C_ACCENT" "$C_RESET"
+    printf ' %s[ 2 ]%s Install VINUS PANEL (Development)\n'   "$C_ACCENT" "$C_RESET"
+    printf ' %s[ 3 ]%s Update Panel (pull GitHub + rebuild)\n' "$C_ACCENT" "$C_RESET"
+    printf ' %s[ 4 ]%s Create / Reset Administrator Account\n' "$C_ACCENT" "$C_RESET"
+    printf ' %s[ 5 ]%s Restart Panel Service\n'               "$C_ACCENT" "$C_RESET"
+    printf ' %s[ 6 ]%s Uninstall Panel\n'                     "$C_ACCENT" "$C_RESET"
+    printf ' %s[ 7 ]%s Exit\n'                                "$C_ACCENT" "$C_RESET"
+    printf '\n'
+}
+
+log()  { printf '%s[VinusPanel]%s %s\n' "$C_ACCENT" "$C_RESET" "$*"; }
+ok()   { printf '%s[VinusPanel]%s %s\n' "$C_OK" "$C_RESET" "$*"; }
+warn() { printf '%s[VinusPanel] Attention :%s %s\n' "$C_WARN" "$C_RESET" "$*" >&2; }
+fail() { printf '%s[VinusPanel] Erreur :%s %s\n' "$C_ERR" "$C_RESET" "$*" >&2; exit 1; }
 
 usage() {
     cat <<'USAGE'
 Usage : sudo bash install.sh [options]
 
-Installation du theme (et, si Pterodactyl est absent, du panel complet).
+Sans option, dans un terminal, ouvre le menu interactif.
 
-  --panel-dir CHEMIN     Racine du panel (defaut : /var/www/pterodactyl)
-  --check                Verifie l'environnement sans rien modifier
-  --url URL              URL publique du panel (defaut : http://<ip-publique>)
-  --timezone TZ          Fuseau du panel (defaut : Europe/Paris)
-  --db-password MDP      Mot de passe de la base (defaut : genere)
-  --admin-email EMAIL    Email de l'administrateur (defaut : admin@<hote>)
-  --admin-user USER      Identifiant administrateur (defaut : admin)
-  --admin-password MDP   Mot de passe administrateur (defaut : genere)
-  --[no-]wings           Installe ou non Wings (defaut : auto si VPS nu)
-  --node-fqdn HOTE       FQDN/IP du noeud Wings (defaut : hote du panel)
-  --alloc-range A-B      Plage de ports des allocations (defaut : 25565-25584)
-  --keep-proxy           Refuse de retirer un reverse-proxy sur 80/443
-  -h, --help             Affiche cette aide
+Actions non interactives :
+  --install [prod|dev]     Installe le panel (si absent) puis le theme
+  --update                 git pull + recompilation du theme
+  --admin                  Cree ou reinitialise le compte administrateur
+  --restart                Redemarre les services du panel
+  --uninstall              Desinstalle le theme
+  --menu                   Force l'affichage du menu
+  --check                  Rapport d'environnement, sans modification
 
-Variables d'environnement equivalentes : VINUS_PANEL_URL, VINUS_DB_PASSWORD,
-VINUS_ADMIN_EMAIL, VINUS_ADMIN_PASSWORD, VINUS_WITH_WINGS, VINUS_PROXY_MODE...
+Parametres :
+  --panel-dir CHEMIN       Racine du panel (defaut : /var/www/pterodactyl)
+  --url URL                URL publique du panel (defaut : http://<ip>)
+  --timezone TZ            Fuseau (defaut : Europe/Paris)
+  --db-password MDP        Mot de passe base de donnees
+  --admin-email EMAIL      Email administrateur
+  --admin-user USER        Identifiant administrateur
+  --admin-password MDP     Mot de passe administrateur
+  --[no-]wings             Installe Wings (defaut : auto si VPS nu)
+  --node-fqdn HOTE         FQDN/IP du noeud Wings
+  --alloc-range A-B        Plage de ports des allocations
+  --keep-proxy             Ne retire pas un reverse-proxy sur 80/443
+  -h, --help               Affiche cette aide
 USAGE
 }
 
-log()  { printf '\033[1;38;5;208m[VinusPanel]\033[0m %s\n' "$*"; }
-warn() { printf '\033[1;33m[VinusPanel] Attention :\033[0m %s\n' "$*" >&2; }
-fail() { printf '\033[1;31m[VinusPanel] Erreur :\033[0m %s\n' "$*" >&2; exit 1; }
-
-while (($#)); do
-    case "$1" in
-        --panel-dir)
-            (($# >= 2)) || fail "--panel-dir necessite un chemin"
-            PANEL_DIR="${2%/}"; shift 2 ;;
-        --check) CHECK_ONLY=1; shift ;;
-        --url) (($# >= 2)) || fail "--url necessite une valeur"; PANEL_URL="$2"; shift 2 ;;
-        --timezone) (($# >= 2)) || fail "--timezone necessite une valeur"; PANEL_TIMEZONE="$2"; shift 2 ;;
-        --db-password) (($# >= 2)) || fail "--db-password necessite une valeur"; DB_PASS="$2"; shift 2 ;;
-        --admin-email) (($# >= 2)) || fail "--admin-email necessite une valeur"; ADMIN_EMAIL="$2"; shift 2 ;;
-        --admin-user) (($# >= 2)) || fail "--admin-user necessite une valeur"; ADMIN_USER="$2"; shift 2 ;;
-        --admin-password) (($# >= 2)) || fail "--admin-password necessite une valeur"; ADMIN_PASS="$2"; shift 2 ;;
-        --wings) WITH_WINGS="yes"; shift ;;
-        --no-wings) WITH_WINGS="no"; shift ;;
-        --node-fqdn) (($# >= 2)) || fail "--node-fqdn necessite une valeur"; NODE_FQDN="$2"; shift 2 ;;
-        --alloc-range)
-            (($# >= 2)) || fail "--alloc-range necessite une valeur"
-            ALLOC_START="${2%-*}"; ALLOC_END="${2#*-}"; shift 2 ;;
-        --keep-proxy) PROXY_MODE="keep"; shift ;;
-        -h|--help) usage; exit 0 ;;
-        *) fail "option inconnue : $1" ;;
-    esac
-done
-
-[[ "$PANEL_DIR" = /* ]] || fail "le chemin du panel doit etre absolu"
-
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+is_tty()      { [[ -t 0 ]]; }
+interactive() { [[ "$MENU_FORCE" == "1" ]] || is_tty; }
+require_root() { ((EUID == 0)) || fail "cette action doit etre lancee avec sudo ou en root"; }
 panel_present() { [[ -f "$PANEL_DIR/artisan" ]]; }
-
-generate_password() {
-    openssl rand -base64 48 | tr -dc 'A-Za-z0-9' | cut -c1-24
-}
+generate_password() { openssl rand -base64 48 | tr -dc 'A-Za-z0-9' | cut -c1-24; }
 
 detect_public_ip() {
     local ip
@@ -113,23 +176,19 @@ detect_public_ip() {
     printf '%s' "$ip"
 }
 
-panel_host() {
-    local h="${PANEL_URL#*://}"
-    printf '%s' "${h%%/*}"
-}
+panel_host() { local h="${PANEL_URL#*://}"; printf '%s' "${h%%/*}"; }
 
 wings_enabled() {
     case "$WITH_WINGS" in
         yes) return 0 ;;
-        no) return 1 ;;
-        *) [[ "${FRESH_PANEL:-0}" == "1" ]] ;;
+        no)  return 1 ;;
+        *)   [[ "$FRESH_PANEL" == "1" ]] ;;
     esac
 }
 
 # ---------------------------------------------------------------------------
-# Bootstrap du systeme et du panel (uniquement si Pterodactyl est absent)
+# Bootstrap systeme + panel (si absent)
 # ---------------------------------------------------------------------------
-
 require_supported_os() {
     [[ -f /etc/os-release ]] || fail "systeme non reconnu"
     # shellcheck disable=SC1091
@@ -142,21 +201,21 @@ require_supported_os() {
 
 free_web_ports() {
     command -v nginx >/dev/null 2>&1 && return 0
-    ss -ltn 2>/dev/null | grep -qE ':(80|443)\b' || return 0
+    ss -ltn 2>/dev/null | grep -E ':(80|443)\b' >/dev/null || return 0
 
-    if command -v docker >/dev/null 2>&1 && docker ps --format '{{.Names}}' 2>/dev/null | grep -qi traefik; then
+    if command -v docker >/dev/null 2>&1 && docker ps --format '{{.Names}}' 2>/dev/null | grep -i traefik >/dev/null; then
         if [[ "$PROXY_MODE" == "keep" ]]; then
-            fail "un reverse-proxy (Traefik) occupe 80/443 ; retire --keep-proxy ou libere les ports a la main"
+            fail "un reverse-proxy (Traefik) occupe 80/443 ; utilise --keep-proxy ou libere les ports manuellement"
         fi
         warn "un reverse-proxy Traefik occupe 80/443 et va etre arrete pour installer Nginx"
         while IFS= read -r container; do
             docker update --restart=no "$container" >/dev/null 2>&1 || true
             docker stop "$container" >/dev/null 2>&1 || true
-        done < <(docker ps --format '{{.Names}}' | grep -i traefik)
+        done < <(docker ps --format '{{.Names}}' | grep -i traefik || true)
         sleep 2
     fi
 
-    if ss -ltn 2>/dev/null | grep -qE ':(80|443)\b'; then
+    if ss -ltn 2>/dev/null | grep -E ':(80|443)\b' >/dev/null; then
         fail "les ports 80/443 sont occupes par un autre service ; libere-les puis relance"
     fi
 }
@@ -189,7 +248,7 @@ install_dependencies() {
 }
 
 download_panel() {
-    log "Telechargement de Pterodactyl $PTERODACTYL_VERSION..."
+    log "Telechargement de Pterodactyl ${PTERODACTYL_VERSION}..."
     mkdir -p "$PANEL_DIR"
     (
         cd "$PANEL_DIR"
@@ -203,8 +262,8 @@ download_panel() {
 }
 
 ensure_app_key() {
-    # Pterodactyl ne peut pas demarrer (EncryptionServiceProvider) sans APP_KEY,
-    # ce qui empeche p:environment:setup de tourner. On pre-genere donc la cle.
+    # Pterodactyl ne demarre pas (EncryptionServiceProvider) sans APP_KEY,
+    # ce qui bloque p:environment:setup. On pre-genere donc la cle.
     (
         cd "$PANEL_DIR"
         [[ -f .env ]] || cp .env.example .env
@@ -220,17 +279,16 @@ ensure_app_key() {
 }
 
 generate_secrets() {
-    local ip
-    ip="$(detect_public_ip)"
-    [[ -n "$PANEL_URL" ]] || PANEL_URL="http://${ip}"
-    [[ -n "$DB_PASS" ]]   || DB_PASS="$(generate_password)"
-    [[ -n "$ADMIN_PASS" ]] || ADMIN_PASS="$(generate_password)"
+    local ip; ip="$(detect_public_ip)"
+    [[ -n "$PANEL_URL" ]]   || PANEL_URL="http://${ip}"
+    [[ -n "$DB_PASS" ]]     || DB_PASS="$(generate_password)"
+    [[ -n "$ADMIN_PASS" ]]  || ADMIN_PASS="$(generate_password)"
     [[ -n "$ADMIN_EMAIL" ]] || ADMIN_EMAIL="admin@${ip}"
-    [[ -n "$NODE_FQDN" ]] || NODE_FQDN="$(panel_host)"
+    [[ -n "$NODE_FQDN" ]]   || NODE_FQDN="$(panel_host)"
 }
 
 configure_database() {
-    log "Creation de la base MariaDB '$DB_NAME'..."
+    log "Creation de la base MariaDB '${DB_NAME}'..."
     mariadb -u root <<SQL
 CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;
 CREATE USER IF NOT EXISTS '${DB_USER}'@'${DB_HOST}' IDENTIFIED BY '${DB_PASS}';
@@ -245,24 +303,18 @@ setup_panel_environment() {
     (
         cd "$PANEL_DIR"
         "$PHP_BIN" artisan p:environment:setup \
-            --author="$ADMIN_EMAIL" \
-            --url="$PANEL_URL" \
-            --timezone="$PANEL_TIMEZONE" \
+            --author="$ADMIN_EMAIL" --url="$PANEL_URL" --timezone="$PANEL_TIMEZONE" \
             --cache=redis --session=redis --queue=redis \
             --redis-host=127.0.0.1 --redis-port=6379 --redis-pass= \
-            --settings-ui=1 --telemetry=0 --new-salt \
-            --no-interaction
+            --settings-ui=1 --telemetry=0 --new-salt --no-interaction
 
         "$PHP_BIN" artisan p:environment:database \
             --host="$DB_HOST" --port="$DB_PORT" --database="$DB_NAME" \
-            --username="$DB_USER" --password="$DB_PASS" \
-            --no-interaction
+            --username="$DB_USER" --password="$DB_PASS" --no-interaction
 
         "$PHP_BIN" artisan p:environment:mail \
-            --driver=log --email="$ADMIN_EMAIL" --from="VinusPanel" \
-            --no-interaction || true
+            --driver=log --email="$ADMIN_EMAIL" --from="VinusPanel" --no-interaction || true
 
-        # p:environment:mail ecrit MAIL_DRIVER mais pas MAIL_MAILER (Laravel 12).
         if grep -q '^MAIL_MAILER=' .env; then
             sed -i 's|^MAIL_MAILER=.*|MAIL_MAILER=log|' .env
         else
@@ -275,7 +327,7 @@ setup_panel_environment() {
     )
 }
 
-create_admin_user() {
+create_admin_user_if_missing() {
     local existing
     existing="$(mariadb -u root -N -B -e \
         "SELECT COUNT(*) FROM \`${DB_NAME}\`.users WHERE email='${ADMIN_EMAIL}';" 2>/dev/null || echo 0)"
@@ -289,15 +341,13 @@ create_admin_user() {
         "$PHP_BIN" artisan p:user:make \
             --email="$ADMIN_EMAIL" --username="$ADMIN_USER" \
             --name-first="$ADMIN_FIRST" --name-last="$ADMIN_LAST" \
-            --password="$ADMIN_PASS" --admin=1 \
-            --no-interaction
+            --password="$ADMIN_PASS" --admin=1 --no-interaction
     )
 }
 
 configure_webserver() {
     log "Configuration de Nginx..."
-    local host
-    host="$(panel_host)"
+    local host; host="$(panel_host)"
     cat > /etc/nginx/sites-available/pterodactyl.conf <<'NGINX'
 server {
     listen 80;
@@ -403,54 +453,48 @@ bootstrap_panel() {
     ensure_app_key
     configure_database
     setup_panel_environment
-    create_admin_user
+    create_admin_user_if_missing
     fix_permissions
     configure_webserver
     configure_services
-    log "Panel Pterodactyl $PTERODACTYL_VERSION installe (${PANEL_URL})."
+    ok "Panel Pterodactyl ${PTERODACTYL_VERSION} installe (${PANEL_URL})."
 }
 
 # ---------------------------------------------------------------------------
-# Controle de l'environnement (--check)
+# Controle d'environnement
 # ---------------------------------------------------------------------------
-
 system_report() {
     log "Controle de l'environnement (aucune modification)."
     [[ -f /etc/os-release ]] && ( . /etc/os-release; log "Systeme : ${PRETTY_NAME:-inconnu}" )
     log "RAM totale : $(awk '/MemTotal/{printf "%.1f Go", $2/1048576}' /proc/meminfo)"
     log "Disque / : $(df -h / | awk 'NR==2{print $4" libres sur "$2}')"
 
-    local missing=()
     local c
     for c in php composer node yarn nginx mariadb redis-server curl tar unzip git; do
-        if command -v "$c" >/dev/null 2>&1; then
-            log "  ok    $c"
-        else
-            warn "  absent $c"
-            missing+=("$c")
-        fi
+        if command -v "$c" >/dev/null 2>&1; then ok "  ok    $c"; else warn "  absent $c"; fi
     done
 
     if panel_present; then
         local detected=""
-        [[ -f "$PANEL_DIR/config/app.php" ]] && detected="$(sed -nE "s/.*'version'[[:space:]]*=>[[:space:]]*'([^']+)'.*/\1/p" "$PANEL_DIR/config/app.php" | head -n1)"
-        log "Panel detecte dans $PANEL_DIR (version : ${detected:-inconnue})."
+        [[ -f "$PANEL_DIR/config/app.php" ]] && \
+            detected="$(sed -nE "s/.*'version'[[:space:]]*=>[[:space:]]*'([^']+)'.*/\1/p" "$PANEL_DIR/config/app.php" | head -n1)"
+        log "Panel detecte dans ${PANEL_DIR} (version : ${detected:-inconnue})."
         [[ "$detected" == "$PTERODACTYL_VERSION" || -z "$detected" ]] || \
-            warn "le paquet est valide pour Pterodactyl ${PTERODACTYL_VERSION}, detecte : $detected"
+            warn "le paquet est valide pour Pterodactyl ${PTERODACTYL_VERSION}, detecte : ${detected}"
         bash "$REPO_DIR/scripts/check-package.sh" || fail "le paquet du theme est invalide"
     else
-        log "Panel absent : une installation complete sera effectuee (mode sans --check)."
+        log "Panel absent : une installation complete sera effectuee."
     fi
-    log "Controle termine."
+    ok "Controle termine."
 }
 
 # ---------------------------------------------------------------------------
-# Application du theme (code historique VinusPanel)
+# Theme VinusPanel
 # ---------------------------------------------------------------------------
-
 USE_BLUEPRINT=0
 MANIFEST="$(mktemp)"
 trap 'rm -f "$MANIFEST"' EXIT
+
 build_manifest() {
     cat "$REPO_DIR/overlay-manifest.txt" > "$MANIFEST"
     if [[ -f "$PANEL_DIR/.blueprint/extensions/blueprint/private/db/is_installed" ]]; then
@@ -462,9 +506,7 @@ build_manifest() {
     LC_ALL=C sort -u -o "$MANIFEST" "$MANIFEST"
 }
 
-require_command() {
-    command -v "$1" >/dev/null 2>&1 || fail "commande requise absente : $1"
-}
+require_command() { command -v "$1" >/dev/null 2>&1 || fail "commande requise absente : $1"; }
 
 validate_environment() {
     [[ -f "$REPO_DIR/theme.json" ]] || fail "theme.json est absent"
@@ -495,7 +537,7 @@ validate_environment() {
         fail "Pterodactyl $detected_version detecte ; ce paquet est valide pour $PTERODACTYL_VERSION"
     fi
 
-    log "Prerequis valides (PHP $(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;'), Node $(node --version), Yarn $(yarn --version))."
+    ok "Prerequis valides (PHP $(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;'), Node $(node --version), Yarn $(yarn --version))."
 }
 
 backup_into() {
@@ -503,7 +545,6 @@ backup_into() {
     mkdir -p "$destination/files"
     : > "$destination/tracked.list"
     : > "$destination/new-files.list"
-
     while IFS= read -r relative_path; do
         [[ -n "$relative_path" ]] || continue
         printf '%s\n' "$relative_path" >> "$destination/tracked.list"
@@ -534,7 +575,6 @@ extend_original_backup() {
 restore_from() {
     local source="$1"
     [[ -f "$source/tracked.list" ]] || return 0
-
     while IFS= read -r relative_path; do
         [[ -n "$relative_path" ]] || continue
         if [[ -e "$source/files/$relative_path" || -L "$source/files/$relative_path" ]]; then
@@ -557,7 +597,7 @@ rollback() {
     local exit_code=$?
     trap - ERR INT TERM
     if ((INSTALL_STARTED)) && [[ -n "$TRANSACTION_BACKUP" && -d "$TRANSACTION_BACKUP" ]]; then
-        printf '\n\033[1;31m[VinusPanel] Installation interrompue, restauration automatique...\033[0m\n' >&2
+        printf '\n%s[VinusPanel] Installation interrompue, restauration automatique...%s\n' "$C_ERR" "$C_RESET" >&2
         restore_from "$TRANSACTION_BACKUP"
         (cd "$PANEL_DIR" && composer dump-autoload --no-interaction --no-scripts) >/dev/null 2>&1 || true
         (cd "$PANEL_DIR" && yarn build:production) >/dev/null 2>&1 || true
@@ -591,16 +631,14 @@ install_theme() {
     (cd "$PANEL_DIR" && php artisan down) >/dev/null
     MAINTENANCE_ENABLED=1
 
-    log "Installation de la surcouche VinusPanel $THEME_VERSION..."
+    log "Installation de la surcouche VinusPanel ${THEME_VERSION}..."
     while IFS= read -r relative_path; do
         [[ -n "$relative_path" ]] || continue
         local source_file="$REPO_DIR/overlay/$relative_path"
         if ((USE_BLUEPRINT)) && [[ -f "$REPO_DIR/blueprint-overlay/$relative_path" ]]; then
             source_file="$REPO_DIR/blueprint-overlay/$relative_path"
         fi
-        install -D -m 0644 -o www-data -g www-data \
-            "$source_file" \
-            "$PANEL_DIR/$relative_path"
+        install -D -m 0644 -o www-data -g www-data "$source_file" "$PANEL_DIR/$relative_path"
     done < "$MANIFEST"
 
     cd "$PANEL_DIR"
@@ -610,11 +648,15 @@ install_theme() {
         log "Installation des dependances frontend..."
         yarn install --frozen-lockfile
     fi
-    # La police fait partie de VinusPanel, pas des dependances Pterodactyl.
     yarn add -D @fontsource-variable/ibm-plex-sans@^5.2.8 jest-environment-jsdom@28.1.3 --ignore-scripts
 
-    log "Compilation des assets de production..."
-    yarn build:production
+    if [[ "$BUILD_MODE" == "development" ]]; then
+        log "Compilation des assets (mode developpement)..."
+        yarn build
+    else
+        log "Compilation des assets de production..."
+        yarn build:production
+    fi
 
     log "Nettoyage des caches..."
     php artisan view:clear
@@ -628,26 +670,25 @@ install_theme() {
     trap - ERR INT TERM
     finish_maintenance
 
-    log "VinusPanel $THEME_VERSION est installe. Sauvegarde : $TRANSACTION_BACKUP"
+    ok "VinusPanel ${THEME_VERSION} est installe. Sauvegarde : ${TRANSACTION_BACKUP}"
 }
 
 # ---------------------------------------------------------------------------
-# Wings (optionnel)
+# Wings
 # ---------------------------------------------------------------------------
-
 install_wings() {
     log "Installation de Wings..."
     systemctl enable --now docker >/dev/null 2>&1 || true
     mkdir -p /etc/pterodactyl
 
     if [[ ! -x /usr/local/bin/wings ]]; then
+        local arch="amd64"; [[ "$(uname -m)" == "arm64" || "$(uname -m)" == "aarch64" ]] && arch="arm64"
         curl -fL -o /usr/local/bin/wings \
-            "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$( [[ "$(uname -m)" == "x86_64" ]] && echo amd64 || echo arm64 )"
+            "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_${arch}"
         chmod u+x /usr/local/bin/wings
     fi
 
-    local scheme="http"
-    [[ "$PANEL_URL" == https://* ]] && scheme="https"
+    local scheme="http"; [[ "$PANEL_URL" == https://* ]] && scheme="https"
 
     (
         cd "$PANEL_DIR"
@@ -658,23 +699,12 @@ install_wings() {
         node_id="$("$PHP_BIN" artisan tinker --execute='echo (string) optional(\Pterodactyl\Models\Node::query()->first())->id;' | tr -dc '0-9')"
         if [[ -z "$node_id" ]]; then
             "$PHP_BIN" artisan p:node:make \
-                --name="$NODE_NAME" \
-                --description="Noeud cree par l'installeur VinusPanel" \
-                --locationId="$loc_id" \
-                --fqdn="$NODE_FQDN" \
-                --public=1 \
-                --scheme="$scheme" \
-                --proxy=0 \
-                --maintenance=0 \
-                --maxMemory=7000 \
-                --overallocateMemory=0 \
-                --maxDisk=80000 \
-                --overallocateDisk=0 \
-                --uploadSize=100 \
-                --daemonListeningPort=8080 \
-                --daemonSFTPPort=2022 \
-                --daemonBase=/var/lib/pterodactyl/volumes \
-                --no-interaction
+                --name="$NODE_NAME" --description="Noeud cree par l'installeur VinusPanel" \
+                --locationId="$loc_id" --fqdn="$NODE_FQDN" --public=1 --scheme="$scheme" \
+                --proxy=0 --maintenance=0 --maxMemory=7000 --overallocateMemory=0 \
+                --maxDisk=80000 --overallocateDisk=0 --uploadSize=100 \
+                --daemonListeningPort=8080 --daemonSFTPPort=2022 \
+                --daemonBase=/var/lib/pterodactyl/volumes --no-interaction
             node_id="$("$PHP_BIN" artisan tinker --execute='echo (string) optional(\Pterodactyl\Models\Node::query()->first())->id;' | tr -dc '0-9')"
         fi
         [[ -n "$node_id" ]] || fail "impossible de creer le noeud Wings"
@@ -722,18 +752,16 @@ UNIT
 
     systemctl daemon-reload
     systemctl enable --now wings.service
-    log "Wings installe et demarre (node fqdn : ${NODE_FQDN})."
+    ok "Wings installe et demarre (noeud ${NODE_NAME} / ${NODE_FQDN})."
 }
 
 # ---------------------------------------------------------------------------
 # Recapitulatif
 # ---------------------------------------------------------------------------
-
 print_summary() {
     printf '\n'
-    log "Installation terminee."
-
-    if ((FRESH_PANEL)); then
+    ok "Installation terminee."
+    if [[ "$FRESH_PANEL" == "1" ]]; then
         mkdir -p "$STATE_DIR"
         {
             printf '# Identifiants VinusPanel (genere le %s)\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -752,30 +780,21 @@ print_summary() {
     else
         log "Theme applique sur un panel existant (${PANEL_DIR})."
     fi
-
     if wings_enabled; then
         log "Wings      : noeud '${NODE_NAME}' (${NODE_FQDN}) - config /etc/pterodactyl/config.yml"
     fi
 }
 
 # ---------------------------------------------------------------------------
-# Point d'entree
+# Actions du menu
 # ---------------------------------------------------------------------------
-
-main() {
-    FRESH_PANEL=0
-
-    if ((CHECK_ONLY)); then
-        system_report
-        exit 0
-    fi
-
-    ((EUID == 0)) || fail "l'installation doit etre lancee avec sudo ou en root"
-
+action_install() {
+    BUILD_MODE="${1:-production}"
+    require_root
     generate_secrets
 
     if panel_present; then
-        log "Panel Pterodactyl detecte dans $PANEL_DIR."
+        log "Panel Pterodactyl detecte dans ${PANEL_DIR}."
     else
         FRESH_PANEL=1
         bootstrap_panel
@@ -783,14 +802,187 @@ main() {
 
     validate_environment
     install_theme
-
-    if wings_enabled; then
-        install_wings
-        mkdir -p "$STATE_DIR"
-        printf 'yes\n' > "$STATE_DIR/wings-enabled"
-    fi
-
+    if wings_enabled; then install_wings; fi
     print_summary
 }
 
-main "$@"
+action_update() {
+    require_root
+    if [[ -d "$REPO_DIR/.git" ]]; then
+        log "Recuperation des sources VinusPanel (git pull)..."
+        git -C "$REPO_DIR" fetch --quiet origin >/dev/null 2>&1 || warn "git fetch a echoue"
+        if git -C "$REPO_DIR" pull --ff-only --quiet; then
+            ok "Sources a jour."
+        else
+            warn "git pull impossible (modifications locales ou branche divergente) : sources inchangees."
+        fi
+    else
+        warn "Ce dossier n'est pas un clone Git : mise a jour des sources ignoree."
+    fi
+    validate_environment
+    BUILD_MODE="production"
+    install_theme
+    ok "Mise a jour terminee."
+}
+
+action_admin() {
+    require_root
+    panel_present || fail "aucun panel Pterodactyl detecte ; utilise d'abord l'option 1"
+
+    local email="$ADMIN_EMAIL" user="$ADMIN_USER" pass="$ADMIN_PASS" ans
+    if is_tty; then
+        local ip; ip="$(detect_public_ip)"
+        read -r -p "Email administrateur [${email:-admin@${ip}}] : " ans || true
+        email="${ans:-${email:-admin@${ip}}}"
+        read -r -p "Identifiant [${user:-admin}] : " ans || true
+        user="${ans:-${user:-admin}}"
+        read -r -s -p "Mot de passe (vide = genere automatiquement) : " pass || true
+        printf '\n'
+    fi
+    [[ -n "$pass" ]] || pass="$(generate_password)"
+
+    local existing
+    existing="$(mariadb -u root -N -B -e \
+        "SELECT COUNT(*) FROM \`${DB_NAME}\`.users WHERE email='${email}';" 2>/dev/null || echo 0)"
+
+    cd "$PANEL_DIR"
+    if [[ "$existing" != "0" ]]; then
+        VINUS_EM="$email" VINUS_PW="$pass" "$PHP_BIN" artisan tinker --execute='
+            $u = \Pterodactyl\Models\User::where("email", getenv("VINUS_EM"))->first();
+            $u->password = \Illuminate\Support\Facades\Hash::make(getenv("VINUS_PW"));
+            $u->save();
+            echo "reset-ok";
+        ' >/dev/null
+        ok "Mot de passe reinitialise pour ${email}."
+    else
+        "$PHP_BIN" artisan p:user:make \
+            --email="$email" --username="$user" \
+            --name-first="$ADMIN_FIRST" --name-last="$ADMIN_LAST" \
+            --password="$pass" --admin=1 --no-interaction
+        ok "Compte administrateur ${email} cree."
+    fi
+    log "Identifiant : ${user}"
+    log "Mot de passe : ${pass}"
+}
+
+action_restart() {
+    require_root
+    local svc
+    for svc in php8.3-fpm nginx pteroq wings; do
+        if systemctl cat "$svc" >/dev/null 2>&1; then
+            if systemctl restart "$svc" >/dev/null 2>&1; then ok "Redemarre : ${svc}"; else warn "echec du redemarrage : ${svc}"; fi
+        fi
+    done
+    if panel_present; then
+        (cd "$PANEL_DIR" && "$PHP_BIN" artisan queue:restart) >/dev/null 2>&1 && ok "File d'attente reinitialisee."
+        (cd "$PANEL_DIR" && "$PHP_BIN" artisan view:clear >/dev/null 2>&1) || true
+        (cd "$PANEL_DIR" && "$PHP_BIN" artisan cache:clear >/dev/null 2>&1) || true
+    fi
+    ok "Services redemarres."
+}
+
+action_uninstall() {
+    require_root
+    local script="$REPO_DIR/uninstall.sh"
+    if [[ ! -f "$script" ]]; then
+        script="$PANEL_DIR/../vinuspanel/uninstall.sh"
+    fi
+    [[ -f "$script" ]] || fail "uninstall.sh est introuvable (execute cette action depuis le depot VinusPanel)"
+    if is_tty; then
+        local a
+        read -r -p "Confirmer la desinstallation du theme VinusPanel ? [oui/non] : " a || true
+        case "$a" in
+            oui|o|y|yes) ;;
+            *) log "Desinstallation annulee."; return 0 ;;
+        esac
+    fi
+    bash "$script"
+    ok "Desinstallation terminee."
+}
+
+# ---------------------------------------------------------------------------
+# Boucle du menu
+# ---------------------------------------------------------------------------
+interactive_loop() {
+    while true; do
+        [[ -t 1 ]] && clear 2>/dev/null || true
+        banner
+        header
+        menu
+        printf 'Select an option %s[1-7]%s: ' "$C_ACCENT" "$C_RESET"
+        local choice=""
+        read -r choice || { printf '\n'; break; }
+        printf '\n'
+        case "$choice" in
+            1) action_install production ;;
+            2) action_install development ;;
+            3) action_update ;;
+            4) action_admin ;;
+            5) action_restart ;;
+            6) action_uninstall ;;
+            7) log "Au revoir."; exit 0 ;;
+            *) warn "Choix invalide (1-7)." ;;
+        esac
+        printf '\n'
+        printf '%s--- Appuie sur Entree pour revenir au menu ---%s' "$C_GREY" "$C_RESET"
+        read -r _ || { printf '\n'; break; }
+    done
+}
+
+# ---------------------------------------------------------------------------
+# Analyse des arguments
+# ---------------------------------------------------------------------------
+while (($#)); do
+    case "$1" in
+        --panel-dir) (($# >= 2)) || fail "--panel-dir necessite un chemin"; PANEL_DIR="${2%/}"; shift 2 ;;
+        --check) ACTION="check"; CHECK_ONLY=1; shift ;;
+        --menu) MENU_FORCE=1; shift ;;
+        --install)
+            ACTION="install"
+            if (($# >= 2)) && [[ "$2" == "dev" || "$2" == "development" || "$2" == "prod" || "$2" == "production" ]]; then
+                BUILD_MODE="$2"; [[ "$BUILD_MODE" == "dev" ]] && BUILD_MODE="development"
+                [[ "$BUILD_MODE" == "prod" ]] && BUILD_MODE="production"
+                shift 2
+            else
+                BUILD_MODE="production"; shift
+            fi ;;
+        --update) ACTION="update"; shift ;;
+        --admin) ACTION="admin"; shift ;;
+        --restart) ACTION="restart"; shift ;;
+        --uninstall) ACTION="uninstall"; shift ;;
+        --url) (($# >= 2)) || fail "--url necessite une valeur"; PANEL_URL="$2"; shift 2 ;;
+        --timezone) (($# >= 2)) || fail "--timezone necessite une valeur"; PANEL_TIMEZONE="$2"; shift 2 ;;
+        --db-password) (($# >= 2)) || fail "--db-password necessite une valeur"; DB_PASS="$2"; shift 2 ;;
+        --admin-email) (($# >= 2)) || fail "--admin-email necessite une valeur"; ADMIN_EMAIL="$2"; shift 2 ;;
+        --admin-user) (($# >= 2)) || fail "--admin-user necessite une valeur"; ADMIN_USER="$2"; shift 2 ;;
+        --admin-password) (($# >= 2)) || fail "--admin-password necessite une valeur"; ADMIN_PASS="$2"; shift 2 ;;
+        --wings) WITH_WINGS="yes"; shift ;;
+        --no-wings) WITH_WINGS="no"; shift ;;
+        --node-fqdn) (($# >= 2)) || fail "--node-fqdn necessite une valeur"; NODE_FQDN="$2"; shift 2 ;;
+        --alloc-range) (($# >= 2)) || fail "--alloc-range necessite une valeur"; ALLOC_START="${2%-*}"; ALLOC_END="${2#*-}"; shift 2 ;;
+        --keep-proxy) PROXY_MODE="keep"; shift ;;
+        -h|--help) usage; exit 0 ;;
+        *) fail "option inconnue : $1" ;;
+    esac
+done
+
+[[ "$PANEL_DIR" = /* ]] || fail "le chemin du panel doit etre absolu"
+
+# ---------------------------------------------------------------------------
+# Point d'entree
+# ---------------------------------------------------------------------------
+case "$ACTION" in
+    check)   system_report; exit 0 ;;
+    install) action_install "$BUILD_MODE"; exit 0 ;;
+    update)  action_update; exit 0 ;;
+    admin)   action_admin; exit 0 ;;
+    restart) action_restart; exit 0 ;;
+    uninstall) action_uninstall; exit 0 ;;
+esac
+
+if interactive; then
+    interactive_loop
+else
+    # Execution non interactive (scripts / CI) : installation complete.
+    action_install production
+fi
