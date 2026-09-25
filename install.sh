@@ -50,6 +50,8 @@ ALLOC_START="${VINUS_ALLOC_START:-25565}"
 ALLOC_END="${VINUS_ALLOC_END:-25584}"
 WITH_WINGS="${VINUS_WITH_WINGS:-auto}"
 PROXY_MODE="${VINUS_PROXY_MODE:-auto}"
+NODE_MEMORY="${VINUS_NODE_MEMORY:-}"
+NODE_DISK="${VINUS_NODE_DISK:-}"
 
 # ---------------------------------------------------------------------------
 # Style
@@ -738,11 +740,22 @@ install_wings() {
 
         node_id="$("$PHP_BIN" artisan tinker --execute='echo (string) optional(\Pterodactyl\Models\Node::query()->first())->id;' | tr -dc '0-9')"
         if [[ -z "$node_id" ]]; then
+            # Limites du noeud deduites de la machine (85 % de la RAM et du disque).
+            local node_mem="$NODE_MEMORY" node_disk="$NODE_DISK"
+            if [[ -z "$node_mem" ]]; then
+                node_mem="$(awk '/MemTotal/{printf "%d", $2/1024*0.85}' /proc/meminfo 2>/dev/null || echo "")"
+                [[ "$node_mem" =~ ^[0-9]+$ && "$node_mem" -ge 512 ]] || node_mem=2048
+            fi
+            if [[ -z "$node_disk" ]]; then
+                node_disk="$(df -Pm / 2>/dev/null | awk 'NR==2{printf "%d", $2*0.85}')"
+                [[ "$node_disk" =~ ^[0-9]+$ && "$node_disk" -ge 2048 ]] || node_disk=20000
+            fi
+
             "$PHP_BIN" artisan p:node:make \
                 --name="$NODE_NAME" --description="Noeud cree par l'installeur VinusPanel" \
                 --locationId="$loc_id" --fqdn="$NODE_FQDN" --public=1 --scheme="$scheme" \
-                --proxy=0 --maintenance=0 --maxMemory=7000 --overallocateMemory=0 \
-                --maxDisk=80000 --overallocateDisk=0 --uploadSize=100 \
+                --proxy=0 --maintenance=0 --maxMemory="$node_mem" --overallocateMemory=0 \
+                --maxDisk="$node_disk" --overallocateDisk=0 --uploadSize=100 \
                 --daemonListeningPort=8080 --daemonSFTPPort=2022 \
                 --daemonBase=/var/lib/pterodactyl/volumes --no-interaction
             node_id="$("$PHP_BIN" artisan tinker --execute='echo (string) optional(\Pterodactyl\Models\Node::query()->first())->id;' | tr -dc '0-9')"
