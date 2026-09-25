@@ -34,9 +34,8 @@ export default () => {
             <FlashMessageRender byKey={'account'} />
             <header className={style.activity_page_header}>
                 <div>
-                    <p className={style.eyebrow}>{vt("Journal de sécurité")}</p>
-                    <h1>{vt("Activité du compte")}</h1>
-                    <p>{vt("Retrouvez les connexions et opérations sensibles liées à votre compte.")}</p>
+                    <h1>{vt("Activité")}</h1>
+                    <p>{vt("Les actions effectuées avec ce compte, avec leur date et leur origine.")}</p>
                 </div>
                 <div className={style.activity_summary}>
                     <ClockIcon className={'h-5 w-5'} />

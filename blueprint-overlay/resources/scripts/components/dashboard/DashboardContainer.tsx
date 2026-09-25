@@ -1,4 +1,5 @@
 import BeforeContent from '@blueprint/components/Dashboard/Serverlist/BeforeContent';
+import MessageBox from '@/components/MessageBox';
 import AfterContent from '@blueprint/components/Dashboard/Serverlist/AfterContent';
 import { useDesign, designPreview } from '@/designRuntime';
 import React, { useEffect, useState } from 'react';
@@ -110,7 +111,7 @@ export default function DashboardContainer({ preview = false, design }: { previe
         </section>
         <section className={styles.activity} aria-labelledby="activity-heading">
             <header><div><h2 id="activity-heading">{vt('Activité récente')}</h2><p>{activity ? vt('{{count}} événements récents', {count: activity.items.length}) : vt('Chargement…')}</p></div><Link to="/account/activity">{vt('Tout voir')}</Link></header>
-            {activityError ? <p className={styles.error} role="alert">{vt('Impossible de charger l’activité.')} <button type="button" onClick={() => retryActivity()}>{vt('Réessayer')}</button></p>
+            {activityError ? <MessageBox type="error">{vt('Impossible de charger l’activité.')} <button type="button" onClick={() => retryActivity()}>{vt('Réessayer')}</button></MessageBox>
                 : !activity ? <div className={styles.loading}><Spinner centered /></div>
                 : activity.items.length ? <ul>{activity.items.slice(safeActivityPage * 3, safeActivityPage * 3 + 3).map(entry => <li key={entry.id}>
                     <span className={styles.statusDot} /><div><strong>{activityLabel(entry)}</strong><small>{entry.event.split(':')[0]}{entry.relationships.actor ? ` · ${entry.relationships.actor.username}` : ''}</small></div>

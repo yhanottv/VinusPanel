@@ -2,6 +2,9 @@
 
 ## Unreleased — Live Design Studio
 
+- Add emoji landmarks to the GitBook chapters and update the installation guide to use `main`.
+- Synchronize the latest deployed Activity styling and keep Blueprint navigation, feedback notices and console power controls aligned with the standard theme while preserving extension hooks.
+
 - Persist the post-install VinusPlayers reminder on the panel for seven days, scoped to the installing account and server, so a reload or device change can recover it. Add a Versions-page entry point to reopen the offer.
 - Present an illustrated, animated VinusPlayers offer after a successful Minecraft installation reaches running state. Later keeps Players available; explicit activation gracefully stops, verifies/installs and requests startup, with timeout and existing-file safeguards.
 - Publish [VinusPanel Docs on GitBook](https://vinuspanel.gitbook.io/vinuspanel-docs/) with 13 French chapters, an English quick start, a welcome page and a contents page. Sources remain in `docs/gitbook/`; Git Sync configuration is provided but automatic synchronization is not connected. The GitHub wiki is disabled.

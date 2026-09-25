@@ -1,5 +1,6 @@
 // VinusPanel UI translations. Server content and logs are never translated.
 export default {
+    "Les actions effectuées avec ce compte, avec leur date et leur origine.": "Actions performed with this account, with their date and origin.",
     "Découvrir VinusPlayers": "Discover VinusPlayers",
     "Informations sur les joueurs": "Player information",
     "La liaison VinusPlayers transmet au panel les joueurs connectés, leur inventaire, leur vie, leur nourriture et leur expérience en direct.": "The VinusPlayers bridge sends online players, inventory, health, food and experience to the panel in real time.",

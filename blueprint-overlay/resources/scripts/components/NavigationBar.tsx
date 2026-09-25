@@ -1,3 +1,4 @@
+import MessageBox from '@/components/MessageBox';
 import NavLink from '@/components/dashboard/design/DesignNavLink';
 import BeforeNavigation from '@blueprint/components/Navigation/NavigationBar/BeforeNavigation';
 import AdditionalItems from '@blueprint/components/Navigation/NavigationBar/AdditionalItems';
@@ -59,6 +60,7 @@ export default function NavigationBar() {
                 {user.rootAdmin && <a href="/admin"><Icon name="controls" /><span>{vt('Administration')}</span></a>}
                 <a href="https://github.com/yhanottv/VinusPanel" target="_blank" rel="noreferrer"><Icon name="globe" /><span>VinusPanel · GitHub</span></a>
             </div>}
+            {design.links.filter(link => link.visible).map((link,index) => <a key={index} href={link.url} target="_blank" rel="noreferrer"><Icon name="external" /><span>{link.label}</span></a>)}
             <AdditionalItems />
         </nav>
         <Link className={styles.profile} to="/account/profile">
@@ -66,7 +68,7 @@ export default function NavigationBar() {
             <span><strong>{appearance.displayName || user.username}</strong><small>{user.email}</small></span>
         </Link>
         <button className={styles.standaloneLogout} type="button" onClick={logout} disabled={busy}><Icon name="logout" />{vt('Déconnexion')}</button>
-        {error && <p role="alert" className={styles.error}>{error}</p>}
+        {error && <MessageBox type="error" dismissible key={error}>{error}</MessageBox>}
         <AfterNavigation />
     </aside>;
 }
