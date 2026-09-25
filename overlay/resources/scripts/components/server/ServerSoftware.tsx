@@ -1,3 +1,4 @@
+import CompanionChoice, { CompanionOffer, CompanionDecision, decisionReady, acceptsCompanion, companionResult } from './players/CompanionChoice';
 import MessageBox from '@/components/MessageBox';
 import useServerOperation from './useServerOperation';
 import React, { useEffect, useRef, useState } from 'react';
@@ -14,7 +15,7 @@ import styles from './software.module.css';
 interface Software { name: string; icon: string | null; description: string; deprecated: boolean; experimental: boolean; }
 interface Version { id: string; java: number; channel: string; supported: boolean; }
 interface Build { id: number; name: string; experimental: boolean; }
-interface Plan { token: string; java: number; image: string; label: string; size: number; }
+interface Plan { companion: CompanionOffer; token: string; java: number; image: string; label: string; size: number; }
 const groupNames: Record<string, string> = { recommended: 'Recommandés', established: 'Établis', experimental: 'Expérimentaux', miscellaneous: 'Autres logiciels', limbos: 'Serveurs d’attente' };
 
 export default function ServerSoftware() {
@@ -31,6 +32,8 @@ export default function ServerSoftware() {
     const [builds, setBuilds] = useState<Build[]>([]);
     const [build, setBuild] = useState('');
     const [query, setQuery] = useState('');
+    const [companionChoice, setCompanionChoice] = useState<CompanionDecision>(null);
+    const [companionStatus, setCompanionStatus] = useState('');
     const [plan, setPlan] = useState<Plan | null>(null);
     const [loading, setLoading] = useState(false);
     const [busy, setBusy] = useState(false);
@@ -64,16 +67,17 @@ export default function ServerSoftware() {
         return () => { active = false; };
     }, [endpoint, selected, version]);
     const prepare = async () => {
+        setCompanionChoice(null);
         const request = identity.current; setBusy(true); setError('');
         try { const { data } = await http.post(`${endpoint}/plan`, { type: selected, version, build: Number(build) }); if (request === identity.current) setPlan(data); }
         catch (e) { if (request === identity.current) setError(httpErrorToHuman(e)); } finally { setBusy(false); }
     };
     const install = async () => {
-        if (!plan || busy) return;
-        setBusy(true); setError(''); setMessage('');
+        if (!plan || busy || !decisionReady(plan.companion, companionChoice)) return;
+        setBusy(true); setError(''); setMessage(''); setCompanionStatus('');
         try {
-            const { data } = await http.post(`${endpoint}/install`, { token: plan.token }, { timeout: 660000 });
-            if (operation.current()) { setMessage(data.message); setBackup(data.backup); setPlan(null); setSelected(''); await refreshServer(server.id); }
+            const { data } = await http.post(`${endpoint}/install`, { token: plan.token, install_players: acceptsCompanion(plan.companion, companionChoice) }, { timeout: 660000 });
+            if (operation.current()) { setCompanionStatus(data.companion?.status || 'declined'); setMessage(data.message); setBackup(data.backup); setPlan(null); setSelected(''); await refreshServer(server.id); }
         } catch (e) { if (operation.current()) { setError(httpErrorToHuman(e)); setPlan(null); } } finally { operation.reconnect(); if (operation.current()) setBusy(false); }
     };
     return <PageContentBlock title={`${server.name} | Version`} className={styles.page}>
@@ -81,6 +85,7 @@ export default function ServerSoftware() {
         <div className={styles.warning}>{vt('Un changement de logiciel peut rendre vos mondes, plugins ou mods incompatibles. Les fichiers remplacés sont conservés dans un dossier de récupération. Créez aussi une sauvegarde de vos mondes avant de changer de version.')}</div>
         {error && !selected && <MessageBox type="error" dismissible key={error}>{error}</MessageBox>}
         {message && <div className={styles.success} role="status">{message}{backup && <Link to={`/server/${server.id}/files#/${backup}`}>{vt('Ouvrir les fichiers de récupération')} ↗</Link>}</div>}
+        {companionStatus && <MessageBox type={companionStatus === 'failed' ? 'warning' : 'info'}>{companionResult(companionStatus)}</MessageBox>}
         <input className={styles.search} value={query} onChange={e => setQuery(e.target.value)} placeholder={vt('Rechercher un logiciel…')} aria-label={vt('Rechercher un logiciel…')} />
         {loading && !selected && <p role="status">{vt('Chargement des logiciels…')}</p>}
         {Object.entries(groups).map(([group, items]) => {
@@ -99,7 +104,8 @@ export default function ServerSoftware() {
                 {loading && <p role="status">{vt('Chargement des versions…')}</p>}
                 {!canInstall && <p>{vt('Les permissions de réinstallation, de démarrage et de gestion des fichiers sont nécessaires.')}</p>}
                 {plan ? <><div className={styles.warning}>{vt('Confirmer ce changement remplacera le logiciel et ses bibliothèques. Vos mondes et extensions restent présents. Le serveur doit être arrêté et restera arrêté après l’installation.')}</div><p>{plan.label} · Java {plan.java} · {(plan.size / 1048576).toFixed(1)} Mio</p><label className={styles.imageLabel}>{vt('Image Docker')}<code>{plan.image}</code></label>{status !== 'offline' && <p>{vt('Arrêtez le serveur depuis la console pour continuer.')}</p>}
-                    <button className={styles.primary} type="button" disabled={busy || status !== 'offline'} onClick={install}>{busy ? vt('Téléchargement, vérification et installation…') : vt('Confirmer l’installation')}</button>
+                <CompanionChoice offer={plan.companion} value={companionChoice} onChange={setCompanionChoice} disabled={busy}/>
+                    <button className={styles.primary} type="button" disabled={busy || status !== 'offline' || !decisionReady(plan.companion, companionChoice)} onClick={install}>{busy ? vt('Téléchargement, vérification et installation…') : vt('Confirmer l’installation')}</button>
                 </> : <button className={styles.primary} type="button" disabled={!canInstall || busy || loading || !build} onClick={prepare}>{busy ? vt('Préparation…') : vt('Préparer l’installation')}</button>}
             </div>
         </Dialog>

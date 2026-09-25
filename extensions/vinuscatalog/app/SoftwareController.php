@@ -45,13 +45,16 @@ final class SoftwareController extends Controller
         $image = SoftwareInstaller::image($server, (int) $plan['java']);
         $token = Str::random(48);
         Cache::put('vinussoftware:plan:'.$token, ['user' => $request->user()->id, 'server' => $server->uuid, 'startup' => $server->startup, 'image' => $server->image, 'plan' => $plan], 600);
-        return ['token' => $token, 'java' => $plan['java'], 'image' => $image, 'label' => $plan['label'], 'size' => array_sum(array_column($plan['steps'], 'size'))];
+        return ['companion' => app(PlayerCompanion::class)->offer($plan, $image) + ['can_install' => $request->user()->can('control.console', $server)], 'token' => $token, 'java' => $plan['java'], 'image' => $image, 'label' => $plan['label'], 'size' => array_sum(array_column($plan['steps'], 'size'))];
     }
 
     public function install(Request $request, Server $server): array
     {
         $this->access($request, $server, true);
-        $token = $request->validate(['token' => 'required|regex:/^[a-zA-Z0-9]{48}$/D'])['token'];
+        $data = $request->validate(['token' => 'required|regex:/^[a-zA-Z0-9]{48}$/D', 'install_players' => 'required|boolean']);
+        $token = $data['token'];
+        $accepted = $request->boolean('install_players');
+        if ($accepted) abort_unless($request->user()->can('control.console', $server), 403);
         $lock = Cache::lock('vinuscatalog:install:'.$server->uuid, 900);
         abort_unless($lock->get(), 409, 'Une installation est déjà en cours.');
         try {
@@ -62,7 +65,7 @@ final class SoftwareController extends Controller
             Cache::forget('vinussoftware:plan:'.$token);
             $result = $this->installer->install($server, $saved['plan']);
         } finally { $lock->release(); }
-        app(PlayerCompanion::class)->automatic($server->fresh());
+        $result['companion'] = app(PlayerCompanion::class)->automatic($server->fresh(), $accepted);
         return $result;
     }
 }

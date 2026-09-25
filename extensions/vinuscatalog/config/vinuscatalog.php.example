@@ -1,8 +1,6 @@
 <?php
 
 return [
-    // Install bundled, verified player bridges after successful Minecraft installations.
-    'players_auto_install' => true,
     // Private server-side key: never passed to the browser.
     'curseforge_key' => env('VINUS_CURSEFORGE_API_KEY'),
     // Map the egg UUID (not the server UUID) to a Detection::PROFILES key.

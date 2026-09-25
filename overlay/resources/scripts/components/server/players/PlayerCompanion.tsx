@@ -20,7 +20,7 @@ export default function PlayerCompanion({endpoint,onInstalled}:{endpoint:string;
         catch(e){if(alive.current)setError(httpErrorToHuman(e));}finally{if(alive.current)setBusy(false);}
     };
     return <section className={styles.companion}>
-        <div><strong>{vt('Liaison joueurs')}</strong><p>{vt('Les données sauvegardées restent consultables. Installez la liaison compatible pour afficher les joueurs et leurs inventaires en direct.')}</p>
+        <div><strong>{vt('Liaison joueurs')}</strong><p>{vt('Pour afficher les joueurs connectés, leur inventaire, leur vie et leur expérience en direct, installez le plugin ou le mod VinusPlayers sur ce serveur. Sans cette liaison, seules les données sauvegardées disponibles peuvent être consultées.')}</p>
             {data&&<small>{data.software||vt('Logiciel inconnu')} · {data.minecraft||vt('Version Minecraft inconnue')} · {vt(data.supported?(data.kind==='plugin'?'Plugin compatible':'Mod compatible'):'Aucune liaison vérifiée pour cette configuration')}</small>}
             {data?.reason==='loader'&&<p>{vt('La version du loader est inconnue ou n’a pas encore été vérifiée. Consultez la liste de compatibilité.')}</p>}
             {data?.reason==='java'&&<p>{vt('L’image Java de ce serveur est inconnue ou trop ancienne pour cette liaison.')}</p>}

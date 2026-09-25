@@ -128,6 +128,7 @@ resources/scripts/components/elements/button/style.module.css
 resources/scripts/components/elements/language-selector.module.css
 resources/scripts/components/elements/private-value.module.css
 resources/scripts/components/message-box.module.css
+resources/scripts/components/server/CompanionConsent.spec.tsx
 resources/scripts/components/server/MotdEditor.tsx
 resources/scripts/components/server/ServerActivityLogContainer.tsx
 resources/scripts/components/server/ServerModpacks.tsx
@@ -180,11 +181,13 @@ resources/scripts/components/server/motd.spec.ts
 resources/scripts/components/server/motd.ts
 resources/scripts/components/server/network/AllocationRow.tsx
 resources/scripts/components/server/network/NetworkContainer.tsx
+resources/scripts/components/server/players/CompanionChoice.tsx
 resources/scripts/components/server/players/PlayerCompanion.spec.tsx
 resources/scripts/components/server/players/PlayerCompanion.tsx
 resources/scripts/components/server/players/PlayerInventory.spec.tsx
 resources/scripts/components/server/players/PlayerInventory.tsx
 resources/scripts/components/server/players/PlayerSkin.tsx
+resources/scripts/components/server/players/companion-choice.module.css
 resources/scripts/components/server/players/players.module.css
 resources/scripts/components/server/players/types.ts
 resources/scripts/components/server/properties.module.css

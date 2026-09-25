@@ -56,9 +56,20 @@ final class PlayerCompanion
     public function availability(Server $server): array
     {
         $profile = VinusSoftware::forServer($server);
+        return $this->describe($profile, $server->image, $this->loaderVersion($server, $profile));
+    }
+
+    public function offer(array $plan, string $image): array
+    {
+        $profile = ServerSoftware::profile($plan['software'], $plan['version'], $plan['label']);
+        return $this->describe($profile, $image, $plan['loader_version'] ?? null);
+    }
+
+    private function describe(array $profile, string $image, ?string $loaderVersion): array
+    {
         $artifact = self::select($profile, $this->artifacts());
-        $loaderVerified = !$artifact || $artifact['loader'] === 'bukkit' || in_array($this->loaderVersion($server, $profile), $artifact['loader_versions'] ?? [], true);
-        $java = preg_match('/(?:^|[:\/_-])java[_-]?(\d{1,2})(?:$|[^0-9])/i', $server->image, $m) ? (int) $m[1] : null;
+        $loaderVerified = !$artifact || $artifact['loader'] === 'bukkit' || in_array($loaderVersion, $artifact['loader_versions'] ?? [], true);
+        $java = preg_match('/(?:^|[:\/_-])java[_-]?(\d{1,2})(?:$|[^0-9])/i', $image, $m) ? (int) $m[1] : null;
         $supported = $artifact && $loaderVerified && $java !== null && $java >= max($artifact['java'], version_compare($profile['game_version'] ?? '0', '1.20.5', '>=') ? 21 : 17);
         return ['supported' => (bool) $supported, 'software' => $profile['software'], 'minecraft' => $profile['game_version'],
             'kind' => $artifact ? ($artifact['loader'] === 'bukkit' ? 'plugin' : 'mod') : null,
@@ -108,14 +119,17 @@ final class PlayerCompanion
         } finally { $lock->release(); }
     }
 
-    public function automatic(Server $server): void
+    /** Old queued jobs omit consent and must never install a bridge. */
+    public function automatic(Server $server, bool $accepted = false): array
     {
-        if (!config('vinuscatalog.players_auto_install', true)) return;
+        if (!$accepted) return ['status' => 'declined'];
         try {
-            if ($this->availability($server)['supported']) $this->install($server);
+            if (!$this->availability($server)['supported']) return ['status' => 'unsupported'];
+            return $this->install($server);
         } catch (\Throwable $error) {
-            // A bridge failure must not turn a successful Minecraft installation into a failed one.
             report($error);
+            // Keep the successful software installation, but report the separate bridge failure.
+            return ['status' => 'failed'];
         }
     }
 }

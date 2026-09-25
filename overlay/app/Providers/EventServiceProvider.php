@@ -24,7 +24,6 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         ServerInstalledEvent::class => [ServerInstalledNotification::class],
-        \Pterodactyl\Events\Server\Updated::class => [\Pterodactyl\Listeners\VinusPlayerCompanion::class],
     ];
 
     protected $subscribe = [

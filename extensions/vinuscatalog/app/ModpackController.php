@@ -77,7 +77,7 @@ final class ModpackController extends Controller
             $token = Str::random(48);
             $plan = ['project' => $data['project'], 'version' => $data['version'], 'title' => $project['title'], 'release' => $version['version_number'], 'artifact' => $artifact, 'runtime' => $runtime];
             Cache::put('vinusmodpacks:plan:'.$token, ['user' => $request->user()->id, 'server' => $server->uuid, 'startup' => $server->startup, 'image' => $server->image, 'plan' => $plan], 900);
-            return ['token' => $token, 'title' => $project['title'], 'release' => $version['version_number'], 'minecraft' => $pack['runtime']['minecraft'], 'software' => $pack['runtime']['software'], 'loader' => $pack['runtime']['loader_version'], 'java' => $runtime['java'], 'image' => $image, 'size' => $pack['size'] + array_sum(array_column($pack['overrides'], 'size')) + array_sum(array_column($runtime['steps'], 'size')), 'files' => count(array_filter($pack['files'], fn ($f) => !$f['optional'])), 'optional' => array_values(array_column(array_filter($pack['files'], fn ($f) => $f['optional']), 'path')), 'skipped' => $pack['client_files_skipped']];
+            return ['companion' => app(PlayerCompanion::class)->offer($runtime, $image) + ['can_install' => $request->user()->can('control.console', $server)], 'token' => $token, 'title' => $project['title'], 'release' => $version['version_number'], 'minecraft' => $pack['runtime']['minecraft'], 'software' => $pack['runtime']['software'], 'loader' => $pack['runtime']['loader_version'], 'java' => $runtime['java'], 'image' => $image, 'size' => $pack['size'] + array_sum(array_column($pack['overrides'], 'size')) + array_sum(array_column($runtime['steps'], 'size')), 'files' => count(array_filter($pack['files'], fn ($f) => !$f['optional'])), 'optional' => array_values(array_column(array_filter($pack['files'], fn ($f) => $f['optional']), 'path')), 'skipped' => $pack['client_files_skipped']];
         } finally { if ($temp && is_file($temp)) unlink($temp); $this->download->deadline = null; }
     }
 
@@ -92,14 +92,16 @@ final class ModpackController extends Controller
             $token=Str::random(48);$artifact=array_merge($artifacts['server'],['sha512'=>$prepared['sha512']]);
             $plan=['source'=>'curseforge','project'=>$input['project'],'version'=>$input['version'],'title'=>$artifacts['title'],'release'=>$artifacts['release'],'artifact'=>$artifact,'runtime'=>$runtime,'pack_runtime'=>$pack['runtime']];
             Cache::put('vinusmodpacks:plan:'.$token,['user'=>$request->user()->id,'server'=>$server->uuid,'startup'=>$server->startup,'image'=>$server->image,'plan'=>$plan],900);
-            return ['token'=>$token,'title'=>$artifacts['title'],'release'=>$artifacts['release'],'minecraft'=>$pack['runtime']['minecraft'],'software'=>$pack['runtime']['software'],'loader'=>$pack['runtime']['loader_version'],'java'=>$runtime['java'],'image'=>$image,'size'=>array_sum(array_column($pack['overrides'],'size'))+array_sum(array_column($runtime['steps'],'size')),'files'=>count($pack['overrides']),'optional'=>[],'skipped'=>0,'launcher_files_skipped'=>$pack['launcher_files_skipped']];
+            return ['companion'=>app(PlayerCompanion::class)->offer($runtime,$image)+['can_install'=>$request->user()->can('control.console',$server)],'token'=>$token,'title'=>$artifacts['title'],'release'=>$artifacts['release'],'minecraft'=>$pack['runtime']['minecraft'],'software'=>$pack['runtime']['software'],'loader'=>$pack['runtime']['loader_version'],'java'=>$runtime['java'],'image'=>$image,'size'=>array_sum(array_column($pack['overrides'],'size'))+array_sum(array_column($runtime['steps'],'size')),'files'=>count($pack['overrides']),'optional'=>[],'skipped'=>0,'launcher_files_skipped'=>$pack['launcher_files_skipped']];
         } finally {foreach(glob($directory.'/*')?:[] as $file)if(is_file($file))unlink($file);rmdir($directory);$this->download->deadline=null;}
     }
 
     public function install(Request $request, Server $server): array
     {
         $this->access($request, $server, true);
-        $data = $request->validate(['token' => 'required|regex:/^[a-zA-Z0-9]{48}$/D','optional' => 'present|array|max:2000','optional.*' => 'string|max:512','replace' => 'required|accepted']);
+        $data = $request->validate(['token' => 'required|regex:/^[a-zA-Z0-9]{48}$/D','optional' => 'present|array|max:2000','optional.*' => 'string|max:512','replace' => 'required|accepted', 'install_players' => 'required|boolean']);
+        $accepted = $request->boolean('install_players');
+        if ($accepted) abort_unless($request->user()->can('control.console', $server), 403);
         $lock = Cache::lock('vinuscatalog:install:'.$server->uuid, 900);
         abort_unless($lock->get(), 409, 'Une installation est déjà en cours.');
         try {
@@ -109,7 +111,7 @@ final class ModpackController extends Controller
             $server->validateCurrentState(); Cache::forget('vinusmodpacks:plan:'.$data['token']);
             $result = $this->installer->install($server, $saved['plan'], $data['optional']);
         } finally { $lock->release(); }
-        app(PlayerCompanion::class)->automatic($server->fresh());
+        $result['companion'] = app(PlayerCompanion::class)->automatic($server->fresh(), $accepted);
         return $result;
     }
 }

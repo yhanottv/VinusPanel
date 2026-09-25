@@ -17,6 +17,7 @@ namespace Pterodactyl\BlueprintFramework\Extensions\vinuscatalog {
 namespace Pterodactyl\Events\Server { class Updated {function __construct(public $server){}} }
 namespace Pterodactyl\Jobs { class InstallVinusPlayerCompanion {public static array $calls=[];static function dispatch($id){self::$calls[]=$id;return new self();}function delay($seconds){if($seconds<1)throw new \RuntimeException('Missing delay');return $this;}function afterCommit(){return $this;}} }
 namespace {
+    function report($error){}
     function storage_path($path){return sys_get_temp_dir().'/vinus-unit-no-record/'.$path;}
     function abort_unless($value,$code=500,$message=''){if(!$value)throw new \RuntimeException($message,$code);}
     require __DIR__.'/../extensions/vinuscatalog/app/PlayerCompanion.php';
@@ -59,5 +60,12 @@ namespace {
     $server->changed=true;$server->status='install_failed';$listener->handle($event);check(!\Pterodactyl\Jobs\InstallVinusPlayerCompanion::$calls);
     $server->status=null;$server->installed_at=null;$listener->handle($event);check(!\Pterodactyl\Jobs\InstallVinusPlayerCompanion::$calls);
     $server->installed_at='2026-01-01';$listener->handle($event);check(\Pterodactyl\Jobs\InstallVinusPlayerCompanion::$calls===[1]);
+    \Illuminate\Support\Facades\Cache::$available=true;
+    $consentFiles=new InstallFiles();$consentDaemon=new DaemonServerRepository();$consentService=new PlayerCompanion($consentFiles,$consentDaemon);
+    check($consentService->automatic($server)['status']==='declined');check(!$consentFiles->contents);
+    check($consentService->automatic($server,false)['status']==='declined');check(!$consentFiles->renames);
+    check($consentService->automatic($server,true)['status']==='installed');check(count($consentFiles->renames)===1);
+    $consentDaemon->state='running';check($consentService->automatic($server,true)['status']==='failed');
+    $server->profile['game_version']='99.9';check($consentService->automatic($server,true)['status']==='unsupported');
     echo "Player companion: $checks checks passed.\n";
 }
