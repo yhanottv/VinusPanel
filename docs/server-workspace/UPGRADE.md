@@ -1,6 +1,6 @@
 # Upgrading to VinusPanel 3.2.0
 
-Back up the panel, database, game-server files and local configuration before upgrading. Apply the theme with `install.sh`, then update the optional Vinus Catalog Blueprint package to **1.4.1**. The theme installer does not install the extension automatically.
+Back up the panel, database, game-server files and local configuration before upgrading. Apply the theme with `install.sh`, then update the optional Vinus Catalog Blueprint package to **1.4.2**. The theme installer does not install the extension automatically.
 
 ## Local configuration
 

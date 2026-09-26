@@ -1,4 +1,4 @@
-# Vinus Catalog 1.4.1
+# Vinus Catalog 1.4.2
 
 Outils Minecraft pour **Pterodactyl 1.15.1**, **Blueprint beta-2026-06** et **VinusPanel 3.2.0**. Le catalogue de mods/plugins inclut ses propres traductions ; les vues Version, Modpacks, Mondes et BlueMap dépendent de l’espace serveur et des services du thème. Installer les deux paquets pour disposer de l’ensemble.
 

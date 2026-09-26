@@ -17,7 +17,7 @@ Cette documentation décrit la branche **`main`** du dépôt. Les archives publi
 | Base, cache | MariaDB 10.11, Redis 7 |
 | Wings | Installé par `install.sh` sur VPS vierge (Docker inclus) |
 | Blueprint | `beta-2026-06`, optionnel pour le thème, **requis** pour le catalogue |
-| Vinus Catalog | 1.4.1, installé séparément |
+| Vinus Catalog | 1.4.2, installé séparément |
 
 Les autres versions, forks et extensions ne sont pas automatiquement certifiés. Les tests responsive incluent des largeurs de 390, 742, 1920 et 3440 pixels dans Chromium ; cela ne certifie pas tous les téléphones et navigateurs.
 

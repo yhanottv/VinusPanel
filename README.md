@@ -85,7 +85,7 @@ Profile names and avatars are local to the browser. They do not change Pterodact
 | VinusPanel | Source version **3.2.0**. |
 | Pterodactyl Panel | **1.15.1**. Other versions and forks are not validated. |
 | Blueprint | Optional for the theme; **beta-2026-06** is the validated integration. Required for Vinus Catalog. |
-| Vinus Catalog | Extension **1.4.1**, included in this repository. Install/update the Blueprint extension separately for Minecraft installation tools. |
+| Vinus Catalog | Extension **1.4.2**, included in this repository. Install/update the Blueprint extension separately for Minecraft installation tools. |
 | Node.js | Installer requires **22+**; builds were validated on Node 22. Later major versions are not automatically certified. |
 | Yarn | **1.x**. |
 | PHP | Validated on **8.3**. Keep the PHP requirements of your panel and Blueprint installation. |
@@ -147,7 +147,7 @@ On failure, the script attempts to restore backed-up files, rebuild and leave ma
 
 ## 📦 Optional Minecraft mod and plugin catalog
 
-**Blueprint is the extension framework.** Vinus Catalog 1.4.1 provides Modrinth, supported free SpigotMC resources and an optional CurseForge adapter. Its complete software, modpack, world and BlueMap workspace requires VinusPanel 3.2.0.
+**Blueprint is the extension framework.** Vinus Catalog 1.4.2 provides Modrinth, supported free SpigotMC resources and an optional CurseForge adapter. Its complete software, modpack, world and BlueMap workspace requires VinusPanel 3.2.0.
 
 | Detected server software | Available categories |
 | --- | --- |

@@ -1,38 +1,50 @@
 # VinusPanel changelog
 
+**English** · [Français](CHANGELOG.fr.md)
+
+Every entry exists in both languages: `CHANGELOG.md` (English) and `CHANGELOG.fr.md` (Français).
+
 ## Unreleased — Live Design Studio
 
-- Players page: the icon sprite now also uses the pinned `minecraft-textures` pack (3D isometric block icons such as the crafting table, about 2,000 icons in total) on top of Mojang's client textures; a sprite built before this change is regenerated on the next install or update.
-- The dashboard "Créer un serveur" button now opens the creation assistant (the one shown at first login) instead of the classic admin form, which remains available from the admin area.
-- Players page: item icons are now built automatically by the installer from Mojang's official client (`--textures` to retry), instead of showing a placeholder for every item. Player controls now work on native mod bridges (Fabric, Forge, NeoForge): heal, feed, kill, game mode, XP levels, operator, whitelist and ban are sent as vanilla console commands, restricted to validated player names and values and to `control.console`.
-- `install.sh` now installs everything on a fresh VPS, including Blueprint `beta-2026-06` and Vinus Catalog (panel → Blueprint → theme with Blueprint variants → catalogue). New `--[no-]blueprint` and `--catalog` options; the catalogue step is non-fatal. Validated end to end on a blank Ubuntu 24.04 VPS with a preinstalled Traefik (about 7 minutes). The application key is generated before `composer install`, which removes two spurious errors from the log.
-- Rewrite the GitBook documentation (`docs/gitbook/`) for a complete A-to-Z installation on a fresh VPS: prerequisites, installer walkthrough, generated credentials, checks, the Blueprint → theme → catalogue order, a new production-hardening chapter (HTTPS, firewall, SSH, mail, backups, logs), first-login wizard, `vinus-guard`, update/rollback/reset and an extended troubleshooting table. Chapters 12 and 13 became 13 and 14. Align both READMEs, `INSTALLATION.fr.md` and the catalogue guide (version 1.4.0).
-- `install.sh` resumes an interrupted fresh install instead of treating a half-installed panel as complete (`/var/lib/vinuspanel/bootstrap-incomplete`), and installs `zip` and `wget`, which Blueprint and the catalogue packaging need.
+### Fixed
 
-- Fix the administration script (`vinus-admin.js`) being deleted by every `yarn build:production`: Pterodactyl's `clean` step removes each `*.js` under `public/assets`, so the admin search, language switch and navigation marker silently failed. The script now ships in `public/vinus/js/`.
-- Create servers for the signed-in administrator in the deployment wizard. The wizard looked for a numeric user id that the client API never provides, so the owner always defaulted to the first account.
-- Deployment wizard: unlimited cgroup v2 hosts (`cpu.max` = `max 100000`) no longer report a single CPU core, and a disabled `shell_exec` no longer breaks the page. A missing or unreachable Forge catalogue no longer blocks server creation with a misleading version error, and creation failures are now logged.
-- Harden `vinus-guard`: never follow symlinked `mods`, `logs`, `crash-reports` or quarantine directories out of a server volume (the guard runs as root), only process UUID-named volumes, and honour the panel directory chosen at install time. `uninstall.sh` now removes the guard service.
-- Add a ready-to-enable CI workflow (`docs/ci/frontend.yml`) that runs TypeScript, Jest, the production build and every PHP/shell test against a clean Pterodactyl 1.15.1. Repair the stale catalogue rate-limit test and the `ServerRow` spec, and remove unused imports.
+- **BlueMap viewer: no player heads.** The installer wrote `live-player-markers: false`. With that setting BlueMap neither lists players nor downloads their skins, so the viewer showed only the map. New installs now write `live-player-markers: true` with `write-players-interval: 5`, so positions and heads are written into the map files the viewer reads. Existing BlueMap installs: set `live-player-markers: true` in `config/bluemap/plugin.conf` (or `plugins/BlueMap/plugin.conf`) and restart. Tests cover the settings and the serving of `live/players.json` and player head images.
+- Player controls did nothing on native mod bridges (Fabric, Forge, NeoForge), which are read-only. Heal, feed, kill, game mode, XP levels, operator, whitelist and ban are now sent as vanilla console commands, with validated player names and values, behind `control.console`.
+- Players page: items showed a placeholder icon because the installer never built the icon sprite. It now builds it automatically (`--textures` to retry). The sprite layers the pinned `minecraft-textures` pack (3D isometric block icons such as the crafting table, checksum verified) over Mojang's client textures: about 2,000 icons. A sprite built before this change is regenerated on the next install or update.
+- The administration script (`vinus-admin.js`) was deleted by every `yarn build:production` (Pterodactyl's `clean` step removes each `*.js` under `public/assets`), so the admin search, language switch and navigation marker silently failed. It now ships in `public/vinus/js/`.
+- Deployment wizard: the owner was always the first account (the wizard read a numeric user id the client API never provides); unlimited cgroup v2 hosts (`cpu.max` = `max 100000`) reported a single CPU core; a disabled `shell_exec` broke the page; a missing or unreachable Forge catalogue blocked server creation with a misleading version error; creation failures were not logged.
+- `vinus-guard` (runs as root) no longer follows symlinked `mods`, `logs`, `crash-reports` or quarantine directories out of a server volume, only processes UUID-named volumes and honours the panel directory chosen at install time. `uninstall.sh` now removes the guard service.
+- `install.sh` generates the application key before `composer install`, which removes two spurious errors from the log, and updates the catalogue with `blueprint -install` (`blueprint -upgrade` upgrades Blueprint itself).
+- Repair the stale catalogue rate-limit test and the `ServerRow` spec, and remove unused imports.
+
+### Added
+
+- `install.sh` installs everything on a fresh VPS, including Blueprint `beta-2026-06` and Vinus Catalog (panel → Blueprint → theme with Blueprint variants → catalogue → guard → Wings). New `--[no-]blueprint`, `--catalog` and `--textures` options; the catalogue and texture steps are non-fatal. Validated end to end on a blank Ubuntu 24.04 VPS with a preinstalled Traefik (about 7 minutes).
+- `install.sh` resumes an interrupted fresh install instead of treating a half-installed panel as complete (`/var/lib/vinuspanel/bootstrap-incomplete`), and installs `zip` and `wget`.
+- The dashboard "Créer un serveur" button opens the creation assistant (the one shown at first login) instead of the classic admin form, which remains available from the admin area.
+- A ready-to-enable CI workflow (`docs/ci/frontend.yml`) runs TypeScript, Jest, the production build and every PHP/shell test against a clean Pterodactyl 1.15.1.
+- Bilingual changelog: `CHANGELOG.md` (English) and `CHANGELOG.fr.md` (Français).
+
+### Documentation
+
+- Rewrite the GitBook documentation (`docs/gitbook/`) for a complete A-to-Z installation on a fresh VPS: prerequisites, installer walkthrough, credentials, checks, automatic Blueprint and catalogue, a new production-hardening chapter (HTTPS, firewall, SSH, mail, backups, logs), first-login wizard, `vinus-guard`, item icons, BlueMap players, update/rollback/reset and an extended troubleshooting table. Chapters 12 and 13 became 13 and 14. READMEs, `INSTALLATION.fr.md` and the catalogue guide aligned (Vinus Catalog 1.4.2).
+
+### Earlier development on `main`
 
 - Add emoji landmarks to the GitBook chapters and update the installation guide to use `main`.
 - Synchronize the latest deployed Activity styling and keep Blueprint navigation, feedback notices and console power controls aligned with the standard theme while preserving extension hooks.
-
 - Persist the post-install VinusPlayers reminder on the panel for seven days, scoped to the installing account and server, so a reload or device change can recover it. Add a Versions-page entry point to reopen the offer.
 - Present an illustrated, animated VinusPlayers offer after a successful Minecraft installation reaches running state. Later keeps Players available; explicit activation gracefully stops, verifies/installs and requests startup, with timeout and existing-file safeguards.
-- Publish [VinusPanel Docs on GitBook](https://vinuspanel.gitbook.io/vinuspanel-docs/) with 13 French chapters, an English quick start, a welcome page and a contents page. Sources remain in `docs/gitbook/`; Git Sync configuration is provided but automatic synchronization is not connected. The GitHub wiki is disabled.
+- Publish [VinusPanel Docs on GitBook](https://vinuspanel.gitbook.io/vinuspanel-docs/) with French chapters, an English quick start, a welcome page and a contents page. Sources remain in `docs/gitbook/`. The GitHub wiki is disabled.
 - Add account email/key icons and independently accessible password visibility buttons.
 - Add outlined administration icons, a sliding active-navigation marker and reduced-motion-aware entrance/hover effects.
-- Bundle verified Bukkit, Fabric, Forge and NeoForge player companions with exact Minecraft/loader selection, checksum-verified stopped-server installation after explicit consent. Native mods provide read-only live snapshots; Bukkit retains actions. See the supported matrix in `docs/PLAYERS.md`.
-
+- Bundle verified Bukkit, Fabric, Forge and NeoForge player companions with exact Minecraft/loader selection, checksum-verified stopped-server installation after explicit consent. Native mods provide read-only live snapshots; Bukkit retains acknowledged actions. See the supported matrix in `docs/PLAYERS.md`.
 - Redesign account Overview with separate picture, email, password and two-factor sections. Keep existing authentication forms and browser-local profile pictures.
 - Rebuild the administration shell and home screen with flat surfaces, searchable navigation, responsive tables, clearer forms and shared branding. Preserve server/node actions, permissions and Blueprint hooks.
-
 - Refresh selected live player profiles every second, resume immediately when returning to the tab, and synchronize unchanged XP/game-mode controls with server updates. Preserve unapplied edits and prevent overlapping polls.
 - Add player profiles with read-only inventories, equipment, Ender chests, skins, health, food and XP.
 - Add the optional Bukkit companion for live presence and validated heal/feed/kill, access, game mode and level controls.
 - Label saved data and unavailable capabilities explicitly; document companion installation and optional Minecraft artwork.
-
 - Replace the design form with a full-screen categorized editor and isolated responsive previews.
 - Add shared visual settings for the dashboard, navigation, authentication, server overview and console.
 - Preserve legacy identity settings, private server artwork and Blueprint extension hooks.

@@ -45,6 +45,8 @@ Le workflow `docs/ci/frontend.yml` enchaîne ces étapes ; le copier dans `.gith
 
 Pour une nouvelle combinaison VinusPlayers, construire le JAR, vérifier le chargement et les données, puis ajouter la version exacte au manifeste. Pour une modification visuelle, contrôler mobile, thème clair, clavier et réduction des mouvements.
 
+Tout changement notable s'ajoute au changelog **dans les deux langues** : `CHANGELOG.md` (anglais) et `CHANGELOG.fr.md` (français), sous « Non publié / Unreleased », rangé en Corrigé / Ajouté / Documentation.
+
 Ne jamais déposer de configuration d'instance, identifiants, snapshots `.vinus/`, mondes ou captures privées. Les captures de documentation doivent utiliser des données de démonstration.
 
 ## Publier les pages sur GitBook

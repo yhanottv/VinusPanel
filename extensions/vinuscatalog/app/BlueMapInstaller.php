@@ -30,7 +30,9 @@ class BlueMapInstaller
         return ['core.conf'=>"accept-download: ".($accept?'true':'false')."\nrender-thread-count: 1\nmetrics: false\n",
             'webserver.conf'=>"enabled: false\n",
             'webapp.conf'=>"enabled: true\nwebroot: \"bluemap/web\"\nuse-cookies: false\nupdate-settings-file: true\n",
-            'plugin.conf'=>"live-player-markers: false\nwrite-players-interval: 10\nwrite-markers-interval: 10\n"];
+            // live-player-markers must stay on: with it off BlueMap neither lists players nor downloads their skins,
+            // so the viewer would show no player heads. The intervals write the data into the map files this viewer reads.
+            'plugin.conf'=>"live-player-markers: true\nwrite-players-interval: 5\nwrite-markers-interval: 10\n"];
     }
 
     public function plan(Server $server): array

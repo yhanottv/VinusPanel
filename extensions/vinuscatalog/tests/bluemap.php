@@ -91,6 +91,17 @@ $files->items['/bluemap/web/index.html']='<html>map</html>';
 $files->items['/bluemap/web/maps/world/textures.json.gz']=gzencode('{}');
 $asset=$assets->read($server,'maps/world/textures.json');$check($asset['gzip']&&gzdecode($asset['body'])==='{}','Compressed texture fallback');
 $check($assets->read($server,'maps/world/tiles/0/x1/z1.prbm')['status']===204,'Missing tile is empty');
+// Player positions and heads written by BlueMap when live-player-markers is on.
+$files->items['/bluemap/web/maps/world/live/players.json.gz']=gzencode('{"players":[]}');
+$live=$assets->read($server,'maps/world/live/players.json');$check($live['status']===200&&$live['gzip']&&gzdecode($live['body'])==='{"players":[]}','Compressed live players file is served');
+$check(BlueMapAssets::mime('maps/world/live/players.json')==='application/json','Live players path supported');
+$headPath='maps/world/assets/playerheads/00000000-0000-4000-8000-000000000001.png';
+$files->items['/bluemap/web/'.$headPath]="\x89PNG\r\n\x1a\n";
+$head=$assets->read($server,$headPath);$check($head['status']===200&&$head['mime']==='image/png'&&!$head['gzip'],'Player head image is served');
+// Without live-player-markers BlueMap lists no players and downloads no skins: no heads on the map.
+$plugin=BlueMapInstaller::configs(false)['plugin.conf'];
+$check(preg_match('/^live-player-markers: true$/m',$plugin)===1,'Players are tracked so heads and positions exist');
+$check(preg_match('/^write-players-interval: [1-9][0-9]*$/m',$plugin)===1,'Players are written to the map files read by the viewer');
 $check($assets->read($server,'missing.js')['status']===404,'Missing script is not an empty tile');
 
 $check(BlueMapAssets::mime('lang/fr.conf')==='text/plain; charset=utf-8','BlueMap language files supported');
