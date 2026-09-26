@@ -69,6 +69,7 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
     const [nodeId, setNodeId] = useState(0);
     const [allocationId, setAllocationId] = useState(0);
     const [eggId, setEggId] = useState(0);
+    const [eulaAccepted, setEulaAccepted] = useState(false);
     const [versionEnv, setVersionEnv] = useState<string>('');
     const [versionValue, setVersionValue] = useState<string>('');
     const [catalogVersionEnabled, setCatalogVersionEnabled] = useState(false);
@@ -115,6 +116,7 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
 
     const applyEgg = useCallback((item: EggInfo) => {
         setEggId(item.id);
+        setEulaAccepted(false);
         const versions = item.versions || [];
         const variable = item.variables.find((entry) =>
             ['MC_VERSION', 'MINECRAFT_VERSION', 'VANILLA_VERSION'].includes(entry.env_variable)
@@ -180,6 +182,7 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
         return undefined;
     }, [data, eggId]);
     const nestOfEgg = useMemo(() => data?.nests.find((nest) => nest.eggs.some((item) => item.id === eggId)), [data, eggId]);
+    const requiresMinecraftEula = /minecraft/i.test(nestOfEgg?.name || '');
     const versionOptions = useMemo(() => allowValues(egg?.variables.find((variable) => variable.env_variable === versionEnv)?.rules || ''), [egg, versionEnv]);
     const catalogVersions = useMemo(() => catalogVersionEnabled ? (egg?.versions || []) : [], [catalogVersionEnabled, egg]);
     const buildVariable = useMemo(() => egg?.variables.find((entry) =>
@@ -267,6 +270,7 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
         if (step === 2) return allocationId > 0;
         if (step === 3) {
             if (!eggId) return false;
+            if (requiresMinecraftEula && !eulaAccepted) return false;
             if (!catalogVersionEnabled || !buildVariable) return true;
             return !buildLoading && catalogBuilds.length > 0 && buildValue !== '';
         }
@@ -286,7 +290,8 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
                 memory,
                 disk,
                 cpu,
-                start_on_completion: false,
+                start_on_completion: true,
+                accept_eula: eulaAccepted,
             };
             if (versionEnv && versionValue) {
                 const environment: Record<string, string> = { [versionEnv]: versionValue };
@@ -457,6 +462,12 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
                                     </div>
                                 </div>
                             ))}
+                            {requiresMinecraftEula && (
+                                <label className={styles.eulaRow}>
+                                    <input type="checkbox" checked={eulaAccepted} onChange={(event) => setEulaAccepted(event.target.checked)} />
+                                    <span>{vt('J’accepte le contrat de licence Minecraft (EULA).')} <a href="https://www.minecraft.net/eula" target="_blank" rel="noreferrer">{vt('Lire le contrat')}</a></span>
+                                </label>
+                            )}
                             {versionEnv && catalogVersions.length > 0 && (
                                 <div className={styles.picker}>
                                     <p className={styles.pickerLabel}>{vt('Version de Minecraft')}</p>

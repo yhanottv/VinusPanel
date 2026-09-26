@@ -256,9 +256,15 @@ class VinusDeployController extends Controller
             'environment' => ['sometimes', 'array'],
             'environment.*' => ['nullable', 'string', 'max:191'],
             'start_on_completion' => ['sometimes', 'boolean'],
+            'accept_eula' => ['sometimes', 'boolean'],
         ]);
 
         $egg = Egg::query()->with('variables')->findOrFail($data['egg_id']);
+        $nest = Nest::query()->find($egg->nest_id);
+        $isMinecraft = stripos((string) ($nest->name ?? ''), 'minecraft') !== false;
+        if ($isMinecraft && !$request->boolean('accept_eula')) {
+            return response()->json(['message' => 'Accepte le contrat Minecraft EULA pour demarrer ce serveur.'], 422);
+        }
         $allocation = Allocation::query()->findOrFail($data['allocation_id']);
         if (!empty($allocation->server_id)) {
             return response()->json(['message' => 'Ce port est deja utilise.'], 422);
@@ -284,6 +290,29 @@ class VinusDeployController extends Controller
             $environment[$key] = (string) $value;
         }
 
+        $startup = (string) $egg->startup;
+        if ($isMinecraft) {
+            $startup = '$(test -f eula.txt || printf "eula=true\\n" > eula.txt) ' . $startup;
+        }
+
+        if ($egg->name === 'Forge Minecraft' && !empty($environment['MC_VERSION']) && !empty($environment['FORGE_VERSION'])) {
+            $minecraftVersion = trim($environment['MC_VERSION']);
+            $loaderVersion = trim($environment['FORGE_VERSION']);
+            if (str_starts_with($loaderVersion, $minecraftVersion . '-')) {
+                $loaderVersion = substr($loaderVersion, strlen($minecraftVersion) + 1);
+            }
+            try {
+                $availableBuilds = app(ServerSoftware::class)->builds('FORGE', $minecraftVersion);
+            } catch (\Throwable) {
+                $availableBuilds = [];
+            }
+            $isValidBuild = collect($availableBuilds)->contains(fn (array $build) => $build['name'] === $loaderVersion);
+            if (!$isValidBuild) {
+                return response()->json(['message' => 'La version Forge choisie ne correspond pas à cette version Minecraft.'], 422);
+            }
+            $environment['FORGE_VERSION'] = $minecraftVersion . '-' . $loaderVersion;
+        }
+
         try {
             $server = $this->creationService->handle([
                 'name' => $data['name'],
@@ -298,11 +327,11 @@ class VinusDeployController extends Controller
                 'io' => 500,
                 'cpu' => (int) ($data['cpu'] ?? 100),
                 'disk' => (int) $data['disk'],
-                'startup' => (string) $egg->startup,
+                'startup' => $startup,
                 'image' => (string) $images[0],
                 'environment' => $environment,
                 'skip_scripts' => false,
-                'start_on_completion' => (bool) ($data['start_on_completion'] ?? false),
+                'start_on_completion' => true,
                 'database_limit' => 0,
                 'allocation_limit' => 0,
                 'backup_limit' => 0,
