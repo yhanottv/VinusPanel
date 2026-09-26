@@ -413,6 +413,34 @@
     color: #ff9b52;
 }
 
+.panel .eulaRow {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 18px 0;
+    padding: 14px;
+    border: 1px solid rgba(255, 122, 26, 0.28);
+    border-radius: 11px;
+    background: rgba(255, 122, 26, 0.06);
+    color: #cfd0d6;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.panel .eulaRow input {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+    margin: 1px 0 0;
+    accent-color: #ff7a1a;
+}
+
+.panel .eulaRow a {
+    color: #ff9b52;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
 .summary {
     margin: 0;
     padding: 0;
