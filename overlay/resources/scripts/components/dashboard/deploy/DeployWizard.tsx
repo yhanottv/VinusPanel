@@ -6,9 +6,13 @@ import styles from './deploy.module.css';
 const csrf = () => document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '';
 
 interface AllocationInfo { id: number; ip: string; port: number; alias: string | null }
+interface MemoryPreset { value: number; label: string }
 interface NodeInfo {
     id: number; name: string; fqdn: string;
     memory: number; disk: number; memory_overallocate: number; disk_overallocate: number;
+    memory_presets: MemoryPreset[];
+    cpu_presets: number[];
+    cpu_cores: number;
     allocations: AllocationInfo[];
 }
 interface VariableInfo { env_variable: string; name: string; default_value: string; rules: string }
@@ -16,18 +20,6 @@ interface EggInfo { id: number; name: string; startup: string; images: string[];
 interface NestInfo { id: number; name: string; eggs: EggInfo[] }
 interface UserInfo { id: number; email: string; username: string }
 interface DeployData { nodes: NodeInfo[]; nests: NestInfo[]; users: UserInfo[] }
-
-const MEMORY_CHOICES: Array<[number, string]> = [
-    [1024, 'Small Testing Server'],
-    [2048, 'Small Testing Server'],
-    [4096, 'Starter Survival'],
-    [8192, 'Medium Survival Server'],
-    [16384, 'Large Community Server'],
-    [24576, 'Heavy Modpack Server'],
-    [32768, 'High-Traffic Network'],
-    [49152, 'Enterprise Workload'],
-    [65536, 'Extreme Performance'],
-];
 
 const STEPS = ['IDENTITY', 'RESOURCES', 'ACCESS', 'SOFTWARE', 'REVIEW'] as const;
 
@@ -38,12 +30,19 @@ const allowValues = (rules: string): string[] => {
     return match ? match[1].split(',').map((value) => value.trim()).filter(Boolean) : [];
 };
 
+const cpuLabel = (value: number, cores: number): string => {
+    if (value >= cores * 100) return vt('Tous les coeurs disponibles');
+    if (value % 100 === 0) return vt('{{count}} coeur(s) dédié(s)', { count: value / 100 });
+    return vt('Performance partagée');
+};
+
 export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
     const user = useStoreState((state) => state.user.data!);
     const isAdmin = !!user?.rootAdmin;
     const dismissKey = `vinus:deploy:prompt:${user?.uuid || 'anon'}`;
 
     const [promptVisible, setPromptVisible] = useState(false);
+    const [promptLeaving, setPromptLeaving] = useState(false);
     const [open, setOpen] = useState(false);
     const [data, setData] = useState<DeployData | null>(null);
     const [dataError, setDataError] = useState<string | null>(null);
@@ -54,9 +53,9 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [ownerId, setOwnerId] = useState<number>(0);
-    const [memory, setMemory] = useState(4096);
-    const [cpu, setCpu] = useState(150);
-    const [disk, setDisk] = useState(10240);
+    const [memory, setMemory] = useState(0);
+    const [cpu, setCpu] = useState(0);
+    const [disk, setDisk] = useState(0);
     const [nodeId, setNodeId] = useState(0);
     const [allocationId, setAllocationId] = useState(0);
     const [eggId, setEggId] = useState(0);
@@ -74,7 +73,8 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
 
     const dismiss = useCallback(() => {
         try { window.localStorage.setItem(dismissKey, '1'); } catch { /* ignore */ }
-        setPromptVisible(false);
+        setPromptLeaving(true);
+        window.setTimeout(() => setPromptVisible(false), 260);
     }, [dismissKey]);
 
     const load = useCallback(async () => {
@@ -88,10 +88,16 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
             if (!response.ok) throw new Error(`${response.status}`);
             const payload: DeployData = await response.json();
             setData(payload);
+
             const node = payload.nodes[0];
             if (node) {
                 setNodeId(node.id);
                 setAllocationId(node.allocations[0]?.id || 0);
+                const lastMem = node.memory_presets[node.memory_presets.length - 1];
+                setMemory(node.memory_presets.find((preset) => preset.value >= 4096)?.value ?? lastMem?.value ?? 1024);
+                const lastCpu = node.cpu_presets[node.cpu_presets.length - 1];
+                setCpu(lastCpu ?? node.cpu_cores * 100);
+                setDisk(Math.min(10240, node.disk));
             }
             setOwnerId(user?.id || payload.users[0]?.id || 0);
             const egg = payload.nests[0]?.eggs[0];
@@ -126,8 +132,21 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
     const versionOptions = useMemo(() => allowValues(versionRules), [versionRules]);
     const allocation = useMemo(() => node?.allocations.find((item) => item.id === allocationId), [node, allocationId]);
 
+    useEffect(() => {
+        if (node && !node.memory_presets.some((preset) => preset.value === memory)) {
+            const lastMem = node.memory_presets[node.memory_presets.length - 1];
+            setMemory(lastMem?.value ?? 1024);
+        }
+        if (node && !node.cpu_presets.includes(cpu)) {
+            const lastCpu = node.cpu_presets[node.cpu_presets.length - 1];
+            setCpu(lastCpu ?? node.cpu_cores * 100);
+        }
+        if (node && disk > node.disk) setDisk(node.disk);
+    }, [node, memory, cpu, disk]);
+
     const canNext = (): boolean => {
         if (step === 0) return name.trim().length > 0 && ownerId > 0;
+        if (step === 1) return memory > 0 && cpu > 0 && disk >= 128;
         if (step === 2) return allocationId > 0;
         if (step === 3) return eggId > 0;
         return true;
@@ -176,8 +195,8 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
 
     if (promptVisible && !open) {
         return (
-            <div className={styles.overlay} role="dialog" aria-modal="true" aria-label={vt('Créer un serveur')}>
-                <div className={styles.prompt}>
+            <div className={`${styles.overlay} ${promptLeaving ? styles.overlayOut : styles.overlayIn}`} role="dialog" aria-modal="true" aria-label={vt('Créer un serveur')}>
+                <div className={`${styles.prompt} ${promptLeaving ? styles.cardOut : styles.cardIn}`}>
                     <span className={styles.badge}>{vt('Première connexion')}</span>
                     <h2>{vt('Voulez-vous créer un serveur maintenant ?')}</h2>
                     <p>{vt('Un assistant vous guide en cinq étapes : identité, ressources, accès, logiciel et récapitulatif.')}</p>
@@ -193,8 +212,8 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
     if (!open) return null;
 
     return (
-        <div className={styles.overlay} role="dialog" aria-modal="true" aria-label={vt('Assistant de création')}>
-            <div className={styles.shell}>
+        <div className={`${styles.overlay} ${styles.overlayIn}`} role="dialog" aria-modal="true" aria-label={vt('Assistant de création')}>
+            <div className={`${styles.shell} ${styles.cardIn}`}>
                 <header className={styles.head}>
                     <div>
                         <span className={styles.badge}>{vt('DÉPLOYER UNE INSTANCE')}</span>
@@ -212,12 +231,12 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
                     ))}
                 </ol>
 
-                <div className={styles.body}>
+                <div className={styles.body} key={step}>
                     {dataError && <p className={styles.error}>{dataError}</p>}
                     {!data && !dataError && <p className={styles.muted}>{vt('Chargement…')}</p>}
 
                     {data && step === 0 && (
-                        <section className={styles.panel}>
+                        <section className={`${styles.panel} ${styles.panelIn}`}>
                             <h3>{vt('Identité')}</h3>
                             <label>{vt('Nom du serveur')}
                                 <input value={name} maxLength={191} onChange={(event) => setName(event.target.value)} placeholder="mon-serveur" />
@@ -234,31 +253,47 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
                     )}
 
                     {data && step === 1 && (
-                        <section className={styles.panel}>
+                        <section className={`${styles.panel} ${styles.panelIn}`}>
                             <h3>{vt('Ressources')}</h3>
-                            <p className={styles.label}>{vt('Allocation de RAM')}</p>
+                            <p className={styles.label}>{vt('Allocation de RAM')} <em className={styles.hint}>{node && vt('· {{total}} Go disponibles sur ce nœud', { total: Math.floor(node.memory / 1024) })}</em></p>
                             <div className={styles.memoryGrid}>
-                                {MEMORY_CHOICES.map(([value, hint]) => (
-                                    <button key={value} type="button" className={styles.memoryCard} data-active={memory === value} onClick={() => setMemory(value)}>
-                                        <strong>{value / 1024}<em>GB</em></strong>
-                                        <small>{hint}</small>
+                                {(node?.memory_presets || []).map((preset, index) => (
+                                    <button key={preset.value} type="button" className={styles.memoryCard} style={{ animationDelay: `${index * 45}ms` }} data-active={memory === preset.value} onClick={() => setMemory(preset.value)}>
+                                        <strong>{preset.value / 1024}<em>GB</em></strong>
+                                        <small>{preset.label}</small>
+                                    </button>
+                                ))}
+                            </div>
+                            <p className={styles.label}>{vt('Limite CPU')} <em className={styles.hint}>{node && vt('· {{cores}} cœur(s) sur ce nœud', { cores: node.cpu_cores })}</em></p>
+                            <div className={styles.memoryGrid}>
+                                {(node?.cpu_presets || []).map((value, index) => (
+                                    <button key={value} type="button" className={styles.memoryCard} style={{ animationDelay: `${index * 45}ms` }} data-active={cpu === value} onClick={() => setCpu(value)}>
+                                        <strong>{value}<em>%</em></strong>
+                                        <small>{cpuLabel(value, node?.cpu_cores || 1)}</small>
                                     </button>
                                 ))}
                             </div>
                             <div className={styles.twoCols}>
-                                <label>{vt('Limite CPU (%)')}
-                                    <input type="number" min={0} max={2000} value={cpu} onChange={(event) => setCpu(Number(event.target.value))} />
-                                </label>
                                 <label>{vt('Disque (MB)')}
-                                    <input type="number" min={128} value={disk} onChange={(event) => setDisk(Number(event.target.value))} />
+                                    <input type="number" min={128} max={node?.disk || undefined} value={disk} onChange={(event) => setDisk(Number(event.target.value))} />
                                 </label>
+                                <div className={styles.autoBox}>
+                                    <strong>{vt('Auto-optimisé')}</strong>
+                                    <button type="button" className={styles.autoButton} onClick={() => {
+                                        if (!node) return;
+                                        const mid = node.memory_presets[Math.max(0, Math.floor(node.memory_presets.length / 2))];
+                                        setMemory(mid?.value ?? node.memory);
+                                        setDisk(Math.min(10240, node.disk));
+                                        setCpu(node.cpu_presets[node.cpu_presets.length - 1] ?? node.cpu_cores * 100);
+                                    }}>{vt('⚡ AUTO')}</button>
+                                    <small>{node && vt('Ajusté pour ce nœud')}</small>
+                                </div>
                             </div>
-                            {node && <p className={styles.muted}>{vt('Nœud')} : {node.name} · {node.memory} MB RAM · {node.disk} MB disque</p>}
                         </section>
                     )}
 
                     {data && step === 2 && (
-                        <section className={styles.panel}>
+                        <section className={`${styles.panel} ${styles.panelIn}`}>
                             <h3>{vt('Réseau & accès')}</h3>
                             {data.nodes.length > 1 && (
                                 <label>{vt('Nœud')}
@@ -278,14 +313,14 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
                     )}
 
                     {data && step === 3 && (
-                        <section className={styles.panel}>
+                        <section className={`${styles.panel} ${styles.panelIn}`}>
                             <h3>{vt('Logiciel')}</h3>
-                            {data.nests.map((nest) => (
+                            {data.nests.map((nest, nestIndex) => (
                                 <div key={nest.id} className={styles.nestBlock}>
                                     <p className={styles.label}>{isMinecraft(nest) ? vt('Serveur Minecraft') : nest.name}</p>
                                     <div className={styles.engineGrid}>
-                                        {nest.eggs.map((item) => (
-                                            <button key={item.id} type="button" className={styles.engineCard} data-active={eggId === item.id} onClick={() => {
+                                        {nest.eggs.map((item, eggIndex) => (
+                                            <button key={item.id} type="button" className={styles.engineCard} style={{ animationDelay: `${(nestIndex * 3 + eggIndex) * 45}ms` }} data-active={eggId === item.id} onClick={() => {
                                                 setEggId(item.id);
                                                 const version = item.variables.find((variable) => /version/i.test(variable.env_variable));
                                                 setVersionEnv(version?.env_variable || '');
@@ -312,16 +347,16 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
                     )}
 
                     {data && step === 4 && (
-                        <section className={styles.panel}>
+                        <section className={`${styles.panel} ${styles.panelIn}`}>
                             <h3>{vt('Récapitulatif')}</h3>
                             <ul className={styles.summary}>
-                                <li><span>{vt('Nom')}</span><strong>{name || '—'}</strong></li>
-                                <li><span>{vt('Propriétaire')}</span><strong>{data.users.find((item) => item.id === ownerId)?.username || '—'}</strong></li>
-                                <li><span>{vt('Ressources')}</span><strong>{memory / 1024} GB · {cpu}% · {disk} MB</strong></li>
-                                <li><span>{vt('Nœud')}</span><strong>{node?.name || '—'}</strong></li>
-                                <li><span>{vt('Port')}</span><strong>{allocation?.port || '—'}</strong></li>
-                                <li><span>{vt('Logiciel')}</span><strong>{nestOfEgg?.name || '—'} · {egg?.name || '—'}</strong></li>
-                                {versionEnv && <li><span>{vt('Version')}</span><strong>{versionValue}</strong></li>}
+                                <li style={{ animationDelay: '0ms' }}><span>{vt('Nom')}</span><strong>{name || '—'}</strong></li>
+                                <li style={{ animationDelay: '55ms' }}><span>{vt('Propriétaire')}</span><strong>{data.users.find((item) => item.id === ownerId)?.username || '—'}</strong></li>
+                                <li style={{ animationDelay: '110ms' }}><span>{vt('Ressources')}</span><strong>{memory / 1024} GB · {cpu}% · {disk} MB</strong></li>
+                                <li style={{ animationDelay: '165ms' }}><span>{vt('Nœud')}</span><strong>{node?.name || '—'}</strong></li>
+                                <li style={{ animationDelay: '220ms' }}><span>{vt('Port')}</span><strong>{allocation?.port || '—'}</strong></li>
+                                <li style={{ animationDelay: '275ms' }}><span>{vt('Logiciel')}</span><strong>{nestOfEgg?.name || '—'} · {egg?.name || '—'}</strong></li>
+                                {versionEnv && <li style={{ animationDelay: '330ms' }}><span>{vt('Version')}</span><strong>{versionValue}</strong></li>}
                             </ul>
                             {message && <p className={styles.error}>{message}</p>}
                         </section>

@@ -19,11 +19,100 @@ class VinusDeployController extends Controller
     }
 
     /**
+     * Nombre de coeurs CPU visibles par le panel : cgroup v2, cgroup v1,
+     * nproc, dans cet ordre.
+     */
+    private function cpuCores(): int
+    {
+        $quota = null;
+        if (is_file('/sys/fs/cgroup/cpu.max')) {
+            $line = trim((string) file_get_contents('/sys/fs/cgroup/cpu.max'));
+            if ($line !== '' && $line !== 'max') {
+                [$quota, $period] = array_pad(explode(' ', $line), 2, '100000');
+                if ((int) $period > 0) {
+                    $quota = max(1, (int) ceil(((int) $quota) / ((int) $period)));
+                }
+            }
+        }
+        if ($quota === null && is_file('/sys/fs/cgroup/cpu/cpu.cfs_quota_us')) {
+            $q = (int) file_get_contents('/sys/fs/cgroup/cpu/cpu.cfs_quota_us');
+            $p = (int) file_get_contents('/sys/fs/cgroup/cpu/cpu.cfs_period_us');
+            if ($q > 0 && $p > 0) {
+                $quota = max(1, (int) ceil($q / $p));
+            }
+        }
+        if ($quota === null) {
+            $cores = (int) shell_exec('nproc 2>/dev/null') ?: (int) (@shell_exec('getconf _NPROCESSORS_ONLN 2>/dev/null') ?: 0);
+            return max(1, $cores);
+        }
+
+        return max(1, (int) $quota);
+    }
+
+    /**
+     * Presets de RAM deduits de la memoire reelle allouable du noeud.
+     */
+    private function memoryPresets(int $nodeMemory): array
+    {
+        $labels = [
+            1024 => 'Small Testing Server',
+            2048 => 'Small Testing Server',
+            4096 => 'Starter Survival',
+            8192 => 'Medium Survival Server',
+            16384 => 'Large Community Server',
+            24576 => 'Heavy Modpack Server',
+            32768 => 'High-Traffic Network',
+            49152 => 'Enterprise Workload',
+            65536 => 'Extreme Performance',
+        ];
+
+        $presets = [];
+        foreach ([1024, 2048, 4096, 8192, 16384, 24576, 32768, 49152, 65536] as $value) {
+            if ($value <= $nodeMemory) {
+                $presets[] = ['value' => $value, 'label' => $labels[$value] ?? 'Serveur'];
+            }
+        }
+        // Le noeud peut permettre plus que le dernier preset standard : on
+        // ajoute le maximum reel comme choix final.
+        if ($nodeMemory > 1024 && empty($presets)) {
+            $presets[] = ['value' => 1024, 'label' => 'Small Testing Server'];
+        }
+        $last = end($presets);
+        if ($last === false || (int) $last['value'] < $nodeMemory) {
+            $rounded = (int) (floor($nodeMemory / 1024) * 1024);
+            if ($rounded > 0 && ($last === false || (int) $last['value'] < $rounded)) {
+                $presets[] = ['value' => $rounded, 'label' => 'Maximum du serveur'];
+            }
+        }
+
+        return array_values($presets);
+    }
+
+    /**
+     * Presets de CPU deduits du nombre de coeurs reels.
+     */
+    private function cpuPresets(int $cores): array
+    {
+        $limit = $cores * 100;
+        $presets = [];
+        foreach ([100, 200, 300, 400, 600, 800] as $value) {
+            if ($value <= $limit) {
+                $presets[] = $value;
+            }
+        }
+        $presets[] = $limit;
+
+        return array_values(array_unique($presets));
+    }
+
+    /**
      * Everything the first-login wizard needs: nodes with free allocations,
      * nests and eggs (with their variables) and the list of owners.
      */
     public function data(): JsonResponse
     {
+        $cores = $this->cpuCores();
+
         $nodes = Node::query()->orderBy('id')->get()->map(fn (Node $node) => [
             'id' => $node->id,
             'name' => $node->name,
@@ -32,6 +121,9 @@ class VinusDeployController extends Controller
             'disk' => (int) $node->disk,
             'memory_overallocate' => (int) $node->memory_overallocate,
             'disk_overallocate' => (int) $node->disk_overallocate,
+            'memory_presets' => $this->memoryPresets((int) $node->memory),
+            'cpu_presets' => $this->cpuPresets($cores),
+            'cpu_cores' => $cores,
             'allocations' => Allocation::query()
                 ->where('node_id', $node->id)
                 ->whereNull('server_id')

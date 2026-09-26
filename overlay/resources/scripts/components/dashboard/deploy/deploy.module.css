@@ -10,6 +10,24 @@
     backdrop-filter: blur(10px);
 }
 
+.overlayIn {
+    animation: vinus-fade 0.28s ease both;
+}
+
+.overlayOut {
+    animation: vinus-fade-out 0.24s ease both;
+}
+
+@keyframes vinus-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes vinus-fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
 .prompt,
 .shell {
     width: 100%;
@@ -18,6 +36,24 @@
     background: linear-gradient(180deg, #17171c 0%, #121216 100%);
     box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
     color: #e9e9ee;
+}
+
+.cardIn {
+    animation: vinus-rise 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cardOut {
+    animation: vinus-sink 0.24s ease both;
+}
+
+@keyframes vinus-rise {
+    from { opacity: 0; transform: translateY(26px) scale(0.965); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes vinus-sink {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(18px) scale(0.97); }
 }
 
 .prompt {
@@ -73,10 +109,12 @@
     font-size: 26px;
     line-height: 1;
     cursor: pointer;
+    transition: color 0.15s ease, transform 0.15s ease;
 }
 
 .close:hover {
     color: #fff;
+    transform: rotate(90deg);
 }
 
 .steps {
@@ -97,6 +135,7 @@
     border-radius: 12px;
     white-space: nowrap;
     opacity: 0.55;
+    transition: opacity 0.25s ease, border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
 }
 
 .steps li span {
@@ -114,6 +153,7 @@
     opacity: 1;
     border-color: rgba(255, 122, 26, 0.65);
     background: rgba(255, 122, 26, 0.08);
+    transform: scale(1.03);
 }
 
 .steps li[data-state='done'] {
@@ -132,6 +172,15 @@
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: #cfd0d6;
+}
+
+.panelIn {
+    animation: vinus-slide 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes vinus-slide {
+    from { opacity: 0; transform: translateX(22px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
 .panel label,
@@ -153,18 +202,27 @@
     background: #0e0e12;
     color: #ececf1;
     font-size: 14px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .panel input:focus,
 .panel select:focus {
     outline: none;
     border-color: rgba(255, 122, 26, 0.7);
+    box-shadow: 0 0 0 3px rgba(255, 122, 26, 0.14);
 }
 
 .label {
     margin: 0 0 12px;
     font-size: 13px;
     color: #cfd0d6;
+}
+
+.hint {
+    font-style: normal;
+    color: #8f9199;
+    font-size: 12px;
+    margin-left: 6px;
 }
 
 .memoryGrid {
@@ -183,12 +241,18 @@
     background: #14141a;
     color: #e9e9ee;
     cursor: pointer;
-    transition: border-color 0.15s ease, transform 0.15s ease;
+    transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    animation: vinus-card 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes vinus-card {
+    from { opacity: 0; transform: translateY(14px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .memoryCard:hover,
 .engineCard:hover {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
     border-color: rgba(255, 122, 26, 0.5);
 }
 
@@ -197,6 +261,7 @@
     border-color: #ff7a1a;
     background: linear-gradient(180deg, rgba(255, 122, 26, 0.16) 0%, rgba(255, 122, 26, 0.04) 100%);
     box-shadow: 0 0 0 1px rgba(255, 122, 26, 0.55) inset;
+    transform: translateY(-1px);
 }
 
 .memoryCard strong {
@@ -224,6 +289,47 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
+    align-items: stretch;
+}
+
+.autoBox {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 11px;
+    background: #14141a;
+}
+
+.autoBox strong {
+    font-size: 13px;
+    color: #cfd0d6;
+}
+
+.autoBox small {
+    font-size: 12px;
+    color: #8f9199;
+}
+
+.autoButton {
+    align-self: flex-start;
+    padding: 9px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    background: #0e0e12;
+    color: #e9e9ee;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+
+.autoButton:hover {
+    border-color: rgba(255, 122, 26, 0.6);
+    background: rgba(255, 122, 26, 0.12);
+    transform: translateY(-1px);
 }
 
 .nestBlock {
@@ -255,6 +361,12 @@
     gap: 16px;
     padding: 13px 18px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    animation: vinus-line 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes vinus-line {
+    from { opacity: 0; transform: translateX(-14px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
 .summary li:last-child {
@@ -304,11 +416,17 @@
     font-weight: 600;
     cursor: pointer;
     border: 1px solid transparent;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
 }
 
 .primary {
     background: linear-gradient(180deg, #ff9b52 0%, #ff7a1a 100%);
     color: #1a1205;
+}
+
+.primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(255, 122, 26, 0.28);
 }
 
 .primary:disabled,
@@ -323,10 +441,27 @@
     color: #e9e9ee;
 }
 
+.ghost:hover:not(:disabled) {
+    border-color: rgba(255, 255, 255, 0.28);
+}
+
 .actions {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .overlayIn,
+    .overlayOut,
+    .cardIn,
+    .cardOut,
+    .panelIn,
+    .memoryCard,
+    .engineCard,
+    .summary li {
+        animation: none !important;
+    }
 }
 
 @media (max-width: 720px) {
