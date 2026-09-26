@@ -19,7 +19,7 @@ interface NodeInfo {
 interface VariableInfo { env_variable: string; name: string; default_value: string; rules: string }
 interface CatalogVersion { id: string; channel: string; supported: boolean }
 interface CatalogBuild { id: string; name: string; experimental: boolean }
-interface EggInfo { id: number; name: string; startup: string; images: string[]; type?: string | null; versions?: CatalogVersion[]; builds?: CatalogBuild[]; variables: VariableInfo[] }
+interface EggInfo { id: number; name: string; startup: string; images: string[]; type?: string | null; versions?: CatalogVersion[]; variables: VariableInfo[] }
 interface NestInfo { id: number; name: string; eggs: EggInfo[] }
 interface UserInfo { id: number; email: string; username: string }
 interface DeployData { nodes: NodeInfo[]; nests: NestInfo[]; users: UserInfo[] }
@@ -71,7 +71,11 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
     const [eggId, setEggId] = useState(0);
     const [versionEnv, setVersionEnv] = useState<string>('');
     const [versionValue, setVersionValue] = useState<string>('');
+    const [catalogVersionEnabled, setCatalogVersionEnabled] = useState(false);
     const [buildValue, setBuildValue] = useState<string>('');
+    const [catalogBuilds, setCatalogBuilds] = useState<CatalogBuild[]>([]);
+    const [buildLoading, setBuildLoading] = useState(false);
+    const [buildError, setBuildError] = useState('');
 
     useEffect(() => {
         if (!isAdmin) return;
@@ -111,11 +115,18 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
 
     const applyEgg = useCallback((item: EggInfo) => {
         setEggId(item.id);
-        const variable = item.variables.find((entry) => /version/i.test(entry.env_variable));
         const versions = item.versions || [];
+        const variable = item.variables.find((entry) =>
+            ['MC_VERSION', 'MINECRAFT_VERSION', 'VANILLA_VERSION'].includes(entry.env_variable)
+        ) || item.variables.find((entry) => versions.some((version) => version.id === entry.default_value));
+        const fallback = item.variables.find((entry) => /version/i.test(entry.env_variable));
         const preferred = versions.find((entry) => entry.supported) || versions[0];
-        setVersionEnv(variable?.env_variable || '');
-        setVersionValue(preferred ? preferred.id : (variable?.default_value || ''));
+        setCatalogVersionEnabled(!!item.type && !!variable);
+        setVersionEnv((variable || fallback)?.env_variable || '');
+        setVersionValue(variable && preferred ? preferred.id : ((variable || fallback)?.default_value || ''));
+        setCatalogBuilds([]);
+        setBuildValue('');
+        setBuildError('');
     }, []);
 
     const load = useCallback(async () => {
@@ -170,8 +181,10 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
     }, [data, eggId]);
     const nestOfEgg = useMemo(() => data?.nests.find((nest) => nest.eggs.some((item) => item.id === eggId)), [data, eggId]);
     const versionOptions = useMemo(() => allowValues(egg?.variables.find((variable) => variable.env_variable === versionEnv)?.rules || ''), [egg, versionEnv]);
-    const catalogVersions = useMemo(() => egg?.versions || [], [egg]);
-    const catalogBuilds = useMemo(() => egg?.builds || [], [egg]);
+    const catalogVersions = useMemo(() => catalogVersionEnabled ? (egg?.versions || []) : [], [catalogVersionEnabled, egg]);
+    const buildVariable = useMemo(() => egg?.variables.find((entry) =>
+        entry.env_variable !== versionEnv && /^(FORGE_VERSION|BUILD_NUMBER|LOADER_VERSION|FABRIC_LOADER_VERSION|SPONGE_VERSION)$/i.test(entry.env_variable)
+    ), [egg, versionEnv]);
     const allocation = useMemo(() => node?.allocations.find((item) => item.id === allocationId), [node, allocationId]);
 
     useEffect(() => {
@@ -214,16 +227,49 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
     }, [versionEnv, catalogVersions, versionValue]);
 
     useEffect(() => {
-        if (!catalogBuilds.length) { setBuildValue(''); return; }
-        if (catalogBuilds.some((entry) => entry.id === buildValue)) return;
-        setBuildValue(String(catalogBuilds[0].id));
-    }, [catalogBuilds, buildValue]);
+        if (!catalogVersionEnabled || !egg?.type || !versionValue || !buildVariable) {
+            setCatalogBuilds([]);
+            setBuildValue('');
+            setBuildError('');
+            setBuildLoading(false);
+            return;
+        }
+
+        const controller = new AbortController();
+        setBuildLoading(true);
+        setBuildError('');
+        setCatalogBuilds([]);
+        setBuildValue('');
+
+        fetch(`/admin/vinus-deploy/builds?type=${encodeURIComponent(egg.type)}&version=${encodeURIComponent(versionValue)}`, {
+            credentials: 'same-origin',
+            headers: { Accept: 'application/json' },
+            signal: controller.signal,
+        }).then(async (response) => {
+            const payload = await response.json();
+            if (!response.ok) throw new Error(payload?.message || 'builds unavailable');
+            const builds: CatalogBuild[] = payload.builds || [];
+            setCatalogBuilds(builds);
+            const preferred = builds.find((entry) => !entry.experimental) || builds[0];
+            setBuildValue(preferred?.name || '');
+        }).catch((error) => {
+            if (error?.name !== 'AbortError') setBuildError(vt('Les versions du loader sont indisponibles.'));
+        }).finally(() => {
+            if (!controller.signal.aborted) setBuildLoading(false);
+        });
+
+        return () => controller.abort();
+    }, [catalogVersionEnabled, egg?.type, versionValue, buildVariable]);
 
     const canNext = (): boolean => {
         if (step === 0) return name.trim().length > 0 && ownerId > 0;
         if (step === 1) return memory > 0 && cpu > 0 && disk >= 128;
         if (step === 2) return allocationId > 0;
-        if (step === 3) return eggId > 0;
+        if (step === 3) {
+            if (!eggId) return false;
+            if (!catalogVersionEnabled || !buildVariable) return true;
+            return !buildLoading && catalogBuilds.length > 0 && buildValue !== '';
+        }
         return true;
     };
 
@@ -244,8 +290,10 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
             };
             if (versionEnv && versionValue) {
                 const environment: Record<string, string> = { [versionEnv]: versionValue };
-                const buildVariable = egg?.variables.find((entry) => /build|loader|forge|fabric/i.test(entry.env_variable) && entry.env_variable !== versionEnv);
-                if (buildVariable && buildValue) environment[buildVariable.env_variable] = buildValue;
+                if (buildVariable && buildValue) {
+                    const value = buildVariable.env_variable === 'BUILD_NUMBER' ? buildValue.replace(/^#/, '') : buildValue;
+                    environment[buildVariable.env_variable] = value;
+                }
                 body.environment = environment;
             }
             const response = await fetch('/admin/vinus-deploy', {
@@ -422,12 +470,15 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
                                     </div>
                                 </div>
                             )}
-                            {versionEnv && catalogBuilds.length > 0 && (
+                            {buildVariable && buildLoading && <p className={styles.muted} role="status">{vt('Chargement des versions du loader…')}</p>}
+                            {buildError && <p className={styles.error}>{buildError}</p>}
+                            {buildVariable && !buildLoading && !buildError && versionValue && catalogBuilds.length === 0 && <p className={styles.muted}>{vt('Aucun loader disponible pour cette version Minecraft.')}</p>}
+                            {buildVariable && catalogBuilds.length > 0 && (
                                 <div className={styles.picker}>
                                     <p className={styles.pickerLabel}>{vt('Version du loader')}</p>
                                     <div className={styles.optionScroll}>
                                         {catalogBuilds.map((entry, index) => (
-                                            <button key={entry.id} type="button" style={{ animationDelay: `${Math.min(index, 20) * 25}ms` }} className={styles.optionRow} data-active={buildValue === entry.id} onClick={() => setBuildValue(String(entry.id))}>
+                                            <button key={entry.id} type="button" style={{ animationDelay: `${Math.min(index, 20) * 25}ms` }} className={styles.optionRow} data-active={buildValue === entry.name} onClick={() => setBuildValue(entry.name)}>
                                                 <strong>{entry.name}</strong>
                                                 <span>{entry.experimental ? vt('Expérimental') : vt('Stable')}</span>
                                             </button>
@@ -458,7 +509,8 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
                                 <li style={{ animationDelay: '165ms' }}><span>{vt('Nœud')}</span><strong>{node?.name || '—'}</strong></li>
                                 <li style={{ animationDelay: '220ms' }}><span>{vt('Port')}</span><strong>{allocation?.port || '—'}</strong></li>
                                 <li style={{ animationDelay: '275ms' }}><span>{vt('Logiciel')}</span><strong>{nestOfEgg?.name || '—'} · {egg?.name || '—'}</strong></li>
-                                {versionEnv && versionValue && <li style={{ animationDelay: '330ms' }}><span>{vt('Version')}</span><strong>{versionValue}{buildValue ? ` · ${buildValue}` : ''}</strong></li>}
+                                {versionEnv && versionValue && <li style={{ animationDelay: '330ms' }}><span>{vt('Version Minecraft')}</span><strong>{versionValue}</strong></li>}
+                                {buildVariable && buildValue && <li style={{ animationDelay: '385ms' }}><span>{vt('Version du loader')}</span><strong>{buildValue}</strong></li>}
                             </ul>
                             {message && <p className={styles.error}>{message}</p>}
                         </section>
