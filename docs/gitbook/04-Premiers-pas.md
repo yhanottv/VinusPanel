@@ -1,10 +1,24 @@
-# 🖥️ Tableau de bord, compte et langues
+# 🖥️ Tableau de bord, assistant, compte et langues
 
 ## Tableau de bord
 
 Rechercher un serveur, choisir la liste ou la grille, puis **Gérer**. Les cartes reprennent l’état, les ressources et le logo du logiciel détecté. Une connexion indisponible ne doit pas être interprétée comme une consommation nulle.
 
 Les raccourcis mènent à la console, aux fichiers, aux sauvegardes et à l’activité. Leur disponibilité dépend des permissions et limites du serveur.
+
+## Assistant de création (première connexion)
+
+Quand un **administrateur** ouvre le tableau de bord d'un panel qui ne contient encore **aucun serveur**, une fenêtre propose : « Voulez-vous créer un serveur maintenant ? ». **Plus tard** la ferme (le choix est mémorisé par navigateur) ; si l'assistant est abandonné en cours de route, un rappel apparaît à la visite suivante. Une fois un serveur créé, l'assistant ne se propose plus : créer les serveurs suivants depuis **Admin → Servers → Create New**.
+
+L'assistant a cinq étapes :
+
+1. **Identité** : nom, description et propriétaire. Le compte connecté est présélectionné.
+2. **Ressources** : RAM (préréglages de 1 à 64 Go limités à la capacité du nœud), limite CPU (déduite des cœurs de la machine) et disque (10 Go par défaut, plafonné à l'espace du nœud).
+3. **Accès** : nœud et port, choisi parmi les allocations libres.
+4. **Logiciel** : famille (nest), moteur (egg) et version. Pour Minecraft, les versions viennent du catalogue et, pour Forge, NeoForge, Fabric et les moteurs équivalents, le build du loader se choisit aussi. L'acceptation du contrat Minecraft EULA est **obligatoire** pour créer un serveur Minecraft.
+5. **Récapitulatif** puis création. Le panel ouvre ensuite le serveur, qui démarre à la fin de son installation.
+
+L'image Docker (adaptée à la version de Java exigée par la version Minecraft choisie), la commande de démarrage et les variables de l'egg sont déterminées côté serveur ; le navigateur n'envoie que des valeurs vérifiées. Les logiciels proposés sont ceux des eggs installés dans le panel.
 
 ## Compte → Vue d’ensemble
 

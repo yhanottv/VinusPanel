@@ -1,12 +1,12 @@
-# Vinus Catalog 1.3.0
+# Vinus Catalog 1.4.0
 
 Outils Minecraft pour **Pterodactyl 1.15.1**, **Blueprint beta-2026-06** et **VinusPanel 3.2.0**. Le catalogue de mods/plugins inclut ses propres traductions ; les vues Version, Modpacks, Mondes et BlueMap dépendent de l’espace serveur et des services du thème. Installer les deux paquets pour disposer de l’ensemble.
 
 ## Installation
 
 1. Sauvegarder le panel, sa base, sa configuration et les fichiers des serveurs.
-2. Installer la version compatible de [Blueprint](https://blueprint.zip/guides/admin/install).
-3. Appliquer le thème avec `sudo bash install.sh` depuis le dépôt.
+2. Installer la version compatible de [Blueprint](https://blueprint.zip/guides/admin/install) (`beta-2026-06`) dans le panel déjà installé.
+3. Réappliquer le thème avec `sudo bash install.sh --update` depuis le dépôt : les variantes Blueprint sont alors détectées.
 4. Depuis ce dossier, créer le paquet puis l’installer :
 
 ```bash

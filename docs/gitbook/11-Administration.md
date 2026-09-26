@@ -10,9 +10,11 @@ Le nouveau design conserve routes, formulaires, actions et autorisations Pteroda
 - Un **nest** regroupe des **eggs**.
 - Un **egg** décrit installation, démarrage, variables et images du logiciel.
 
-Configurer d’abord Pterodactyl/Wings selon leur documentation officielle. Le thème ne remplace pas l’installation de l’infrastructure.
+Sur un VPS vierge, `install.sh` crée l'emplacement `fr1`, un nœud local et ses allocations, et installe Wings ([chapitre 2](02-Installation.md)). Pour ajouter d'autres nœuds ou une infrastructure distincte, suivre la documentation officielle de Pterodactyl/Wings : le thème ne remplace pas l'installation d'un nœud supplémentaire.
 
 ## Créer un serveur
+
+Sur un panel sans serveur, l'[assistant de la première connexion](04-Premiers-pas.md) réalise ces étapes. Sinon, depuis **Admin → Servers → Create New** :
 
 1. Choisir propriétaire, nœud et allocation.
 2. Définir CPU, mémoire, disque, sauvegardes et bases selon les ressources réelles.

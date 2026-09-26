@@ -40,20 +40,21 @@ Les modules absents sont masqués. Le thème ne fournit pas de facturation, de g
 
 ## Compatibilité et installation
 
-Validé avec **Pterodactyl 1.15.1**, **Node 22**, **Yarn 1.x**, **PHP 8.3** et Ubuntu 24.04. Blueprint est optionnel pour le thème ; **beta-2026-06** est requis pour **Vinus Catalog 1.3.0**. D’autres versions ou thèmes ne sont pas automatiquement compatibles.
+Validé avec **Pterodactyl 1.15.1**, **Node 22**, **Yarn 1.x**, **PHP 8.3** et Ubuntu 24.04. Blueprint est optionnel pour le thème ; **beta-2026-06** est requis pour **Vinus Catalog 1.4.0**. D’autres versions ou thèmes ne sont pas automatiquement compatibles.
 
-Ce dépôt est un overlay : il faut déjà disposer d’un panel Pterodactyl et de Wings fonctionnels. Sauvegarder le panel, sa base, ses configurations et les serveurs avant installation.
+Sur un **VPS Ubuntu 24.04 vierge**, `install.sh` installe tout : Pterodactyl Panel 1.15.1, MariaDB, Redis, Nginx, le worker, le thème, Docker et Wings. Sur un panel Pterodactyl déjà installé, il applique seulement le thème. Sauvegarder le panel, sa base, ses configurations et les serveurs avant toute installation sur une machine existante.
 
 ```bash
-git clone --depth 1 https://github.com/yhanottv/VinusPanel.git
+apt update && apt install -y git curl
+git clone --branch main --single-branch https://github.com/yhanottv/VinusPanel.git
 cd VinusPanel
-bash install.sh --check
-sudo bash install.sh
+sudo bash install.sh --check      # rapport, aucune modification
+sudo bash install.sh --install    # ou sans option : menu interactif, choix [1]
 ```
 
-Pour un autre chemin, ajouter `--panel-dir /chemin/du/panel`. Le script sauvegarde les fichiers concernés, place temporairement le panel en maintenance et compile les ressources. Il ne démarre ni n’arrête les serveurs de jeu. Les réglages Design Studio restent sur l’installation.
+Les identifiants générés sont enregistrés dans `/var/lib/vinuspanel/credentials.txt`. Pour un autre chemin de panel, ajouter `--panel-dir /chemin/du/panel`. Le script sauvegarde les fichiers concernés, place temporairement le panel en maintenance et compile les ressources. Il ne démarre ni n’arrête les serveurs de jeu. Les réglages Design Studio restent sur l’installation. Avant d’ouvrir le panel au public : HTTPS, pare-feu et sauvegardes, voir la [documentation](https://vinuspanel.gitbook.io/vinuspanel-docs/).
 
-Le thème **n’installe pas automatiquement** les outils Minecraft. Installer Blueprint avant le thème, puis construire et installer séparément l’extension :
+Le thème **n’installe pas automatiquement** les outils Minecraft. Sur un VPS vierge : installer le panel et le thème, puis Blueprint `beta-2026-06`, réappliquer le thème (`sudo bash install.sh --update`), puis construire et installer l’extension :
 
 ```bash
 cd extensions/vinuscatalog

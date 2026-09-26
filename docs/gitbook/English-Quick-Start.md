@@ -1,84 +1,104 @@
 # 🌐 English quick start
 
-This documentation covers the **main branch**, including features not yet included in older release archives. Detailed chapters are currently in French. The repository also has an [English README](https://github.com/yhanottv/VinusPanel/blob/main/README.md) and [player documentation](https://github.com/yhanottv/VinusPanel/blob/main/docs/PLAYERS.md).
+This documentation covers the **`main` branch**. The detailed chapters are in French; this page is a complete English walkthrough of the installation and the essentials. The repository also has an [English README](https://github.com/yhanottv/VinusPanel/blob/main/README.md) and [player documentation](https://github.com/yhanottv/VinusPanel/blob/main/docs/PLAYERS.md).
 
-## Install
+## What you get
 
-### Install Pterodactyl first
+On a **fresh Ubuntu 24.04 VPS**, one script installs Pterodactyl Panel 1.15.1, the VinusPanel theme, MariaDB, Redis, Nginx, the queue worker and cron, Docker and Wings, plus a crash guard service. On a machine that already runs Pterodactyl 1.15.1, it applies (or updates) only the theme. Blueprint and the Vinus Catalog extension (Minecraft tools) are installed as a second step.
 
-The documented VinusPanel installer targets a classic Ubuntu installation with Pterodactyl in `/var/www/pterodactyl`. It does not run directly in the official production Docker image because that image stores the panel in `/app` and omits the Bash, Node.js and Yarn build tools needed by the theme installer.
+## Requirements
 
-For a classic Ubuntu 24.04 host, install the base dependencies and Pterodactyl 1.15.1 first:
+- Ubuntu **24.04 LTS**, clean image, root SSH access. Tested on 2 vCPU / 8 GB RAM / 96 GB disk; less than 4 GB of RAM is not validated (the frontend build is heavy).
+- A public IP. A domain name is optional but required for HTTPS.
+- Ports: `22`, `80`, `443`, `8080` (Wings API), `2022` (SFTP) and the game range (default `25565`–`25584`).
+- Some hosters ship a Traefik/Docker template that occupies ports 80/443. On a machine without Nginx the installer **stops that container and disables its restart policy**. Use a plain Ubuntu image, or pass `--keep-proxy` to make the installer stop instead.
 
-```bash
-apt update && apt -y upgrade
-apt install -y software-properties-common curl ca-certificates gnupg2 sudo lsb-release
-add-apt-repository -y ppa:ondrej/php && apt update
-apt install -y php8.3 php8.3-{common,cli,gd,mysql,mbstring,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
-curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-apt install -y nodejs
-npm install --global yarn@1
-mkdir -p /var/www/pterodactyl && cd /var/www/pterodactyl
-curl -fL -o panel.tar.gz https://github.com/pterodactyl/panel/releases/download/v1.15.1/panel.tar.gz
-tar -xzvf panel.tar.gz && rm panel.tar.gz
-chmod -R 755 storage/* bootstrap/cache
-composer install --no-dev --optimize-autoloader
-php artisan p:environment:setup
-php artisan p:environment:database
-php artisan p:environment:mail
-php artisan key:generate --force
-php artisan migrate --seed --force
-php artisan p:user:make
-```
-
-Finish the Nginx, queue, scheduler and Wings configuration with the [official Pterodactyl installation guide](https://pterodactyl.io/panel/1.0/getting_started.html), then continue with the VinusPanel commands below.
-
-Use an existing Pterodactyl **1.15.1** panel, Node **22**, Yarn **1.x** and a working Wings connection. PHP **8.3** and Ubuntu **24.04** were validated. Blueprint **beta-2026-06** is optional for the theme but required for Vinus Catalog. Back up the panel, database, configuration and game data first.
+## 1. Install
 
 ```bash
+apt update && apt install -y git curl
 git clone --branch main --single-branch https://github.com/yhanottv/VinusPanel.git
 cd VinusPanel
-bash install.sh --check
-sudo bash install.sh
+sudo bash install.sh --check      # read-only report
+sudo bash install.sh --install    # or run without options and choose [1] in the menu
 ```
 
-The default panel path is `/var/www/pterodactyl`; use `--panel-dir` otherwise. Install Blueprint first if needed. Package and install Vinus Catalog separately following chapter 3. A complete clean installation on a newly provisioned panel is not claimed as completed validation.
-
-## Use
-
-Open **Design** as a root administrator to preview branding, layout, icons, typography, charts and the login mosaic. Save publishes; Cancel restores the saved design. Eight language choices are offered, with English fallback for untranslated advanced text.
-
-Version/modpack installation leaves Minecraft stopped. Start it normally. Once it is running, a separate **VinusPlayers** dialog explains live inventory, health, hunger, XP, skin and presence. Later adds nothing. Explicit activation gracefully stops the server, installs the companion and requests startup. It never force-kills. Existing JARs are preserved for compatibility review. Players remains accessible with available saved data without a bridge.
-
-Companion compatibility is narrower than the catalogue: Forge 1.20.1/47.3.0, Fabric 1.20.1/0.16.10, Fabric 1.21.1/0.16.14 and NeoForge 1.21.1/21.1.219. These mods are read-only. Bukkit supports live data and permitted actions on Minecraft 1.20.1/1.21.1, tested on Paper. Inventory editing is not included.
-
-## Maintain
-
-### Update Pterodactyl
-
-Back up the VPS, database and `.env`, then run the following from `/var/www/pterodactyl`:
+With a domain whose DNS `A` record already points to the VPS:
 
 ```bash
-cd /var/www/pterodactyl
-php artisan down
-curl -fL https://github.com/pterodactyl/panel/releases/download/v1.15.1/panel.tar.gz | tar -xzv
-chmod -R 755 storage/* bootstrap/cache
-composer install --no-dev --optimize-autoloader
-php artisan migrate --seed --force
-php artisan view:clear
-php artisan config:clear
-chown -R www-data:www-data /var/www/pterodactyl/*
-php artisan queue:restart
-php artisan up
-systemctl restart pteroq
-systemctl reload nginx
+sudo bash install.sh --install --url https://panel.example.com --admin-email you@example.com
 ```
 
-Check the compatible Wings release in the [official Wings releases](https://github.com/pterodactyl/wings/releases) before updating it. Do not modify a running Docker container in place; rebuild the image for Docker installations.
+The run takes 10–20 minutes. If the panel phase fails, **re-run the same command**: the installer detects the unfinished install (`/var/lib/vinuspanel/bootstrap-incomplete`) and resumes. If the theme phase fails, the installer restores the original files automatically.
 
-Back up before updating, use `git pull --ff-only`, run the preflight and reinstall. Preserve local changes and update the extension separately. `sudo bash uninstall.sh` restores tracked originals, without removing Blueprint or the catalogue. Check that the backup still matches the panel version.
+Generated passwords are printed at the end and saved in `/var/lib/vinuspanel/credentials.txt` (mode 600). Avoid `--db-password` and `--admin-password` on the command line (visible in the process list); use `VINUS_DB_PASSWORD` and `VINUS_ADMIN_PASSWORD`. Change the administrator password at first login.
 
-Support reports should contain versions, reproduction steps and redacted logs/screenshots. Never publish credentials, private configuration or player data. No universal compatibility or fifty-player production capacity guarantee is claimed.
+Useful options: `--timezone`, `--admin-user`, `--[no-]wings`, `--node-fqdn`, `--alloc-range A-B`, `--panel-dir`, `--keep-proxy`, `--update`, `--admin`, `--restart`, `--uninstall`.
+
+## 2. Check
+
+```bash
+systemctl is-active nginx php8.3-fpm mariadb redis-server pteroq wings docker vinus-guard
+cd /var/www/pterodactyl && php8.3 artisan p:info
+cat /var/lib/vinuspanel/version
+```
+
+Expect eight `active` lines, Pterodactyl `1.15.1` and the theme version. Log in, open **Admin → Nodes** (green heart = Wings connected) and **Design**. An administrator on a panel without servers gets a five-step wizard to create the first one.
+
+## 3. Blueprint and Vinus Catalog (Minecraft tools)
+
+Requires Blueprint **`beta-2026-06`** exactly. Order on a fresh VPS: panel + theme → Blueprint → theme re-applied → catalog.
+
+```bash
+apt install -y zip unzip wget
+cd /var/www/pterodactyl
+wget "https://github.com/BlueprintFramework/framework/releases/download/beta-2026-06/release.zip" -O release.zip
+unzip -o release.zip
+printf 'WEBUSER="www-data";\nOWNERSHIP="www-data:www-data";\nUSERSHELL="/bin/bash";\n' > .blueprintrc
+chmod +x blueprint.sh
+printf 'y\n' | bash blueprint.sh
+
+cd ~/VinusPanel && sudo bash install.sh --update      # detects Blueprint, installs its variants
+
+cd extensions/vinuscatalog
+zip -r vinuscatalog.blueprint conf.yml admin app components routes config tests README.md
+sudo cp vinuscatalog.blueprint /var/www/pterodactyl/
+cd /var/www/pterodactyl && sudo blueprint -install vinuscatalog
+php8.3 artisan route:list | grep -c vinuscatalog     # about 40 routes
+```
+
+CurseForge needs a private key in `.env` (`VINUS_CURSEFORGE_API_KEY`); Modrinth, SpigotMC and MCJars work without one.
+
+## 4. Harden before going public
+
+A default install is functional, **not hardened**: HTTP on the IP, Wings API in clear text on 8080, firewall off, mail set to `log`.
+
+- **HTTPS**: install with `--url https://…`, or add Certbot to the existing Nginx vhost, set `APP_URL` in `.env`, run `php8.3 artisan config:clear`, and enable SSL on the node (Admin → Nodes → Settings, then copy its Configuration into `/etc/pterodactyl/config.yml` and restart Wings).
+- **Firewall**: allow `22`, `80`, `443`, `8080`, `2022` and the game range in `ufw` **before** enabling it. Docker-published game ports bypass `ufw`.
+- **SSH**: keys only (`PasswordAuthentication no`, `PermitRootLogin prohibit-password`), test in a second session first; add `fail2ban`.
+- **Mail**: set `MAIL_MAILER=smtp` and the `MAIL_*` values in `.env`, then `config:clear` and `queue:restart`.
+- **Backups** (off the VPS): `mariadb-dump panel`, `.env` (its application key protects encrypted data), `/etc/pterodactyl/config.yml`, `storage/app/vinuspanel`, `public/assets/vinus/custom`, `/var/lib/pterodactyl/volumes`.
+- Any secret pasted in a chat, ticket or repository is compromised: rotate it.
+
+## 5. Use
+
+Open **Design** as a root administrator to preview branding, layout, icons, typography, charts and the login mosaic. Save publishes; Cancel restores the saved design. Eight languages are offered, with English fallback for untranslated advanced text.
+
+Version and modpack installations leave Minecraft stopped. Start it normally; once it is running, a separate **VinusPlayers** dialog explains live inventory, health, hunger, XP, skin and presence. Later adds nothing; explicit activation gracefully stops the server, installs the companion and requests startup, never force-killing. Companion compatibility is narrower than the catalog: Forge 1.20.1/47.3.0, Fabric 1.20.1/0.16.10, Fabric 1.21.1/0.16.14 and NeoForge 1.21.1/21.1.219 (read-only), and Bukkit on 1.20.1/1.21.1 (live data and permitted actions, tested on Paper). Inventory editing is not included.
+
+The `vinus-guard` service quarantines client-only mods that crash a server (`/var/log/vinus-guard.log`, at most 15 attempts per hour per server) and restarts it.
+
+## 6. Maintain
+
+```bash
+cd ~/VinusPanel && sudo bash install.sh --update     # theme update (git pull --ff-only + rebuild)
+sudo bash install.sh --admin                         # create / reset the administrator
+sudo bash install.sh --restart                       # restart PHP-FPM, Nginx, worker, Wings
+sudo bash uninstall.sh                               # restore original files, remove guard service
+```
+
+The theme is validated with Pterodactyl **1.15.1** only. After updating Pterodactyl, reinstall Blueprint (if used), then the theme, then the catalog. To start from scratch, reinstall the VPS operating system and repeat from step 1; take backups first, since this erases game servers too.
+
+Support reports should contain versions, reproduction steps and redacted logs. Never publish credentials, private configuration or player data. No universal compatibility or fifty-player production capacity guarantee is claimed.
 
 [Chapter index](README.md)

@@ -1,61 +1,48 @@
-# Installer et personnaliser VinusPanel 3.2.0 sur un VPS
+# Installer et personnaliser VinusPanel sur un VPS
 
-Ce guide s'adresse à l'administrateur d'un panel Pterodactyl **déjà installé**. Le téléchargement contient le code source du thème, l'installeur, un désinstalleur et la documentation. Il ne contient ni Pterodactyl, ni Wings, ni les données de vos serveurs.
+Ce guide résume l'installation. **La référence complète, tenue à jour, est la [documentation GitBook](https://vinuspanel.gitbook.io/vinuspanel-docs/)** (sources : [`docs/gitbook/`](docs/gitbook/README.md)), en particulier le chapitre « Installer VinusPanel de A à Z » et le chapitre « Sécuriser et exploiter la production ».
+
+Sur un **VPS vierge**, `install.sh` installe tout : Pterodactyl Panel 1.15.1, MariaDB, Redis, Nginx, le worker, le thème, Docker et Wings, plus le garde-fou `vinus-guard`. Sur un panel déjà installé, il applique seulement le thème. Le dépôt ne contient ni Pterodactyl ni vos données : l'installeur télécharge Pterodactyl.
 
 ## 1. Compatibilité
 
 | Élément | Version validée |
 | --- | --- |
-| Pterodactyl Panel | 1.15.1 |
-| Ubuntu | 24.04 |
+| Pterodactyl Panel | 1.15.1 (installé par le script sur VPS vierge) |
+| Ubuntu | 24.04 LTS |
 | PHP | 8.3 |
-| Node.js | 22 ou plus |
-| Yarn | 1.x |
-| Composer | Installé sur le VPS pour régénérer l'autoload PHP. |
-| Blueprint | Optionnel ; intégration vérifiée avec `beta-2026-06` |
+| Node.js / Yarn | 22 ou plus / 1.x |
+| Machine testée | 2 vCPU, 8 Go de RAM (moins de 4 Go non validé) |
+| Blueprint | Optionnel ; `beta-2026-06` pour Vinus Catalog 1.4.0 |
 
-Il faut un accès SSH avec `sudo`, un panel qui fonctionne déjà, et suffisamment d'espace pour le code source, les dépendances Node et les sauvegardes. Si vous utilisez Blueprint, installez-le **avant** VinusPanel. Ne mélangez pas ce thème avec une autre surcouche qui remplace les mêmes fichiers sans examiner les conflits.
+Il faut un accès SSH en `root` ou avec `sudo`. Si l'hébergeur fournit une image avec Traefik sur les ports 80/443, l'installeur l'arrête et désactive son redémarrage (option `--keep-proxy` pour refuser) : préférer une image Ubuntu nue.
 
-## 2. Sauvegarder le panel
-
-L'installeur sauvegarde chaque fichier qu'il remplace, puis restaure automatiquement en cas d'échec de l'installation. Gardez aussi votre propre sauvegarde du panel, de la base de données et de `storage` avant une mise à jour importante. Les images téléversées dans le menu Design sont conservées sous `public/assets/vinus/custom` et les réglages sous `storage/app/vinuspanel/design.json` ; incluez ces deux chemins dans vos sauvegardes régulières.
-
-Par défaut, le panel doit se trouver dans `/var/www/pterodactyl`. Pour un autre emplacement, utilisez `--panel-dir /chemin/absolu` dans chaque commande.
-
-## 3. Récupérer le code source
-
-Connectez-vous au VPS, puis exécutez :
+## 2. Récupérer le code
 
 ```bash
-cd /tmp
-git clone https://github.com/yhanottv/VinusPanel.git vinuspanel
-cd vinuspanel
-git checkout v3.2.0
+apt update && apt install -y git curl
+git clone --branch main --single-branch https://github.com/yhanottv/VinusPanel.git
+cd VinusPanel
 ```
 
-Si vous avez téléchargé le ZIP gratuit sur BuiltByBit, décompressez-le sur le VPS et placez-vous dans le dossier contenant `install.sh`. Le contenu est identique à la version GitHub correspondante.
+Si vous avez téléchargé le ZIP publié (BuiltByBit), décompressez-le et placez-vous dans le dossier contenant `install.sh` ; préférer `main` pour retrouver toutes les fonctions décrites dans la documentation.
 
-Si une ancienne copie du dépôt existe déjà, utilisez `git fetch origin`, `git checkout v3.2.0` dans cette copie. Conservez vos propres changements dans une branche ou une sauvegarde avant de changer de version.
-
-## 4. Vérifier puis installer
+## 3. Vérifier puis installer
 
 ```bash
-sudo bash install.sh --check
-sudo bash install.sh
+sudo bash install.sh --check      # rapport, aucune modification
+sudo bash install.sh --install    # ou sans option : menu, choix [1]
 ```
 
-`--check` examine la version du panel, Node, Yarn, PHP et la structure du paquet sans modifier Pterodactyl. L'installation active temporairement le mode maintenance, copie les fichiers, compile les assets et vide les caches. Attendez le message final « VinusPanel 3.2.0 est installé » avant de rouvrir le panel. L'installeur affiche le chemin de la sauvegarde de cette opération ; notez-le.
+Avec un domaine (DNS `A` déjà orienté vers le VPS) : `sudo bash install.sh --install --url https://panel.exemple.fr --admin-email vous@exemple.fr`. L'opération dure de 10 à 20 minutes. En cas d'échec pendant la phase « panel », relancer la même commande : elle reprend. En cas d'échec pendant la phase « thème », les fichiers d'origine sont restaurés automatiquement.
 
-Si vous utilisez le catalogue de mods, mettez aussi à jour **Vinus Catalog 1.3.0** avec les instructions de [`extensions/vinuscatalog/README.md`](extensions/vinuscatalog/README.md). L’installeur du thème ne met pas à jour cette extension Blueprint. La version 1.3.0 ajoute les catalogues pris en charge et les outils logiciels, modpacks, mondes et BlueMap.
+Les mots de passe générés sont affichés à la fin et enregistrés dans `/var/lib/vinuspanel/credentials.txt` (chmod 600). Changer le mot de passe administrateur à la première connexion.
 
-Pour un panel situé ailleurs :
+Pour un panel situé ailleurs que `/var/www/pterodactyl` : `--panel-dir /chemin/absolu`. L'installeur est relançable pour une mise à jour (`sudo bash install.sh --update`) ; il conserve les réglages et images Design.
 
-```bash
-sudo bash install.sh --panel-dir /chemin/absolu --check
-sudo bash install.sh --panel-dir /chemin/absolu
-```
+## 4. Blueprint et catalogue Minecraft (optionnel)
 
-L'installeur est conçu pour être relancé pour une mise à jour. Il conserve les réglages et images Design. Après chaque mise à jour de Pterodactyl ou de Blueprint, revérifiez la compatibilité et réinstallez la surcouche seulement avec une version compatible.
+Ordre sur un VPS vierge : panel + thème → Blueprint `beta-2026-06` → thème réappliqué (`sudo bash install.sh --update`) → paquet `vinuscatalog`. Commandes exactes : chapitre 2, section 6, de la documentation, et [`extensions/vinuscatalog/README.md`](extensions/vinuscatalog/README.md). Avant d'ouvrir le panel au public : domaine et HTTPS, pare-feu, SSH par clé, e-mails et sauvegardes (chapitre 12).
 
 ## 5. Configurer le menu Design
 
@@ -83,11 +70,11 @@ En cas de page inchangée, faites un rechargement forcé du navigateur et vérif
 Pour retirer VinusPanel et retrouver les fichiers présents lors de la première installation :
 
 ```bash
-cd /tmp/vinuspanel
+cd ~/VinusPanel
 sudo bash uninstall.sh
 ```
 
-Le désinstalleur utilise la sauvegarde d'origine conservée dans `/var/lib/vinuspanel/original`. Il recompile les assets d'origine et archive l'état VinusPanel. Les réglages Design et les images téléversées ne sont pas supprimés automatiquement, afin de permettre une réinstallation. Sauvegardez-les séparément si vous souhaitez les conserver lors d'une migration de VPS.
+Le désinstalleur utilise la sauvegarde d'origine conservée dans `/var/lib/vinuspanel/original`. Il recompile les assets d'origine, retire le service `vinus-guard` et archive l'état VinusPanel. Les réglages Design et les images téléversées ne sont pas supprimés automatiquement, afin de permettre une réinstallation. Sauvegardez-les séparément si vous souhaitez les conserver lors d'une migration de VPS.
 
 Si une installation échoue avant la fin, l'installeur tente automatiquement de restaurer les fichiers de la transaction. Consultez aussi le journal Laravel `storage/logs/laravel.log` et la sortie de `yarn build:production` pour diagnostiquer l'erreur.
 
@@ -97,7 +84,7 @@ Si une installation échoue avant la fin, l'installeur tente automatiquement de 
 | --- | --- |
 | `overlay/` | Fichiers appliqués au panel Pterodactyl. |
 | `overlay-manifest.txt` | Liste exacte des fichiers sauvegardés et copiés. |
-| `install.sh` | Contrôle, sauvegarde, installation et compilation. |
+| `install.sh` | Installation complète d'un VPS vierge, ou du thème seul ; sauvegarde et compilation. |
 | `uninstall.sh` | Restauration des fichiers d'origine. |
 | `extensions/vinuscatalog/` | Catalogue Minecraft optionnel pour Blueprint. |
 | `theme.json` | Version et compatibilité du thème. |

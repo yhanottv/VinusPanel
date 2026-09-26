@@ -2,6 +2,9 @@
 
 ## Unreleased — Live Design Studio
 
+- Rewrite the GitBook documentation (`docs/gitbook/`) for a complete A-to-Z installation on a fresh VPS: prerequisites, installer walkthrough, generated credentials, checks, the Blueprint → theme → catalogue order, a new production-hardening chapter (HTTPS, firewall, SSH, mail, backups, logs), first-login wizard, `vinus-guard`, update/rollback/reset and an extended troubleshooting table. Chapters 12 and 13 became 13 and 14. Align both READMEs, `INSTALLATION.fr.md` and the catalogue guide (version 1.4.0).
+- `install.sh` resumes an interrupted fresh install instead of treating a half-installed panel as complete (`/var/lib/vinuspanel/bootstrap-incomplete`), and installs `zip` and `wget`, which Blueprint and the catalogue packaging need.
+
 - Fix the administration script (`vinus-admin.js`) being deleted by every `yarn build:production`: Pterodactyl's `clean` step removes each `*.js` under `public/assets`, so the admin search, language switch and navigation marker silently failed. The script now ships in `public/vinus/js/`.
 - Create servers for the signed-in administrator in the deployment wizard. The wizard looked for a numeric user id that the client API never provides, so the owner always defaulted to the first account.
 - Deployment wizard: unlimited cgroup v2 hosts (`cpu.max` = `max 100000`) no longer report a single CPU core, and a disabled `shell_exec` no longer breaks the page. A missing or unreachable Forge catalogue no longer blocks server creation with a misleading version error, and creation failures are now logged.

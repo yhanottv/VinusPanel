@@ -85,14 +85,14 @@ Profile names and avatars are local to the browser. They do not change Pterodact
 | VinusPanel | Source version **3.2.0**. |
 | Pterodactyl Panel | **1.15.1**. Other versions and forks are not validated. |
 | Blueprint | Optional for the theme; **beta-2026-06** is the validated integration. Required for Vinus Catalog. |
-| Vinus Catalog | Extension **1.3.0**, included in this repository. Install/update the Blueprint extension separately for Minecraft installation tools. |
+| Vinus Catalog | Extension **1.4.0**, included in this repository. Install/update the Blueprint extension separately for Minecraft installation tools. |
 | Node.js | Installer requires **22+**; builds were validated on Node 22. Later major versions are not automatically certified. |
 | Yarn | **1.x**. |
 | PHP | Validated on **8.3**. Keep the PHP requirements of your panel and Blueprint installation. |
 | Host OS | Deployed on **Ubuntu 24.04**. Bash scripts expect an Ubuntu/Debian-style Linux environment and the `www-data` web user. |
-| Wings | An existing working Wings connection; the theme does not install or modify Wings. |
+| Wings | Installed by `install.sh` on a fresh VPS (with Docker); on an existing panel your Wings is left untouched. |
 
-Install Blueprint **before** VinusPanel when you need its integration. The installer rejects an incompatible panel version when detectable and a detected Blueprint version other than the one supported. This is not a guarantee of compatibility with every third-party extension or another theme.
+On a panel that already runs, install Blueprint **before** re-applying VinusPanel when you need its integration (on a fresh VPS the order is panel + theme → Blueprint → theme again → catalog, see the installation section). The installer rejects an incompatible panel version when detectable and a detected Blueprint version other than the one supported. This is not a guarantee of compatibility with every third-party extension or another theme.
 
 ### 📱 Devices and browsers
 
@@ -112,27 +112,25 @@ Keyboard focus indicators, a skip-to-content link, keyboard-operable search, acc
 
 ## 🚀 Installation
 
-Use the machine hosting **Pterodactyl Panel**, not just a separate Wings node. You need SSH access, `sudo`, the panel's frontend sources and its dependencies.
+On a **fresh Ubuntu 24.04 VPS**, `install.sh` installs everything: Pterodactyl Panel 1.15.1, MariaDB, Redis, Nginx, the queue worker and cron, the theme, Docker, Wings and the `vinus-guard` crash-guard service. On a machine that already runs Pterodactyl 1.15.1 it applies (or updates) only the theme. Run it on the host of the **Panel**, with SSH access and `sudo`.
 
-Back up your panel, database and configuration first. The installer temporarily places the panel in maintenance mode while compiling assets. It does not issue start/stop commands to game servers.
+Back up an existing panel, its database and configuration first. The installer temporarily places the panel in maintenance mode while compiling assets. It does not issue start/stop commands to game servers.
 
 ```bash
-git clone --depth 1 https://github.com/yhanottv/VinusPanel.git
+apt update && apt install -y git curl
+git clone --branch main --single-branch https://github.com/yhanottv/VinusPanel.git
 cd VinusPanel
 
-# Check requirements without changing the panel
-bash install.sh --check
+# Check requirements without changing anything
+sudo bash install.sh --check
 
-# Install the theme
-sudo bash install.sh
+# Install (or run without options for the interactive menu and choose [1])
+sudo bash install.sh --install
 ```
 
-The default panel directory is `/var/www/pterodactyl`. For a custom location:
+Generated passwords are saved in `/var/lib/vinuspanel/credentials.txt` (mode 600). With a domain whose DNS record already points to the VPS, add `--url https://panel.example.com`. If the panel phase fails, re-run the same command: it resumes. The default panel directory is `/var/www/pterodactyl`; for a custom location add `--panel-dir /path/to/pterodactyl`.
 
-```bash
-bash install.sh --panel-dir /path/to/pterodactyl --check
-sudo bash install.sh --panel-dir /path/to/pterodactyl
-```
+A default install is functional but **not hardened** (HTTP on the IP, firewall off). Read the [full A-to-Z guide and the production hardening chapter](https://vinuspanel.gitbook.io/vinuspanel-docs/) before going public.
 
 ### What the installer does
 
@@ -149,7 +147,7 @@ On failure, the script attempts to restore backed-up files, rebuild and leave ma
 
 ## 📦 Optional Minecraft mod and plugin catalog
 
-**Blueprint is the extension framework.** Vinus Catalog 1.3.0 provides Modrinth, supported free SpigotMC resources and an optional CurseForge adapter. Its complete software, modpack, world and BlueMap workspace requires VinusPanel 3.2.0.
+**Blueprint is the extension framework.** Vinus Catalog 1.4.0 provides Modrinth, supported free SpigotMC resources and an optional CurseForge adapter. Its complete software, modpack, world and BlueMap workspace requires VinusPanel 3.2.0.
 
 | Detected server software | Available categories |
 | --- | --- |
@@ -166,7 +164,7 @@ The catalog tracks its own installed files and lets users check/apply compatible
 
 ### Install the extension
 
-After installing the compatible Blueprint version and the theme, run from the repository root (`zip` must be installed):
+After installing the compatible Blueprint version (`beta-2026-06`) and re-applying the theme (`sudo bash install.sh --update`), run from the repository root (`zip` must be installed; `install.sh` installs it):
 
 ```bash
 cd extensions/vinuscatalog
