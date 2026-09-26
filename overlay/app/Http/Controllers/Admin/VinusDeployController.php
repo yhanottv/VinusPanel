@@ -132,6 +132,7 @@ class VinusDeployController extends Controller
                     'id' => $version['id'],
                     'channel' => $version['channel'],
                     'supported' => (bool) $version['supported'],
+                    'java' => (int) ($version['java'] ?? 0),
                 ])->values()->all();
         } catch (\Throwable) {
             return [];
@@ -277,8 +278,8 @@ class VinusDeployController extends Controller
             return response()->json(['message' => 'La memoire ou le disque depasse la capacite du noeud.'], 422);
         }
 
-        $images = array_values($egg->docker_images ?? []);
-        if (empty($images)) {
+        $dockerImages = $egg->docker_images ?? [];
+        if (empty($dockerImages)) {
             return response()->json(['message' => "Cette egg n'a pas d'image Docker."], 422);
         }
 
@@ -288,6 +289,34 @@ class VinusDeployController extends Controller
         }
         foreach (($data['environment'] ?? []) as $key => $value) {
             $environment[$key] = (string) $value;
+        }
+
+        $images = array_values($dockerImages);
+        $image = $images[0] ?? '';
+        $softwareCatalog = class_exists(ServerSoftware::class) ? app(ServerSoftware::class) : null;
+        $softwareType = null;
+        $gameVersion = $environment['MC_VERSION'] ?? $environment['MINECRAFT_VERSION'] ?? $environment['VANILLA_VERSION'] ?? '';
+        if ($softwareCatalog !== null && $gameVersion !== '') {
+            try {
+                $typeKeys = [];
+                foreach ($softwareCatalog->types() as $group) {
+                    $typeKeys += $group;
+                }
+                $softwareType = $this->catalogType($egg->name, array_keys($typeKeys));
+                if ($softwareType !== null) {
+                    $versionMeta = collect($softwareCatalog->versions($softwareType))->firstWhere('id', $gameVersion);
+                    $requiredJava = (int) ($versionMeta['java'] ?? 0);
+                    if ($requiredJava > 0) {
+                        foreach ($dockerImages as $label => $dockerImage) {
+                            if (preg_match('/java\s*' . preg_quote((string) $requiredJava, '/') . '\b/i', (string) $label)) {
+                                $image = (string) $dockerImage;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } catch (\Throwable) {
+            }
         }
 
         $startup = (string) $egg->startup;
@@ -328,7 +357,7 @@ class VinusDeployController extends Controller
                 'cpu' => (int) ($data['cpu'] ?? 100),
                 'disk' => (int) $data['disk'],
                 'startup' => $startup,
-                'image' => (string) $images[0],
+                'image' => (string) $image,
                 'environment' => $environment,
                 'skip_scripts' => false,
                 'start_on_completion' => true,
