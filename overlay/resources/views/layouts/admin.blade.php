@@ -224,6 +224,6 @@
             </script>
         @show
         @yield('blueprint.wrappers')
-        <script src="/assets/js/vinus-admin.js?v=3.3.2" defer></script>
+        <script src="/vinus/js/vinus-admin.js?v=3.3.2" defer></script>
     </body>
 </html>

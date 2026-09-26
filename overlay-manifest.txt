@@ -28,7 +28,7 @@ public/assets/images/vinus/login-games/seven-days.jpg
 public/assets/images/vinus/login-games/terraria.jpg
 public/assets/images/vinus/login-games/valheim.jpg
 public/assets/images/vinus/login-games/zomboid.jpg
-public/assets/js/vinus-admin.js
+public/vinus/js/vinus-admin.js
 public/assets/vinus/software/catalog-arclight.png
 public/assets/vinus/software/catalog-aspaper.png
 public/assets/vinus/software/catalog-bungeecord.png
@@ -95,6 +95,8 @@ resources/scripts/components/dashboard/activity/ActivityLogContainer.tsx
 resources/scripts/components/dashboard/dashboard.module.css
 resources/scripts/components/dashboard/deploy/DeployWizard.tsx
 resources/scripts/components/dashboard/deploy/deploy.module.css
+resources/scripts/components/dashboard/deploy/owner.spec.ts
+resources/scripts/components/dashboard/deploy/owner.ts
 resources/scripts/components/dashboard/design/ChoicePreview.tsx
 resources/scripts/components/dashboard/design/DesignNavLink.tsx
 resources/scripts/components/dashboard/design/DesignStudio.tsx
