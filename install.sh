@@ -171,10 +171,39 @@ require_root() { ((EUID == 0)) || fail "cette action doit etre lancee avec sudo 
 panel_present() { [[ -f "$PANEL_DIR/artisan" ]]; }
 generate_password() { openssl rand -base64 48 | tr -dc 'A-Za-z0-9' | cut -c1-24; }
 
+sql_quote() {
+    # Echappe une valeur pour une chaine SQL MariaDB (anti-slash, apostrophe).
+    # Un mot de passe fourni avec --db-password ne doit pas pouvoir casser le SQL.
+    local value="$1"
+    value="${value//\\/\\\\}"
+    value="${value//\'/\\\'}"
+    printf '%s' "$value"
+}
+
+sql_identifier() {
+    # Identifiants SQL stricts : on refuse les caracteres dangereux plutot que
+    # de deviner l'echappement.
+    [[ "$1" =~ ^[A-Za-z0-9_]+$ ]] || fail "identifiant SQL invalide : $1 (lettres, chiffres et underscore autorises)"
+    printf '%s' "$1"
+}
+
+sql_host() {
+    [[ "$1" =~ ^[A-Za-z0-9._%-]+$ ]] || fail "hote SQL invalide : $1"
+    printf '%s' "$1"
+}
+
+valid_email() {
+    [[ "$1" =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]]
+}
+
 detect_public_ip() {
     local ip
-    ip="$(hostname -I 2>/dev/null | awk '{print $1}')"
-    [[ -n "$ip" ]] || ip="$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{print $7; exit}')"
+    # On privilegie l'adresse de sortie (route par defaut) : hostname -I peut
+    # renvoyer en premier une interface interne (pont Docker, multi-IP).
+    ip="$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{for (i = 1; i <= NF; i++) if ($i == "src") {print $(i+1); exit}}')"
+    if [[ -z "$ip" || "$ip" == 127.* ]]; then
+        ip="$(hostname -I 2>/dev/null | awk '{print $1}')"
+    fi
     printf '%s' "$ip"
 }
 
@@ -288,37 +317,42 @@ ensure_app_key() {
     )
 }
 
+default_admin_email() {
+    # Pterodactyl refuse un e-mail dont le domaine est une adresse IP :
+    # on prend le nom d'hote complet quand le panel est accede par IP.
+    local mailhost fqdn
+    mailhost="$(panel_hostname)"
+    if [[ "$mailhost" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ || "$mailhost" == \[* ]]; then
+        fqdn="$(hostname -f 2>/dev/null || true)"
+        if [[ -n "$fqdn" && "$fqdn" == *.* && ! "$fqdn" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            mailhost="$fqdn"
+        else
+            mailhost="vinuspanel.local"
+        fi
+    fi
+    printf 'admin@%s' "$mailhost"
+}
+
 generate_secrets() {
     local ip; ip="$(detect_public_ip)"
     [[ -n "$PANEL_URL" ]]   || PANEL_URL="http://${ip}"
     [[ -n "$DB_PASS" ]]     || DB_PASS="$(generate_password)"
     [[ -n "$ADMIN_PASS" ]]  || ADMIN_PASS="$(generate_password)"
-
-    # Pterodactyl refuse un e-mail dont le domaine est une adresse IP :
-    # on prend le nom d'hote complet quand le panel est accede par IP.
-    if [[ -z "$ADMIN_EMAIL" ]]; then
-        local mailhost fqdn
-        mailhost="$(panel_hostname)"
-        if [[ "$mailhost" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ || "$mailhost" == \[* ]]; then
-            fqdn="$(hostname -f 2>/dev/null || true)"
-            if [[ -n "$fqdn" && "$fqdn" == *.* && ! "$fqdn" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-                mailhost="$fqdn"
-            else
-                mailhost="vinuspanel.local"
-            fi
-        fi
-        ADMIN_EMAIL="admin@${mailhost}"
-    fi
-
+    [[ -n "$ADMIN_EMAIL" ]] || ADMIN_EMAIL="$(default_admin_email)"
+    valid_email "$ADMIN_EMAIL" || fail "adresse e-mail administrateur invalide : ${ADMIN_EMAIL}"
     [[ -n "$NODE_FQDN" ]] || NODE_FQDN="$(panel_hostname)"
 }
 
 configure_database() {
     log "Creation de la base MariaDB '${DB_NAME}'..."
+    sql_identifier "$DB_NAME" >/dev/null
+    sql_identifier "$DB_USER" >/dev/null
+    sql_host "$DB_HOST" >/dev/null
+    local q_pass; q_pass="$(sql_quote "$DB_PASS")"
     mariadb -u root <<SQL
 CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;
-CREATE USER IF NOT EXISTS '${DB_USER}'@'${DB_HOST}' IDENTIFIED BY '${DB_PASS}';
-ALTER USER '${DB_USER}'@'${DB_HOST}' IDENTIFIED BY '${DB_PASS}';
+CREATE USER IF NOT EXISTS '${DB_USER}'@'${DB_HOST}' IDENTIFIED BY '${q_pass}';
+ALTER USER '${DB_USER}'@'${DB_HOST}' IDENTIFIED BY '${q_pass}';
 GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'${DB_HOST}';
 FLUSH PRIVILEGES;
 SQL
@@ -637,6 +671,13 @@ rollback() {
     if ((INSTALL_STARTED)) && [[ -n "$TRANSACTION_BACKUP" && -d "$TRANSACTION_BACKUP" ]]; then
         printf '\n%s[VinusPanel] Installation interrompue, restauration automatique...%s\n' "$C_ERR" "$C_RESET" >&2
         restore_from "$TRANSACTION_BACKUP"
+        # On restaure les assets precedents AVANT de tenter la recompilation :
+        # si la recompilation echoue a son tour, le panel conserve une
+        # interface fonctionnelle au lieu de rester sans styles.
+        if [[ -d "$TRANSACTION_BACKUP/assets" ]]; then
+            rm -rf "$PANEL_DIR/public/assets"
+            cp -a "$TRANSACTION_BACKUP/assets" "$PANEL_DIR/public/assets"
+        fi
         (cd "$PANEL_DIR" && composer dump-autoload --no-interaction --no-scripts) >/dev/null 2>&1 || true
         enable_legacy_openssl
         (cd "$PANEL_DIR" && yarn build:production) >/dev/null 2>&1 || true
@@ -721,6 +762,14 @@ install_theme() {
         yarn add xterm-addon-unicode11@^0.6.0 --ignore-scripts
     fi
 
+    # Filet de securite : "yarn run clean" vide public/assets avant de
+    # compiler. Si la compilation echoue, le rollback restaure cet instantane
+    # et le panel garde ses styles au lieu de devenir sans styles.
+    if [[ -d public/assets ]]; then
+        rm -rf "$TRANSACTION_BACKUP/assets"
+        cp -a public/assets "$TRANSACTION_BACKUP/assets"
+    fi
+
     if [[ "$BUILD_MODE" == "development" ]]; then
         log "Compilation des assets (mode developpement)..."
         enable_legacy_openssl
@@ -770,10 +819,10 @@ install_wings() {
     (
         cd "$PANEL_DIR"
         local loc_id node_id
-        loc_id="$("$PHP_BIN" artisan tinker --execute='echo \Pterodactyl\Models\Location::firstOrCreate(["short" => "fr1"], ["long" => "France - VinusPanel"])->id;' | tr -dc '0-9')"
+        loc_id="$("$PHP_BIN" artisan tinker --execute='echo \Pterodactyl\Models\Location::firstOrCreate(["short" => "fr1"], ["long" => "France - VinusPanel"])->id;' | tail -n 1 | tr -dc '0-9')"
         [[ -n "$loc_id" ]] || fail "impossible de creer la location Wings"
 
-        node_id="$("$PHP_BIN" artisan tinker --execute='echo (string) optional(\Pterodactyl\Models\Node::query()->first())->id;' | tr -dc '0-9')"
+        node_id="$("$PHP_BIN" artisan tinker --execute='echo (string) optional(\Pterodactyl\Models\Node::query()->first())->id;' | tail -n 1 | tr -dc '0-9')"
         if [[ -z "$node_id" ]]; then
             # Limites du noeud deduites de la machine (85 % de la RAM et du disque).
             local node_mem="$NODE_MEMORY" node_disk="$NODE_DISK"
@@ -793,7 +842,7 @@ install_wings() {
                 --maxDisk="$node_disk" --overallocateDisk=0 --uploadSize=100 \
                 --daemonListeningPort=8080 --daemonSFTPPort=2022 \
                 --daemonBase=/var/lib/pterodactyl/volumes --no-interaction
-            node_id="$("$PHP_BIN" artisan tinker --execute='echo (string) optional(\Pterodactyl\Models\Node::query()->first())->id;' | tr -dc '0-9')"
+            node_id="$("$PHP_BIN" artisan tinker --execute='echo (string) optional(\Pterodactyl\Models\Node::query()->first())->id;' | tail -n 1 | tr -dc '0-9')"
         fi
         [[ -n "$node_id" ]] || fail "impossible de creer le noeud Wings"
 
@@ -918,20 +967,21 @@ action_admin() {
     panel_present || fail "aucun panel Pterodactyl detecte ; utilise d'abord l'option 1"
 
     local email="$ADMIN_EMAIL" user="$ADMIN_USER" pass="$ADMIN_PASS" ans
+    [[ -n "$email" ]] || email="$(default_admin_email)"
     if is_tty; then
-        local ip; ip="$(detect_public_ip)"
-        read -r -p "Email administrateur [${email:-admin@${ip}}] : " ans || true
-        email="${ans:-${email:-admin@${ip}}}"
+        read -r -p "Email administrateur [${email}] : " ans || true
+        email="${ans:-$email}"
         read -r -p "Identifiant [${user:-admin}] : " ans || true
         user="${ans:-${user:-admin}}"
         read -r -s -p "Mot de passe (vide = genere automatiquement) : " pass || true
         printf '\n'
     fi
+    valid_email "$email" || fail "adresse e-mail invalide : ${email}"
     [[ -n "$pass" ]] || pass="$(generate_password)"
 
     local existing
     existing="$(mariadb -u root -N -B -e \
-        "SELECT COUNT(*) FROM \`${DB_NAME}\`.users WHERE email='${email}';" 2>/dev/null || echo 0)"
+        "SELECT COUNT(*) FROM \`${DB_NAME}\`.users WHERE email='${email//\'/\'\'}';" 2>/dev/null || echo 0)"
 
     cd "$PANEL_DIR"
     if [[ "$existing" != "0" ]]; then

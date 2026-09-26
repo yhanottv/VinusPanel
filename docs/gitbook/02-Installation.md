@@ -1,119 +1,108 @@
 # 🚀 Installer VinusPanel
 
-## Installer Pterodactyl sur une machine vierge
+## Deux situations, une seule commande
 
-Cette procédure vise une installation classique sur Ubuntu 24.04, avec le code du panel dans `/var/www/pterodactyl`. Elle ne s’applique pas à l’image Docker officielle : dans Docker, le panel se trouve généralement dans `/app` et l’image de production ne contient pas les outils de compilation nécessaires à VinusPanel.
+**VPS vierge** (aucun Pterodactyl installé) : `install.sh` installe **tout** — dépendances système, Panel Pterodactyl 1.15.1, base MariaDB, Nginx, worker, compte administrateur, le thème VinusPanel et Wings. Les mots de passe administrateur et base sont générés aléatoirement, puis enregistrés dans `/var/lib/vinuspanel/credentials.txt` (chmod 600).
 
-Pour une installation Docker, consulter la [documentation officielle du Panel](https://pterodactyl.io/panel/1.0/getting_started.html) et prévoir ensuite une image personnalisée qui contient Node.js 22, Yarn et la surcouche compilée. Le projet Pterodactyl documente surtout l’installation classique du Panel ; l’image Docker de production ne se personnalise pas avec `install.sh` directement.
+**Panel Pterodactyl existant** : `install.sh` détecte le panel et applique (ou met à jour) le thème uniquement, avec sauvegarde et retour arrière automatique.
 
-### Dépendances du serveur
+L'installeur a été validé sur une Ubuntu 24.04 entièrement vierge (installation complète panel + thème + Wings en une commande). Il ne s'applique pas à l'image Docker officielle : dans Docker, le panel se trouve généralement dans `/app` et l'image de production ne contient pas les outils de compilation nécessaires à VinusPanel. Pour Docker, consulter la [documentation officielle du Panel](https://pterodactyl.io/panel/1.0/getting_started.html) et prévoir une image personnalisée.
 
-Exécuter ces commandes en SSH avec `root` ou `sudo` :
+## Installation rapide (recommandée)
 
-```bash
-apt update
-apt -y upgrade
-apt install -y software-properties-common curl ca-certificates gnupg2 sudo lsb-release
-add-apt-repository -y ppa:ondrej/php
-apt update
-apt install -y php8.3 php8.3-{common,cli,gd,mysql,mbstring,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
-curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-apt install -y nodejs
-npm install --global yarn@1
-```
-
-Vérifier les prérequis avant de continuer :
+En SSH, avec `root` ou `sudo` :
 
 ```bash
-php -v
-composer --version
-systemctl status mariadb nginx redis-server --no-pager
-node --version
-yarn --version
-```
-
-### Télécharger Pterodactyl 1.15.1
-
-```bash
-mkdir -p /var/www/pterodactyl
-cd /var/www/pterodactyl
-curl -fL -o panel.tar.gz https://github.com/pterodactyl/panel/releases/download/v1.15.1/panel.tar.gz
-tar -xzvf panel.tar.gz
-rm panel.tar.gz
-chmod -R 755 storage/* bootstrap/cache
-```
-
-Créer ensuite une base MariaDB et un utilisateur dédiés. Remplacer les valeurs entre chevrons et ne jamais publier le mot de passe :
-
-```bash
-mariadb -u root -p
-```
-
-```sql
-CREATE DATABASE panel;
-CREATE USER 'pterodactyl'@'127.0.0.1' IDENTIFIED BY '<MOT_DE_PASSE_DB_LONG_ET_UNIQUE>';
-GRANT ALL PRIVILEGES ON panel.* TO 'pterodactyl'@'127.0.0.1';
-FLUSH PRIVILEGES;
-EXIT;
-```
-
-Configurer le panel avec les assistants intégrés :
-
-```bash
-cd /var/www/pterodactyl
-composer install --no-dev --optimize-autoloader
-php artisan p:environment:setup
-php artisan p:environment:database
-php artisan p:environment:mail
-php artisan key:generate --force
-php artisan migrate --seed --force
-php artisan p:user:make
-chown -R www-data:www-data /var/www/pterodactyl/*
-```
-
-Il reste à configurer Nginx, le worker `pteroq`, le cron du scheduler et Wings. Suivre les sections correspondantes du [guide officiel d’installation Pterodactyl](https://pterodactyl.io/panel/1.0/getting_started.html) avant d’installer VinusPanel.
-
-## Préparer le panel
-
-Intervenir sur la machine qui héberge **Pterodactyl Panel**, pas seulement sur un nœud Wings. Le panel doit déjà fonctionner. Prévoir SSH, `sudo`, Git, Bash, PHP, Composer, Node 22, Yarn 1 et les sources frontend Pterodactyl.
-
-Sauvegarder la base de données, les fichiers du panel, sa configuration privée et les volumes des serveurs. Si VinusPanel est déjà installé, inclure `storage/app/vinuspanel/design.json` et `public/assets/vinus/custom`. Les sauvegardes ciblées de l’installeur ne remplacent pas une sauvegarde complète.
-
-Si les outils Minecraft sont souhaités, installer d’abord la version compatible de [Blueprint](https://blueprint.zip/guides/admin/install), puis le thème, puis Vinus Catalog.
-
-## Télécharger la branche documentée
-
-```bash
+apt install -y curl git
 git clone --branch main --single-branch https://github.com/yhanottv/VinusPanel.git
 cd VinusPanel
-bash install.sh --check
 sudo bash install.sh
 ```
 
-Ces commandes choisissent la branche principale à jour, documentée ici. Pour une version publiée, choisir son tag ou son archive et ses instructions ; les fonctions récentes peuvent en être absentes.
+Sans argument, dans un terminal, le script ouvre le **menu interactif** :
 
-Le chemin par défaut est `/var/www/pterodactyl`. Avec un autre emplacement :
+```
+ [ 1 ] Install VINUS PANEL (Production)
+ [ 2 ] Install VINUS PANEL (Development)
+ [ 3 ] Update Panel (pull GitHub + rebuild)
+ [ 4 ] Create / Reset Administrator Account
+ [ 5 ] Restart Panel Service
+ [ 6 ] Uninstall Panel
+ [ 7 ] Exit
+```
+
+Choisir **1** pour une installation de production. L'opération complète prend de 10 à 20 minutes selon la machine (compilation du frontend incluse). À la fin, le script affiche l'URL du panel, le compte administrateur et l'emplacement des identifiants.
+
+Sur un VPS qui exposerait déjà un reverse-proxy (par exemple un Traefik préinstallé occupant les ports 80/443), l'installeur l'arrête automatiquement pour installer Nginx ; utiliser `--keep-proxy` pour refuser ce comportement.
+
+## Options non interactives
+
+Le même script reste utilisable dans un script ou en CI, sans menu :
+
+| Option | Rôle |
+| --- | --- |
+| `--install [prod\|dev]` | Installe le panel (si absent) puis le thème |
+| `--update` | `git pull` + recompilation du thème |
+| `--admin` | Crée ou réinitialise le compte administrateur |
+| `--restart` | Redémarre PHP-FPM, Nginx, le worker et Wings |
+| `--uninstall` | Désinstalle le thème (via `uninstall.sh`) |
+| `--check` | Rapport d'environnement, sans modification |
+| `--url URL` | URL publique du panel (défaut : `http://<ip>`) |
+| `--timezone TZ` | Fuseau (défaut : `Europe/Paris`) |
+| `--db-password MDP` | Mot de passe de la base (défaut : généré) |
+| `--admin-email EMAIL` | E-mail administrateur (défaut : `admin@<nom-d-hote>`) |
+| `--admin-user USER` / `--admin-password MDP` | Identifiant et mot de passe admin |
+| `--[no-]wings` | Installe ou non Wings (défaut : automatique sur VPS vierge) |
+| `--node-fqdn HOTE` | FQDN/IP du nœud Wings |
+| `--alloc-range A-B` | Plage de ports des allocations (défaut : 25565-25584) |
+| `--panel-dir CHEMIN` | Autre emplacement que `/var/www/pterodactyl` |
+| `--keep-proxy` | Ne retire pas un reverse-proxy présent sur 80/443 |
+
+Sans domaine, le panel est servi en `http://<ip>` : un certificat Let's Encrypt ne peut pas être délivré pour une seule IP. Avec une URL `https://` fournie via `--url`, l'installeur demande le certificat avec Certbot. Les limites du nœud Wings sont déduites de la machine (85 % de la RAM et du disque réels), surchargeables via `VINUS_NODE_MEMORY` et `VINUS_NODE_DISK`.
+
+## Blueprint et Vinus Catalog (outils Minecraft)
+
+Les onglets **Version**, **Mods**, **Modpacks**, **Mondes** et **BlueMap** nécessitent l'extension **Vinus Catalog**, qui requiert **Blueprint**. Installer Blueprint **avant** le thème, dans la version exacte attendue (`beta-2026-06`) :
 
 ```bash
-bash install.sh --panel-dir /chemin/vers/pterodactyl --check
-sudo bash install.sh --panel-dir /chemin/vers/pterodactyl
+cd /var/www/pterodactyl
+wget "https://github.com/BlueprintFramework/framework/releases/download/beta-2026-06/release.zip" -O release.zip
+unzip -o release.zip
+printf 'WEBUSER="www-data";\nOWNERSHIP="www-data:www-data";\nUSERSHELL="/bin/bash";\n' > .blueprintrc
+chmod +x blueprint.sh
+printf 'y\n' | bash blueprint.sh
 ```
+
+Puis réappliquer le thème (`sudo bash install.sh` depuis le dépôt : les variantes Blueprint sont détectées automatiquement) et installer le catalogue :
+
+```bash
+cd extensions/vinuscatalog
+zip -r vinuscatalog.blueprint conf.yml admin app components routes config tests README.md
+sudo cp vinuscatalog.blueprint /var/www/pterodactyl/
+cd /var/www/pterodactyl
+sudo blueprint -install vinuscatalog
+```
+
+Depuis la version 3.2.x du thème, `install.sh` gère automatiquement la compatibilité Blueprint (fournisseur OpenSSL historique pour Node 22, normalisation de l'option `css-loader`, ajout de l'addon `xterm-addon-unicode11`). Détails : [Blueprint et catalogue](03-Blueprint-et-Catalogue.md).
 
 ## Déroulement
 
-L’installeur contrôle les versions, sauvegarde les fichiers concernés, active la maintenance, copie l’overlay et les variantes Blueprint applicables, prépare les dépendances et compile le frontend. Il vide ensuite les caches et quitte la maintenance. Conserver la sortie et le chemin de sauvegarde affiché.
+L'installeur contrôle les versions, sauvegarde les fichiers concernés **et les assets frontend existants**, active la maintenance, copie la surcouche et les variantes Blueprint applicables, prépare les dépendances et compile le frontend. Il vide ensuite les caches et quitte la maintenance. En cas d'échec, il **tente** un retour arrière : fichiers précédents restaurés, assets précédents remis en place (le panel reste utilisable même si la recompilation échoue à son tour), puis vérifier le résultat au lieu de supposer sa réussite.
 
-Ne pas interrompre la compilation ni lancer deux installations en parallèle. Le thème ne demande pas de redémarrage aux serveurs de jeu. En cas d’échec, le script **tente** un retour aux fichiers précédents : vérifier le résultat au lieu de supposer sa réussite.
+Ne pas interrompre la compilation ni lancer deux installations en parallèle. Le thème ne demande pas de redémarrage aux serveurs de jeu.
 
 ## Vérifier
 
-1. Recharger le panel sans cache et se connecter.
+1. Recharger le panel sans cache (Ctrl+F5) et se connecter avec le compte affiché par l'installeur.
 2. Ouvrir le tableau de bord puis un serveur : état, fichiers et console.
-3. Ouvrir Design avec un administrateur et vérifier l’aperçu.
-4. Tester un sous-utilisateur et ses restrictions.
+3. Ouvrir **Design** avec un administrateur et vérifier l'aperçu.
+4. Au premier accès d'un administrateur sur un panel sans serveur, l'assistant de création proposé par VinusPanel peut créer un premier serveur.
 5. Installer séparément Vinus Catalog si les outils Minecraft sont nécessaires.
 
-Une installation complète sur un panel entièrement neuf n’est pas une validation acquise du projet : les tests incluent des builds isolés et un panel existant. Prévoir une première installation sur un environnement de test.
+## Chemin manuel (référence)
+
+Pour installer chaque pièce à la main — dépendances, Panel 1.15.1, base MariaDB, Nginx, worker `pteroq`, Wings — suivre les sections correspondantes du [guide officiel Pterodactyl](https://pterodactyl.io/panel/1.0/getting_started.html), puis appliquer le thème avec `bash install.sh --check` et `sudo bash install.sh`. L'installeur automatise exactement ces étapes ; la voie manuelle reste utile pour auditer ou reprendre une installation partielle.
+
+Prérequis minimatiques pour appliquer le thème seul : SSH avec `sudo`, Git, Bash, PHP 8.3, Composer, Node 22, Yarn 1 et les sources frontend Pterodactyl. Sauvegarder la base, les fichiers du panel et `storage/app/vinuspanel/design.json` + `public/assets/vinus/custom` avant une mise à jour importante.
 
 [Sommaire](README.md) · [Blueprint et catalogue](03-Blueprint-et-Catalogue.md)
