@@ -1,0 +1,12 @@
+[Unit]
+Description=VinusPanel guard (quarantaine auto des mods client)
+After=docker.service
+Wants=docker.service
+
+[Service]
+ExecStart=/usr/local/bin/vinus-guard daemon
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
