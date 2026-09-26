@@ -6,6 +6,7 @@ set -Eeuo pipefail
 
 THEME_VERSION="3.2.0"
 PTERODACTYL_VERSION="1.15.1"
+BLUEPRINT_VERSION="beta-2026-06"
 DEFAULT_PANEL_DIR="/var/www/pterodactyl"
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PANEL_DIR="$DEFAULT_PANEL_DIR"
@@ -48,6 +49,8 @@ ALLOC_START="${VINUS_ALLOC_START:-25565}"
 ALLOC_END="${VINUS_ALLOC_END:-25584}"
 WITH_WINGS="${VINUS_WITH_WINGS:-auto}"
 PROXY_MODE="${VINUS_PROXY_MODE:-auto}"
+# auto: Blueprint + Vinus Catalog on a fresh install, or when Blueprint is already present.
+WITH_BLUEPRINT="${VINUS_WITH_BLUEPRINT:-auto}"
 NODE_MEMORY="${VINUS_NODE_MEMORY:-}"
 NODE_DISK="${VINUS_NODE_DISK:-}"
 
@@ -134,7 +137,8 @@ Sans option, dans un terminal, ouvre le menu interactif.
 
 Actions non interactives :
   --install [prod|dev]     Installe le panel (si absent) puis le theme
-  --update                 git pull + recompilation du theme
+  --update                 git pull + recompilation du theme (+ catalogue si Blueprint)
+  --catalog                Installe ou met a jour Vinus Catalog (necessite Blueprint)
   --admin                  Cree ou reinitialise le compte administrateur
   --restart                Redemarre les services du panel
   --uninstall              Desinstalle le theme
@@ -150,6 +154,7 @@ Parametres :
   --admin-user USER        Identifiant administrateur
   --admin-password MDP     Mot de passe administrateur
   --[no-]wings             Installe Wings (defaut : auto si VPS nu)
+  --[no-]blueprint         Installe Blueprint + Vinus Catalog (defaut : auto si VPS nu)
   --node-fqdn HOTE         FQDN/IP du noeud Wings
   --alloc-range A-B        Plage de ports des allocations
   --keep-proxy             Ne retire pas un reverse-proxy sur 80/443
@@ -537,13 +542,80 @@ system_report() {
     ok "Controle termine."
 }
 
+blueprint_installed() { [[ -f "$PANEL_DIR/.blueprint/extensions/blueprint/private/db/is_installed" ]]; }
+
+blueprint_wanted() {
+    case "$WITH_BLUEPRINT" in
+        yes) return 0 ;;
+        no)  return 1 ;;
+        *)   [[ "$FRESH_PANEL" == "1" ]] || blueprint_installed ;;
+    esac
+}
+
+blueprint_cmd() {
+    if command -v blueprint >/dev/null 2>&1; then blueprint "$@"; else bash "$PANEL_DIR/blueprint.sh" "$@"; fi
+}
+
+install_blueprint() {
+    blueprint_installed && return 0
+    log "Installation de Blueprint ${BLUEPRINT_VERSION}..."
+    (
+        cd "$PANEL_DIR"
+        curl -fL -o release.zip \
+            "https://github.com/BlueprintFramework/framework/releases/download/${BLUEPRINT_VERSION}/release.zip"
+        unzip -oq release.zip
+        rm -f release.zip
+        printf 'WEBUSER="www-data";\nOWNERSHIP="www-data:www-data";\nUSERSHELL="/bin/bash";\n' > .blueprintrc
+        chmod +x blueprint.sh
+        enable_legacy_openssl
+        bash blueprint.sh <<< "y"
+    )
+    blueprint_installed || fail "Blueprint ${BLUEPRINT_VERSION} n'a pas pu etre installe (voir la sortie ci-dessus)"
+    ok "Blueprint ${BLUEPRINT_VERSION} installe."
+}
+
+catalog_version() {
+    sed -nE "s/^[[:space:]]*version:[[:space:]]*'?([^'[:space:]]+)'?.*/\1/p" \
+        "$REPO_DIR/extensions/vinuscatalog/conf.yml" | head -n 1
+}
+
+# Non fatal: the panel and the theme already work without the Minecraft tools.
+install_catalog() {
+    blueprint_installed || { warn "Blueprint absent : Vinus Catalog ignore."; return 0; }
+    local wanted recorded="" present=0 action="-install" package="$PANEL_DIR/vinuscatalog.blueprint"
+    wanted="$(catalog_version)"
+    [[ -d "$PANEL_DIR/app/BlueprintFramework/Extensions/vinuscatalog" ]] && present=1
+    [[ -f "$STATE_DIR/catalog-version" ]] && recorded="$(<"$STATE_DIR/catalog-version")"
+    if ((present)) && [[ "$recorded" == "$wanted" ]]; then
+        log "Vinus Catalog ${wanted} deja installe."
+        return 0
+    fi
+    ((present)) && action="-upgrade"
+    log "Vinus Catalog ${wanted} : blueprint ${action}..."
+    rm -f "$package"
+    if ! (cd "$REPO_DIR/extensions/vinuscatalog" && zip -qr "$package" conf.yml admin app components routes config tests README.md); then
+        warn "paquet Vinus Catalog impossible a construire (zip installe ?) : relancer avec --catalog."
+        return 0
+    fi
+    if (cd "$PANEL_DIR" && enable_legacy_openssl && blueprint_cmd "$action" vinuscatalog); then
+        mkdir -p "$STATE_DIR"
+        printf '%s\n' "$wanted" > "$STATE_DIR/catalog-version"
+        (cd "$PANEL_DIR" && "$PHP_BIN" artisan config:clear >/dev/null 2>&1) || true
+        chown -R www-data:www-data "$PANEL_DIR/storage" "$PANEL_DIR/bootstrap/cache" 2>/dev/null || true
+        ok "Vinus Catalog ${wanted} installe."
+    else
+        warn "Vinus Catalog n'a pas pu etre installe : le panel et le theme fonctionnent ; relancer avec --catalog apres correction."
+    fi
+    rm -f "$package"
+}
+
 USE_BLUEPRINT=0
 MANIFEST="$(mktemp)"
 trap 'rm -f "$MANIFEST"' EXIT
 
 build_manifest() {
     cat "$REPO_DIR/overlay-manifest.txt" > "$MANIFEST"
-    if [[ -f "$PANEL_DIR/.blueprint/extensions/blueprint/private/db/is_installed" ]]; then
+    if blueprint_installed; then
         grep -q '^VERSION="beta-2026-06"' "$PANEL_DIR/blueprint.sh" || \
             fail "integration Blueprint validee pour beta-2026-06 uniquement"
         USE_BLUEPRINT=1
@@ -869,6 +941,9 @@ print_summary() {
     else
         log "Theme applique sur un panel existant (${PANEL_DIR})."
     fi
+    if blueprint_installed; then
+        log "Blueprint  : ${BLUEPRINT_VERSION} (Vinus Catalog : $(cat "$STATE_DIR/catalog-version" 2>/dev/null || echo 'non installe'))"
+    fi
     if wings_enabled; then
         log "Wings      : noeud '${NODE_NAME}' (${NODE_FQDN}) - config /etc/pterodactyl/config.yml"
     fi
@@ -888,7 +963,10 @@ action_install() {
     fi
 
     validate_environment
+    # Blueprint goes in before the theme so that one build applies the Blueprint variants.
+    if blueprint_wanted; then install_blueprint; fi
     install_theme
+    if blueprint_wanted; then install_catalog; fi
     install_guard
     if wings_enabled; then install_wings; fi
     print_summary
@@ -917,9 +995,18 @@ action_update() {
     fi
     validate_environment
     BUILD_MODE="production"
+    if blueprint_wanted; then install_blueprint; fi
     install_theme
+    if blueprint_wanted; then install_catalog; fi
     install_guard
     ok "Mise a jour terminee."
+}
+
+action_catalog() {
+    require_root
+    panel_present || fail "aucun panel Pterodactyl detecte ; utilise d'abord l'option 1"
+    blueprint_installed || fail "Blueprint n'est pas installe (utiliser --install --blueprint ou --update --blueprint)"
+    install_catalog
 }
 
 action_admin() {
@@ -1039,6 +1126,9 @@ while (($#)); do
                 BUILD_MODE="production"; shift
             fi ;;
         --update) ACTION="update"; shift ;;
+        --catalog) ACTION="catalog"; shift ;;
+        --blueprint) WITH_BLUEPRINT="yes"; shift ;;
+        --no-blueprint) WITH_BLUEPRINT="no"; shift ;;
         --admin) ACTION="admin"; shift ;;
         --restart) ACTION="restart"; shift ;;
         --uninstall) ACTION="uninstall"; shift ;;
@@ -1064,6 +1154,7 @@ case "$ACTION" in
     check)   system_report; exit 0 ;;
     install) action_install "$BUILD_MODE"; exit 0 ;;
     update)  action_update; exit 0 ;;
+    catalog) action_catalog; exit 0 ;;
     admin)   action_admin; exit 0 ;;
     restart) action_restart; exit 0 ;;
     uninstall) action_uninstall; exit 0 ;;

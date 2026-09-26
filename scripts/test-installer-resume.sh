@@ -38,6 +38,11 @@ configure_database() { :; }; create_admin_user_if_missing() { :; }; fix_permissi
 configure_webserver() { :; }; configure_services() { :; }
 setup_panel_environment() { calls+=(env); if [[ "${FAIL_AT:-}" == env ]]; then exit 1; fi; }
 
+install_blueprint() { calls+=(blueprint); }
+install_catalog() { calls+=(catalog); }
+blueprint_installed() { [[ "${BP_PRESENT:-0}" == 1 ]]; }
+WITH_BLUEPRINT=no   # the resume cases below are about the panel bootstrap only
+
 passed=0
 check() { local label="$1"; shift; if "$@"; then passed=$((passed + 1)); else printf 'FAIL: %s\n' "$label" >&2; exit 1; fi; }
 has_call() { [[ " ${calls[*]:-} " == *" $1 "* ]]; }
@@ -66,4 +71,38 @@ calls=(); FRESH_PANEL=0
 action_install production
 check "complete install is not bootstrapped again" bash -c '[[ " $1 " != *" download "* ]]' _ "${calls[*]}"
 
-printf 'installer resume: %s checks passed.\n' "$passed"
+# --- Blueprint and Vinus Catalog decisions and ordering ---------------------------------
+index_of() { local i; for i in "${!calls[@]}"; do [[ "${calls[$i]}" == "$1" ]] && { echo "$i"; return 0; }; done; echo -1; }
+ordered() { [[ "$(index_of "$1")" -ge 0 && "$(index_of "$1")" -lt "$(index_of "$2")" ]]; }
+fresh_marker() { rm -rf "$STATE_DIR"; mkdir -p "$STATE_DIR"; : > "$BOOTSTRAP_MARKER"; }
+
+# 5. Fresh install (auto): Blueprint first, then the theme, then the catalogue.
+calls=(); FRESH_PANEL=0; WITH_BLUEPRINT=auto; BP_PRESENT=0; fresh_marker
+action_install production
+check "fresh install installs Blueprint before the theme" ordered blueprint theme
+check "fresh install installs the catalogue after the theme" ordered theme catalog
+
+# 6. Existing panel without Blueprint (auto): left alone.
+calls=(); FRESH_PANEL=0; BP_PRESENT=0
+action_install production
+check "existing panel without Blueprint: no Blueprint" bash -c '[[ " $1 " != *" blueprint "* ]]' _ "${calls[*]}"
+check "existing panel without Blueprint: no catalogue" bash -c '[[ " $1 " != *" catalog "* ]]' _ "${calls[*]}"
+
+# 7. Existing panel that already has Blueprint (auto): the catalogue follows the theme.
+calls=(); FRESH_PANEL=0; BP_PRESENT=1
+action_install production
+check "existing Blueprint panel gets the catalogue after the theme" ordered theme catalog
+
+# 8. --no-blueprint wins on a fresh install.
+calls=(); FRESH_PANEL=0; WITH_BLUEPRINT=no; BP_PRESENT=0; fresh_marker
+action_install production
+check "--no-blueprint skips Blueprint" bash -c '[[ " $1 " != *" blueprint "* ]]' _ "${calls[*]}"
+check "--no-blueprint skips the catalogue" bash -c '[[ " $1 " != *" catalog "* ]]' _ "${calls[*]}"
+
+# 9. --blueprint forces it on an existing panel.
+calls=(); FRESH_PANEL=0; WITH_BLUEPRINT=yes; BP_PRESENT=0
+action_install production
+check "--blueprint installs it on an existing panel" ordered blueprint theme
+
+printf 'installer resume: %s checks passed.
+' "$passed"
