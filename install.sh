@@ -49,9 +49,6 @@ PROXY_MODE="${VINUS_PROXY_MODE:-auto}"
 NODE_MEMORY="${VINUS_NODE_MEMORY:-}"
 NODE_DISK="${VINUS_NODE_DISK:-}"
 
-# ---------------------------------------------------------------------------
-# Style
-# ---------------------------------------------------------------------------
 C_ACCENT=$'\033[1;38;5;208m'
 C_GREY=$'\033[38;5;245m'
 C_RESET=$'\033[0m'
@@ -158,9 +155,6 @@ Parametres :
 USAGE
 }
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
 is_tty()      { [[ -t 0 ]]; }
 interactive() { [[ "$MENU_FORCE" == "1" ]] || is_tty; }
 require_root() { ((EUID == 0)) || fail "cette action doit etre lancee avec sudo ou en root"; }
@@ -208,9 +202,6 @@ wings_enabled() {
     esac
 }
 
-# ---------------------------------------------------------------------------
-# Bootstrap systeme + panel (si absent)
-# ---------------------------------------------------------------------------
 require_supported_os() {
     [[ -f /etc/os-release ]] || fail "systeme non reconnu"
     # shellcheck disable=SC1091
@@ -516,9 +507,6 @@ bootstrap_panel() {
     ok "Panel Pterodactyl ${PTERODACTYL_VERSION} installe (${PANEL_URL})."
 }
 
-# ---------------------------------------------------------------------------
-# Controle d'environnement
-# ---------------------------------------------------------------------------
 system_report() {
     log "Controle de l'environnement (aucune modification)."
     [[ -f /etc/os-release ]] && ( . /etc/os-release; log "Systeme : ${PRETTY_NAME:-inconnu}" )
@@ -544,9 +532,6 @@ system_report() {
     ok "Controle termine."
 }
 
-# ---------------------------------------------------------------------------
-# Theme VinusPanel
-# ---------------------------------------------------------------------------
 USE_BLUEPRINT=0
 MANIFEST="$(mktemp)"
 trap 'rm -f "$MANIFEST"' EXIT
@@ -764,9 +749,6 @@ install_theme() {
     ok "VinusPanel ${THEME_VERSION} est installe. Sauvegarde : ${TRANSACTION_BACKUP}"
 }
 
-# ---------------------------------------------------------------------------
-# Wings
-# ---------------------------------------------------------------------------
 install_wings() {
     log "Installation de Wings..."
     if ! command -v docker >/dev/null 2>&1; then
@@ -860,9 +842,6 @@ UNIT
     ok "Wings installe et demarre (noeud ${NODE_NAME} / ${NODE_FQDN})."
 }
 
-# ---------------------------------------------------------------------------
-# Recapitulatif
-# ---------------------------------------------------------------------------
 print_summary() {
     printf '\n'
     ok "Installation terminee."
@@ -890,9 +869,6 @@ print_summary() {
     fi
 }
 
-# ---------------------------------------------------------------------------
-# Actions du menu
-# ---------------------------------------------------------------------------
 action_install() {
     BUILD_MODE="${1:-production}"
     require_root
@@ -907,8 +883,17 @@ action_install() {
 
     validate_environment
     install_theme
+    install_guard
     if wings_enabled; then install_wings; fi
     print_summary
+}
+
+install_guard() {
+    log "Installation du garde-fou anti-crash..."
+    install -D -m 0755 "$REPO_DIR/scripts/vinus-guard.sh" /usr/local/bin/vinus-guard
+    install -D -m 0644 "$REPO_DIR/scripts/vinus-guard.service" /etc/systemd/system/vinus-guard.service
+    systemctl daemon-reload
+    systemctl enable --now vinus-guard.service >/dev/null 2>&1 || true
 }
 
 action_update() {
@@ -927,6 +912,7 @@ action_update() {
     validate_environment
     BUILD_MODE="production"
     install_theme
+    install_guard
     ok "Mise a jour terminee."
 }
 
@@ -1006,9 +992,6 @@ action_uninstall() {
     ok "Desinstallation terminee."
 }
 
-# ---------------------------------------------------------------------------
-# Boucle du menu
-# ---------------------------------------------------------------------------
 interactive_loop() {
     while true; do
         [[ -t 1 ]] && clear 2>/dev/null || true
@@ -1035,9 +1018,6 @@ interactive_loop() {
     done
 }
 
-# ---------------------------------------------------------------------------
-# Analyse des arguments
-# ---------------------------------------------------------------------------
 while (($#)); do
     case "$1" in
         --panel-dir) (($# >= 2)) || fail "--panel-dir necessite un chemin"; PANEL_DIR="${2%/}"; shift 2 ;;
@@ -1074,9 +1054,6 @@ done
 
 [[ "$PANEL_DIR" = /* ]] || fail "le chemin du panel doit etre absolu"
 
-# ---------------------------------------------------------------------------
-# Point d'entree
-# ---------------------------------------------------------------------------
 case "$ACTION" in
     check)   system_report; exit 0 ;;
     install) action_install "$BUILD_MODE"; exit 0 ;;
