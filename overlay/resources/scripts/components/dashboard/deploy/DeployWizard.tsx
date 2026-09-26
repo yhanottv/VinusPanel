@@ -4,6 +4,7 @@ import { vt } from '@/locales/translate';
 import getServers from '@/api/getServers';
 import { queueCompanion } from '@/components/server/players/companionFollowup';
 import { pickOwnerId } from './owner';
+import { DEPLOY_OPEN_EVENT } from './events';
 import styles from './deploy.module.css';
 
 const csrf = () => document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '';
@@ -174,6 +175,31 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
         setOpen(true);
         if (!data) void load();
     }, [data, dismiss, load]);
+
+    // "Créer un serveur" buttons elsewhere open this assistant instead of the classic admin form.
+    useEffect(() => {
+        if (!isAdmin) return;
+        const onOpen = (event: Event) => {
+            const detail = (event as CustomEvent<{ handled?: boolean }>).detail;
+            if (!detail || detail.handled) return;
+            detail.handled = true;
+            try {
+                window.localStorage.removeItem(ABANDONED_KEY);
+                window.localStorage.removeItem(STORE_KEY);
+            } catch { /* noop */ }
+            setPromptVisible(false);
+            setPromptLeaving(false);
+            setName('');
+            setDescription('');
+            setEulaAccepted(false);
+            setMessage(null);
+            setStep(0);
+            setOpen(true);
+            void load();
+        };
+        window.addEventListener(DEPLOY_OPEN_EVENT, onOpen);
+        return () => window.removeEventListener(DEPLOY_OPEN_EVENT, onOpen);
+    }, [isAdmin, load]);
 
     const node = useMemo(() => data?.nodes.find((item) => item.id === nodeId) || data?.nodes[0], [data, nodeId]);
     const egg = useMemo(() => {

@@ -14,7 +14,7 @@ Sur un VPS vierge, `install.sh` crée l'emplacement `fr1`, un nœud local et ses
 
 ## Créer un serveur
 
-Sur un panel sans serveur, l'[assistant de la première connexion](04-Premiers-pas.md) réalise ces étapes. Sinon, depuis **Admin → Servers → Create New** :
+Le bouton **Créer un serveur** du tableau de bord ouvre l'[assistant de création](04-Premiers-pas.md), qui réalise ces étapes. Le formulaire classique reste disponible depuis **Admin → Servers → Create New** :
 
 1. Choisir propriétaire, nœud et allocation.
 2. Définir CPU, mémoire, disque, sauvegardes et bases selon les ressources réelles.

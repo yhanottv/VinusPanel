@@ -43,13 +43,13 @@ Une fiche visible en direct se rafraîchit chaque seconde, sans chevauchement de
 
 ## Images des objets et skins
 
-L'installeur télécharge automatiquement le **client Minecraft officiel** (empreintes SHA-1 vérifiées) et en extrait les icônes des objets et blocs vers `public/assets/images/vinus/players/`. Sans ces fichiers, les objets s'affichent avec une icône de remplacement (◇). En cas d'échec réseau, ou sur un panel installé avant cette fonction :
+L'installeur télécharge automatiquement deux sources et les vérifie par empreinte : le pack d'icônes `minecraft-textures` (version fixée, **icônes 3D isométriques** des blocs comme l'établi, le coffre ou le four, plus les icônes de tous les objets) et le **client Minecraft officiel** 1.21.1 pour les textures que le pack ne couvre pas. Le résultat, environ 2 000 icônes, est écrit dans `public/assets/images/vinus/players/`. Sans ces fichiers, les objets s'affichent avec une icône de remplacement (◇). En cas d'échec réseau, ou pour régénérer les icônes :
 
 ```bash
 cd ~/VinusPanel
 sudo bash install.sh --textures
 ```
 
-Ces images appartiennent à Mojang Studios / Microsoft : elles sont générées sur votre machine et ne font pas partie du code du dépôt (un fichier `NOTICE.txt` les accompagne). `VINUS_SKIP_TEXTURES=1` désactive ce téléchargement. Les modèles ItemsAdder et les textures moddées ne sont pas inclus : les objets de mods restent en icône de remplacement. Les skins passent par les services Mojang et le cache du panel ; les UUID hors ligne peuvent ne pas avoir de skin officiel.
+Ces images appartiennent à Mojang Studios / Microsoft, et le pack d'icônes est publié sous licence GPL-3.0 : elles sont générées sur votre machine et ne font pas partie du code du dépôt (un fichier `NOTICE.txt` les accompagne). `VINUS_SKIP_TEXTURES=1` désactive ce téléchargement. Les modèles ItemsAdder et les textures moddées ne sont pas inclus : les objets de mods restent en icône de remplacement. Les skins passent par les services Mojang et le cache du panel ; les UUID hors ligne peuvent ne pas avoir de skin officiel.
 
 [Guide technique détaillé](https://github.com/yhanottv/VinusPanel/blob/main/docs/PLAYERS.md) · [Sommaire](README.md)

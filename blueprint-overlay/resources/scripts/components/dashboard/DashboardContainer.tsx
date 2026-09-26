@@ -25,6 +25,7 @@ import { vt } from '@/locales/translate';
 import { formatLocale } from '@/locales/preferences';
 import ServerRow from './ServerRow';
 import DeployWizard from './deploy/DeployWizard';
+import { openDeployWizard } from './deploy/events';
 import Icon from './DashboardIcon';
 import styles from './dashboard.module.css';
 
@@ -78,7 +79,7 @@ export default function DashboardContainer({ preview = false, design }: { previe
         <BeforeContent />
         <header className={styles.hero}>
             <div><h1>{vt('Bon retour, ')}{appearance.displayName || user.username}</h1><p>{vt('Gérez toutes vos instances ici.')}</p></div>
-            {user.rootAdmin && <a className={styles.primaryButton} href="/admin/servers/new" aria-label={vt('Créer un serveur')}><Icon name="plus" /><span>{vt('Créer un serveur')}</span><span className={styles.count}>{servers?.pagination.total ?? '—'}</span></a>}
+            {user.rootAdmin && <a className={styles.primaryButton} href="/admin/servers/new" aria-label={vt('Créer un serveur')} onClick={(event) => { if (openDeployWizard()) event.preventDefault(); }}><Icon name="plus" /><span>{vt('Créer un serveur')}</span><span className={styles.count}>{servers?.pagination.total ?? '—'}</span></a>}
         </header>
         {o.welcome_notice && (!dismissed || designPreview) && <section className={styles.announcement} aria-label={vt('Bienvenue sur VinusPanel')}>
             <Icon name="info" /><div><strong>{o.notice_title || vt('Bienvenue sur VinusPanel !')}</strong><p>{o.notice_message || vt('Votre panel open source. Tous vos serveurs, au même endroit.')}</p></div>

@@ -8,7 +8,7 @@ Les raccourcis mènent à la console, aux fichiers, aux sauvegardes et à l’ac
 
 ## Assistant de création (première connexion)
 
-Quand un **administrateur** ouvre le tableau de bord d'un panel qui ne contient encore **aucun serveur**, une fenêtre propose : « Voulez-vous créer un serveur maintenant ? ». **Plus tard** la ferme (le choix est mémorisé par navigateur) ; si l'assistant est abandonné en cours de route, un rappel apparaît à la visite suivante. Une fois un serveur créé, l'assistant ne se propose plus : créer les serveurs suivants depuis **Admin → Servers → Create New**.
+Quand un **administrateur** ouvre le tableau de bord d'un panel qui ne contient encore **aucun serveur**, une fenêtre propose : « Voulez-vous créer un serveur maintenant ? ». **Plus tard** la ferme (le choix est mémorisé par navigateur) ; si l'assistant est abandonné en cours de route, un rappel apparaît à la visite suivante. Une fois un serveur créé, la fenêtre de première connexion ne se propose plus, mais le bouton **Créer un serveur** du tableau de bord (visible des administrateurs) ouvre le **même assistant** à tout moment, au lieu du formulaire classique de l'administration.
 
 L'assistant a cinq étapes :
 

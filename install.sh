@@ -612,12 +612,13 @@ install_catalog() {
     rm -f "$package"
 }
 
-# Item icons of the Players page: built from Mojang's official client (checksums verified by the script).
+# Item icons of the Players page: 3D block renders from a pinned icon pack plus Mojang's official client (checksums verified by the script).
 # Non fatal: without them unknown items simply show a placeholder icon.
 install_player_textures() {
     [[ "${VINUS_SKIP_TEXTURES:-0}" == "1" ]] && return 0
     local target="$PANEL_DIR/public/assets/images/vinus/players"
-    [[ -f "$target/items.svg" && -f "$target/items.json" ]] && return 0
+    # Regenerate a sprite built before the 3D icon pack was added (its NOTICE does not name the pack).
+    [[ -f "$target/items.svg" && -f "$target/items.json" ]] && grep -qs "minecraft-textures" "$target/NOTICE.txt" && return 0
     command -v python3 >/dev/null 2>&1 || { warn "python3 absent : textures des inventaires ignorees."; return 0; }
     log "Textures Minecraft des inventaires (client officiel, empreintes verifiees)..."
     if python3 "$REPO_DIR/scripts/fetch-player-textures.py" "$target"; then
