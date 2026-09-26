@@ -475,7 +475,8 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
                             {buildVariable && !buildLoading && !buildError && versionValue && catalogBuilds.length === 0 && <p className={styles.muted}>{vt('Aucun loader disponible pour cette version Minecraft.')}</p>}
                             {buildVariable && catalogBuilds.length > 0 && (
                                 <div className={styles.picker}>
-                                    <p className={styles.pickerLabel}>{vt('Version du loader')}</p>
+                                    <p className={styles.pickerLabel}>{vt('Version du loader pour Minecraft {{version}}', { version: versionValue })}</p>
+                                    <p className={styles.muted}>{vt('{{count}} versions disponibles', { count: catalogBuilds.length })}</p>
                                     <div className={styles.optionScroll}>
                                         {catalogBuilds.map((entry, index) => (
                                             <button key={entry.id} type="button" style={{ animationDelay: `${Math.min(index, 20) * 25}ms` }} className={styles.optionRow} data-active={buildValue === entry.name} onClick={() => setBuildValue(entry.name)}>
