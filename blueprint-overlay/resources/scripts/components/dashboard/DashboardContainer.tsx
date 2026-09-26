@@ -24,6 +24,7 @@ import { VINUS } from '@/theme';
 import { vt } from '@/locales/translate';
 import { formatLocale } from '@/locales/preferences';
 import ServerRow from './ServerRow';
+import DeployWizard from './deploy/DeployWizard';
 import Icon from './DashboardIcon';
 import styles from './dashboard.module.css';
 
@@ -123,5 +124,6 @@ export default function DashboardContainer({ preview = false, design }: { previe
             </div></div>
         </section>
         <AfterContent />
+        {!preview && user.rootAdmin && <DeployWizard hasServers={(servers?.pagination.total ?? 0) > 0} />}
     </PageContentBlock>;
 }

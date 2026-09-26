@@ -4,6 +4,7 @@ namespace Pterodactyl\Http\Controllers\Admin;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Pterodactyl\BlueprintFramework\Extensions\vinuscatalog\ServerSoftware;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Models\Allocation;
 use Pterodactyl\Models\Egg;
@@ -18,10 +19,6 @@ class VinusDeployController extends Controller
     {
     }
 
-    /**
-     * Nombre de coeurs CPU visibles par le panel : cgroup v2, cgroup v1,
-     * nproc, dans cet ordre.
-     */
     private function cpuCores(): int
     {
         $quota = null;
@@ -49,9 +46,6 @@ class VinusDeployController extends Controller
         return max(1, (int) $quota);
     }
 
-    /**
-     * Presets de RAM deduits de la memoire reelle allouable du noeud.
-     */
     private function memoryPresets(int $nodeMemory): array
     {
         $labels = [
@@ -72,8 +66,6 @@ class VinusDeployController extends Controller
                 $presets[] = ['value' => $value, 'label' => $labels[$value] ?? 'Serveur'];
             }
         }
-        // Le noeud peut permettre plus que le dernier preset standard : on
-        // ajoute le maximum reel comme choix final.
         if ($nodeMemory > 1024 && empty($presets)) {
             $presets[] = ['value' => 1024, 'label' => 'Small Testing Server'];
         }
@@ -88,9 +80,6 @@ class VinusDeployController extends Controller
         return array_values($presets);
     }
 
-    /**
-     * Presets de CPU deduits du nombre de coeurs reels.
-     */
     private function cpuPresets(int $cores): array
     {
         $limit = $cores * 100;
@@ -105,13 +94,65 @@ class VinusDeployController extends Controller
         return array_values(array_unique($presets));
     }
 
-    /**
-     * Everything the first-login wizard needs: nodes with free allocations,
-     * nests and eggs (with their variables) and the list of owners.
-     */
+    private function catalogType(string $eggName, array $keys): ?string
+    {
+        $upper = strtoupper($eggName);
+        $candidates = [];
+        if (preg_match('/\(([^)]+)\)/', $upper, $match)) {
+            $candidates[] = preg_replace('/[^A-Z0-9_]/', '', $match[1]);
+        }
+        $base = preg_replace('/[^A-Z0-9 ]/', ' ', $upper);
+        foreach (preg_split('/\s+/', trim($base)) as $word) {
+            if ($word !== '' && !in_array($word, ['MINECRAFT', 'SERVER'], true)) {
+                $candidates[] = $word;
+            }
+        }
+        foreach ($candidates as $candidate) {
+            if ($candidate !== '' && in_array($candidate, $keys, true)) {
+                return $candidate;
+            }
+            foreach ($keys as $key) {
+                if ($candidate !== '' && str_starts_with($key, $candidate)) {
+                    return $key;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function catalogVersions(?ServerSoftware $catalog, ?string $type): array
+    {
+        if ($catalog === null || $type === null) {
+            return [];
+        }
+        try {
+            return collect($catalog->versions($type))
+                ->map(fn (array $version) => [
+                    'id' => $version['id'],
+                    'channel' => $version['channel'],
+                    'supported' => (bool) $version['supported'],
+                ])->values()->all();
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
     public function data(): JsonResponse
     {
         $cores = $this->cpuCores();
+
+        $catalog = class_exists(ServerSoftware::class) ? app(ServerSoftware::class) : null;
+        $catalogTypes = [];
+        if ($catalog !== null) {
+            try {
+                foreach ($catalog->types() as $group) {
+                    $catalogTypes += $group;
+                }
+            } catch (\Throwable) {
+                $catalog = null;
+            }
+        }
 
         $nodes = Node::query()->orderBy('id')->get()->map(fn (Node $node) => [
             'id' => $node->id,
@@ -141,18 +182,24 @@ class VinusDeployController extends Controller
             ->map(fn (Nest $nest) => [
                 'id' => $nest->id,
                 'name' => $nest->name,
-                'eggs' => $nest->eggs->map(fn (Egg $egg) => [
-                    'id' => $egg->id,
-                    'name' => $egg->name,
-                    'startup' => $egg->startup,
-                    'images' => array_values($egg->docker_images ?? []),
-                    'variables' => $egg->variables->map(fn ($variable) => [
-                        'env_variable' => $variable->env_variable,
-                        'name' => $variable->name,
-                        'default_value' => (string) $variable->default_value,
-                        'rules' => (string) $variable->rules,
-                    ])->values(),
-                ])->values(),
+                'eggs' => $nest->eggs->map(function (Egg $egg) use ($catalog, $catalogTypes) {
+                    $type = $this->catalogType($egg->name, array_keys($catalogTypes));
+
+                    return [
+                        'id' => $egg->id,
+                        'name' => $egg->name,
+                        'startup' => $egg->startup,
+                        'images' => array_values($egg->docker_images ?? []),
+                        'type' => $type,
+                        'versions' => $this->catalogVersions($catalog, $type),
+                        'variables' => $egg->variables->map(fn ($variable) => [
+                            'env_variable' => $variable->env_variable,
+                            'name' => $variable->name,
+                            'default_value' => (string) $variable->default_value,
+                            'rules' => (string) $variable->rules,
+                        ])->values(),
+                    ];
+                })->values(),
             ])->values();
 
         $users = User::query()->orderBy('id')->get(['id', 'email', 'username'])
@@ -165,10 +212,6 @@ class VinusDeployController extends Controller
         return response()->json(['nodes' => $nodes, 'nests' => $nests, 'users' => $users]);
     }
 
-    /**
-     * Create a server from the wizard payload. The full Pterodactyl payload
-     * (startup, image, egg variables) is derived from the chosen egg.
-     */
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([

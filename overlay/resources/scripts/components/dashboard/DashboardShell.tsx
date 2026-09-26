@@ -12,6 +12,7 @@ import LanguageSelector from '@/components/elements/LanguageSelector';
 import { usePersistedState } from '@/plugins/usePersistedState';
 import http from '@/api/http';
 import { VINUS } from '@/theme';
+import DeployWizard from './deploy/DeployWizard';
 
 export default function DashboardShell({ children, sidebar }: { children: React.ReactNode; sidebar?: React.ReactNode }) {
     const design = useDesign();
@@ -88,6 +89,7 @@ export default function DashboardShell({ children, sidebar }: { children: React.
             </header>
             {error && <MessageBox type="error" dismissible key={error}>{error}</MessageBox>}
             {children}
+            {user.rootAdmin && <DeployWizard />}
         </main>
     </div>;
 }
