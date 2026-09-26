@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStoreState } from 'easy-peasy';
 import { vt } from '@/locales/translate';
+import getServers from '@/api/getServers';
 import styles from './deploy.module.css';
 
 const csrf = () => document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '';
@@ -16,7 +17,8 @@ interface NodeInfo {
     allocations: AllocationInfo[];
 }
 interface VariableInfo { env_variable: string; name: string; default_value: string; rules: string }
-interface EggInfo { id: number; name: string; startup: string; images: string[]; variables: VariableInfo[] }
+interface CatalogVersion { id: string; channel: string; supported: boolean }
+interface EggInfo { id: number; name: string; startup: string; images: string[]; type?: string | null; versions?: CatalogVersion[]; variables: VariableInfo[] }
 interface NestInfo { id: number; name: string; eggs: EggInfo[] }
 interface UserInfo { id: number; email: string; username: string }
 interface DeployData { nodes: NodeInfo[]; nests: NestInfo[]; users: UserInfo[] }
@@ -36,7 +38,7 @@ const cpuLabel = (value: number, cores: number): string => {
     return vt('Performance partagée');
 };
 
-export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
+export default function DeployWizard({ hasServers: hasServersProp }: { hasServers?: boolean }) {
     const user = useStoreState((state) => state.user.data!);
     const isAdmin = !!user?.rootAdmin;
     const dismissKey = `vinus:deploy:prompt:${user?.uuid || 'anon'}`;
@@ -49,6 +51,9 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
     const [step, setStep] = useState(0);
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
+    const [known, setKnown] = useState(hasServersProp !== undefined);
+    const [ownHasServers, setOwnHasServers] = useState(false);
+    const hasServers = hasServersProp !== undefined ? hasServersProp : ownHasServers;
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
@@ -63,19 +68,38 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
     const [versionValue, setVersionValue] = useState<string>('');
 
     useEffect(() => {
-        if (!isAdmin || hasServers) return;
+        if (!isAdmin) return;
+        if (hasServersProp !== undefined) return;
+        let cancelled = false;
+        getServers({ page: 1 })
+            .then((result) => { if (!cancelled) { setOwnHasServers(result.pagination.total > 0); setKnown(true); } })
+            .catch(() => { if (!cancelled) setKnown(true); });
+        return () => { cancelled = true; };
+    }, [isAdmin, hasServersProp]);
+
+    useEffect(() => {
+        if (!isAdmin || !known || hasServers) return;
         try {
             if (!window.localStorage.getItem(dismissKey)) setPromptVisible(true);
         } catch {
             setPromptVisible(true);
         }
-    }, [isAdmin, hasServers, dismissKey]);
+    }, [isAdmin, known, hasServers, dismissKey]);
 
     const dismiss = useCallback(() => {
-        try { window.localStorage.setItem(dismissKey, '1'); } catch { /* ignore */ }
+        try { window.localStorage.setItem(dismissKey, '1'); } catch { /* noop */ }
         setPromptLeaving(true);
         window.setTimeout(() => setPromptVisible(false), 260);
     }, [dismissKey]);
+
+    const applyEgg = useCallback((item: EggInfo) => {
+        setEggId(item.id);
+        const variable = item.variables.find((entry) => /version/i.test(entry.env_variable));
+        const versions = item.versions || [];
+        const preferred = versions.find((entry) => entry.supported) || versions[0];
+        setVersionEnv(variable?.env_variable || '');
+        setVersionValue(preferred ? preferred.id : (variable?.default_value || ''));
+    }, []);
 
     const load = useCallback(async () => {
         setMessage(null);
@@ -101,16 +125,11 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
             }
             setOwnerId(user?.id || payload.users[0]?.id || 0);
             const egg = payload.nests[0]?.eggs[0];
-            if (egg) {
-                setEggId(egg.id);
-                const version = egg.variables.find((variable) => /version/i.test(variable.env_variable));
-                setVersionEnv(version?.env_variable || '');
-                setVersionValue(version?.default_value || '');
-            }
+            if (egg) applyEgg(egg);
         } catch {
             setDataError(vt('Impossible de charger les données de déploiement.'));
         }
-    }, [user]);
+    }, [user, applyEgg]);
 
     const openWizard = useCallback(() => {
         dismiss();
@@ -128,8 +147,8 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
         return undefined;
     }, [data, eggId]);
     const nestOfEgg = useMemo(() => data?.nests.find((nest) => nest.eggs.some((item) => item.id === eggId)), [data, eggId]);
-    const versionRules = useMemo(() => egg?.variables.find((variable) => variable.env_variable === versionEnv)?.rules || '', [egg, versionEnv]);
-    const versionOptions = useMemo(() => allowValues(versionRules), [versionRules]);
+    const versionOptions = useMemo(() => allowValues(egg?.variables.find((variable) => variable.env_variable === versionEnv)?.rules || ''), [egg, versionEnv]);
+    const catalogVersions = useMemo(() => egg?.versions || [], [egg]);
     const allocation = useMemo(() => node?.allocations.find((item) => item.id === allocationId), [node, allocationId]);
 
     useEffect(() => {
@@ -143,6 +162,13 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
         }
         if (node && disk > node.disk) setDisk(node.disk);
     }, [node, memory, cpu, disk]);
+
+    useEffect(() => {
+        if (!versionEnv || !catalogVersions.length) return;
+        if (catalogVersions.some((entry) => entry.id === versionValue)) return;
+        const preferred = catalogVersions.find((entry) => entry.supported) || catalogVersions[0];
+        setVersionValue(preferred ? preferred.id : '');
+    }, [versionEnv, catalogVersions, versionValue]);
 
     const canNext = (): boolean => {
         if (step === 0) return name.trim().length > 0 && ownerId > 0;
@@ -167,7 +193,7 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
                 cpu,
                 start_on_completion: false,
             };
-            if (versionEnv) body.environment = { [versionEnv]: versionValue };
+            if (versionEnv && versionValue) body.environment = { [versionEnv]: versionValue };
             const response = await fetch('/admin/vinus-deploy', {
                 method: 'POST',
                 credentials: 'same-origin',
@@ -320,28 +346,33 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
                                     <p className={styles.label}>{isMinecraft(nest) ? vt('Serveur Minecraft') : nest.name}</p>
                                     <div className={styles.engineGrid}>
                                         {nest.eggs.map((item, eggIndex) => (
-                                            <button key={item.id} type="button" className={styles.engineCard} style={{ animationDelay: `${(nestIndex * 3 + eggIndex) * 45}ms` }} data-active={eggId === item.id} onClick={() => {
-                                                setEggId(item.id);
-                                                const version = item.variables.find((variable) => /version/i.test(variable.env_variable));
-                                                setVersionEnv(version?.env_variable || '');
-                                                setVersionValue(version?.default_value || '');
-                                            }}>
+                                            <button key={item.id} type="button" className={styles.engineCard} style={{ animationDelay: `${(nestIndex * 3 + eggIndex) * 45}ms` }} data-active={eggId === item.id} onClick={() => applyEgg(item)}>
                                                 <strong>{item.name}</strong>
                                             </button>
                                         ))}
                                     </div>
                                 </div>
                             ))}
-                            {versionEnv && (
+                            {versionEnv && catalogVersions.length > 0 && (
                                 <label>{vt('Version')}
-                                    {versionOptions.length ? (
-                                        <select value={versionValue} onChange={(event) => setVersionValue(event.target.value)}>
-                                            {versionOptions.map((value) => <option key={value} value={value}>{value}</option>)}
-                                        </select>
-                                    ) : (
-                                        <input value={versionValue} onChange={(event) => setVersionValue(event.target.value)} />
-                                    )}
+                                    <select value={versionValue} onChange={(event) => setVersionValue(event.target.value)}>
+                                        {catalogVersions.map((entry) => (
+                                            <option key={entry.id} value={entry.id}>
+                                                {entry.id}{entry.channel ? ` · ${entry.channel}` : ''}{entry.supported ? '' : ` · ${vt('non pris en charge')}`}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </label>
+                            )}
+                            {versionEnv && catalogVersions.length === 0 && versionOptions.length > 0 && (
+                                <label>{vt('Version')}
+                                    <select value={versionValue} onChange={(event) => setVersionValue(event.target.value)}>
+                                        {versionOptions.map((value) => <option key={value} value={value}>{value}</option>)}
+                                    </select>
+                                </label>
+                            )}
+                            {versionEnv && catalogVersions.length === 0 && versionOptions.length === 0 && (
+                                <p className={styles.muted}>{vt('Version par défaut du logiciel.')}</p>
                             )}
                         </section>
                     )}
@@ -356,7 +387,7 @@ export default function DeployWizard({ hasServers }: { hasServers: boolean }) {
                                 <li style={{ animationDelay: '165ms' }}><span>{vt('Nœud')}</span><strong>{node?.name || '—'}</strong></li>
                                 <li style={{ animationDelay: '220ms' }}><span>{vt('Port')}</span><strong>{allocation?.port || '—'}</strong></li>
                                 <li style={{ animationDelay: '275ms' }}><span>{vt('Logiciel')}</span><strong>{nestOfEgg?.name || '—'} · {egg?.name || '—'}</strong></li>
-                                {versionEnv && <li style={{ animationDelay: '330ms' }}><span>{vt('Version')}</span><strong>{versionValue}</strong></li>}
+                                {versionEnv && versionValue && <li style={{ animationDelay: '330ms' }}><span>{vt('Version')}</span><strong>{versionValue}</strong></li>}
                             </ul>
                             {message && <p className={styles.error}>{message}</p>}
                         </section>

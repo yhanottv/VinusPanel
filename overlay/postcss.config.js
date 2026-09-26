@@ -11,10 +11,6 @@ module.exports = {
         require('postcss-preset-env')({
             features: {
                 'nesting-rules': false,
-                // VinusPanel s'appuie sur :has() natif. Le polyfill produit des
-                // selecteurs d'attribut echappes ([\:has\(...\)]) que l'ancien
-                // css-loader embarque par Blueprint ne sait pas analyser. On le
-                // desactive : les navigateurs modernes prennent :has() en charge.
                 'has-pseudo-class': false,
             },
         }),

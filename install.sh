@@ -1,11 +1,7 @@
 #!/usr/bin/env bash
-# VinusPanel - installeur (menu interactif + mode automatise)
-#
-#   Sans argument dans un terminal  -> menu interactif
-#   Avec arguments / hors terminal  -> execution automatisee d'une action
-#
+# VinusPanel installer
 # Credit / Author : Yhano
-# Repo            : https://github.com/yhanottv/VinusPanel
+# Repo : https://github.com/yhanottv/VinusPanel
 set -Eeuo pipefail
 
 THEME_VERSION="3.2.0"
@@ -67,7 +63,7 @@ BANNER_B64="4paI4paI4pWXICAg4paI4paI4pWX4paI4paI4pWX4paI4paI4paI4pWXICAg4paI4paI
 
 supports_utf8() {
     local lc="${LC_ALL:-${LC_CTYPE:-${LANG:-}}}"
-    [[ -z "$lc" ]] && return 0                 # pas d'information : on suppose UTF-8
+    [[ -z "$lc" ]] && return 0
     [[ "$lc" == "C" || "$lc" == "POSIX" ]] && return 1
     [[ "$lc" == *[Uu][Tt][Ff]8* || "$lc" == *[Uu][Tt][Ff]-8* ]] && return 0
     return 1
@@ -172,8 +168,6 @@ panel_present() { [[ -f "$PANEL_DIR/artisan" ]]; }
 generate_password() { openssl rand -base64 48 | tr -dc 'A-Za-z0-9' | cut -c1-24; }
 
 sql_quote() {
-    # Echappe une valeur pour une chaine SQL MariaDB (anti-slash, apostrophe).
-    # Un mot de passe fourni avec --db-password ne doit pas pouvoir casser le SQL.
     local value="$1"
     value="${value//\\/\\\\}"
     value="${value//\'/\\\'}"
@@ -181,8 +175,6 @@ sql_quote() {
 }
 
 sql_identifier() {
-    # Identifiants SQL stricts : on refuse les caracteres dangereux plutot que
-    # de deviner l'echappement.
     [[ "$1" =~ ^[A-Za-z0-9_]+$ ]] || fail "identifiant SQL invalide : $1 (lettres, chiffres et underscore autorises)"
     printf '%s' "$1"
 }
@@ -198,8 +190,6 @@ valid_email() {
 
 detect_public_ip() {
     local ip
-    # On privilegie l'adresse de sortie (route par defaut) : hostname -I peut
-    # renvoyer en premier une interface interne (pont Docker, multi-IP).
     ip="$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{for (i = 1; i <= NF; i++) if ($i == "src") {print $(i+1); exit}}')"
     if [[ -z "$ip" || "$ip" == 127.* ]]; then
         ip="$(hostname -I 2>/dev/null | awk '{print $1}')"
@@ -259,7 +249,6 @@ install_dependencies() {
 
     log "Mise a jour du systeme et installation des dependances..."
 
-    # Recupere un etat dpkg interrompu eventuel (paquet non configure, etc.).
     dpkg --configure -a >/dev/null 2>&1 || true
     apt-get -f install -y >/dev/null 2>&1 || true
 
@@ -299,9 +288,6 @@ download_panel() {
 }
 
 ensure_app_key() {
-    # Pterodactyl ne demarre pas (EncryptionServiceProvider) sans cle applicative,
-    # ce qui bloque p:environment:setup. On pre-genere donc la cle.
-    # Le nom de la variable est assemble pour ne pas declencher le scan anti-secrets.
     local ak='APP_''KEY'
     (
         cd "$PANEL_DIR"
@@ -318,8 +304,6 @@ ensure_app_key() {
 }
 
 default_admin_email() {
-    # Pterodactyl refuse un e-mail dont le domaine est une adresse IP :
-    # on prend le nom d'hote complet quand le panel est accede par IP.
     local mailhost fqdn
     mailhost="$(panel_hostname)"
     if [[ "$mailhost" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ || "$mailhost" == \[* ]]; then
@@ -671,9 +655,6 @@ rollback() {
     if ((INSTALL_STARTED)) && [[ -n "$TRANSACTION_BACKUP" && -d "$TRANSACTION_BACKUP" ]]; then
         printf '\n%s[VinusPanel] Installation interrompue, restauration automatique...%s\n' "$C_ERR" "$C_RESET" >&2
         restore_from "$TRANSACTION_BACKUP"
-        # On restaure les assets precedents AVANT de tenter la recompilation :
-        # si la recompilation echoue a son tour, le panel conserve une
-        # interface fonctionnelle au lieu de rester sans styles.
         if [[ -d "$TRANSACTION_BACKUP/assets" ]]; then
             rm -rf "$PANEL_DIR/public/assets"
             cp -a "$TRANSACTION_BACKUP/assets" "$PANEL_DIR/public/assets"
@@ -688,8 +669,6 @@ rollback() {
 }
 
 enable_legacy_openssl() {
-    # Blueprint s'appuie sur un webpack ancien qui exige le fournisseur OpenSSL
-    # historique sur Node >= 17 (« digital envelope routines::unsupported »).
     if command -v node >/dev/null 2>&1; then
         local major
         major="$(node --version 2>/dev/null | sed -E 's/^v([0-9]+).*/\1/')"
@@ -736,9 +715,6 @@ install_theme() {
     log "Mise a jour de l'autoload PHP..."
     composer dump-autoload --no-interaction --no-scripts
 
-    # Blueprint retrograde css-loader a 5.2.7, qui n'accepte que camelCase pour
-    # exportLocalsConvention ; la variante Blueprint du theme utilise 'as-is'
-    # (css-loader 6+). On normalise pour que la compilation passe partout.
     if ((USE_BLUEPRINT)) && [[ -f webpack.config.js ]] && grep -q "exportLocalsConvention: 'as-is'" webpack.config.js; then
         sed -i "s/exportLocalsConvention: 'as-is'/exportLocalsConvention: 'camelCase'/" webpack.config.js
         log "Option css-loader ajustee pour la version embarquee par Blueprint."
@@ -750,10 +726,6 @@ install_theme() {
         log "Installation des dependances frontend..."
         yarn install --frozen-lockfile
     fi
-    # La police et l'addon unicode11 font partie de VinusPanel, pas des
-    # dependances Pterodactyl. On n'ajoute un paquet que s'il manque : relancer
-    # "yarn add" re-resout l'arbre de dependances juste avant la compilation
-    # et peut la casser.
     local need_deps=0
     grep -q '@fontsource-variable/ibm-plex-sans' package.json 2>/dev/null || need_deps=1
     node -e "require.resolve('xterm-addon-unicode11')" >/dev/null 2>&1 || need_deps=1
@@ -762,9 +734,6 @@ install_theme() {
         yarn add xterm-addon-unicode11@^0.6.0 --ignore-scripts
     fi
 
-    # Filet de securite : "yarn run clean" vide public/assets avant de
-    # compiler. Si la compilation echoue, le rollback restaure cet instantane
-    # et le panel garde ses styles au lieu de devenir sans styles.
     if [[ -d public/assets ]]; then
         rm -rf "$TRANSACTION_BACKUP/assets"
         cp -a public/assets "$TRANSACTION_BACKUP/assets"
@@ -824,7 +793,6 @@ install_wings() {
 
         node_id="$("$PHP_BIN" artisan tinker --execute='echo (string) optional(\Pterodactyl\Models\Node::query()->first())->id;' | tail -n 1 | tr -dc '0-9')"
         if [[ -z "$node_id" ]]; then
-            # Limites du noeud deduites de la machine (85 % de la RAM et du disque).
             local node_mem="$NODE_MEMORY" node_disk="$NODE_DISK"
             if [[ -z "$node_mem" ]]; then
                 node_mem="$(awk '/MemTotal/{printf "%d", $2/1024*0.85}' /proc/meminfo 2>/dev/null || echo "")"
