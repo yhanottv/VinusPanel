@@ -369,8 +369,22 @@ class VinusDeployController extends Controller
             return response()->json(['message' => $exception->getMessage()], 422);
         }
 
+        $companionFollowup = null;
+        $companionClass = \Pterodactyl\BlueprintFramework\Extensions\vinuscatalog\PlayerCompanion::class;
+        $reminderClass = \Pterodactyl\BlueprintFramework\Extensions\vinuscatalog\CompanionReminder::class;
+        if (class_exists($companionClass) && class_exists($reminderClass)) {
+            try {
+                if (app($companionClass)->availability($server)['supported'] ?? false) {
+                    $companionFollowup = $reminderClass::queue((int) $server->owner_id, $server->uuid);
+                }
+            } catch (\Throwable) {
+                $companionFollowup = null;
+            }
+        }
+
         return response()->json([
             'ok' => true,
+            'companion_followup' => $companionFollowup,
             'server' => [
                 'id' => $server->id,
                 'uuid' => $server->uuid,
