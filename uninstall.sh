@@ -88,6 +88,11 @@ php artisan route:clear
 php artisan cache:clear
 chown -R www-data:www-data storage bootstrap/cache public/assets
 
+log "Retrait du garde-fou anti-crash…"
+systemctl disable --now vinus-guard.service >/dev/null 2>&1 || true
+rm -f /etc/systemd/system/vinus-guard.service /usr/local/bin/vinus-guard
+systemctl daemon-reload >/dev/null 2>&1 || true
+
 archive_dir="/var/backups/vinuspanel/uninstalled-$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$(dirname "$archive_dir")"
 mv "$STATE_DIR" "$archive_dir"
