@@ -13,7 +13,7 @@ Sur un **VPS vierge**, `install.sh` installe tout : Pterodactyl Panel 1.15.1, Ma
 | PHP | 8.3 |
 | Node.js / Yarn | 22 ou plus / 1.x |
 | Machine testée | 2 vCPU, 8 Go de RAM (moins de 4 Go non validé) |
-| Blueprint | Optionnel ; `beta-2026-06` pour Vinus Catalog 1.4.0 |
+| Blueprint | Optionnel ; `beta-2026-06` pour Vinus Catalog 1.4.1 |
 
 Il faut un accès SSH en `root` ou avec `sudo`. Si l'hébergeur fournit une image avec Traefik sur les ports 80/443, l'installeur l'arrête et désactive son redémarrage (option `--keep-proxy` pour refuser) : préférer une image Ubuntu nue.
 

@@ -1,6 +1,6 @@
 # 🧩 Blueprint et Vinus Catalog
 
-Pterodactyl gère les comptes et les serveurs. Blueprint est le framework d'extensions. **Vinus Catalog 1.4.0** fournit les outils Minecraft utilisés par le thème : logiciels et versions, mods et plugins, modpacks, mondes, BlueMap et joueurs. Le catalogue est une extension séparée de Blueprint ; `install.sh` l'installe et le met à jour avec le thème.
+Pterodactyl gère les comptes et les serveurs. Blueprint est le framework d'extensions. **Vinus Catalog 1.4.1** fournit les outils Minecraft utilisés par le thème : logiciels et versions, mods et plugins, modpacks, mondes, BlueMap et joueurs. Le catalogue est une extension séparée de Blueprint ; `install.sh` l'installe et le met à jour avec le thème.
 
 ## Installation automatique
 
@@ -9,7 +9,7 @@ Sur un VPS vierge, `install.sh` fait tout, dans cet ordre : panel Pterodactyl �
 Vérifier l'installation :
 
 ```bash
-cat /var/lib/vinuspanel/catalog-version            # 1.4.0
+cat /var/lib/vinuspanel/catalog-version            # 1.4.1
 cd /var/www/pterodactyl
 php8.3 artisan route:list | grep -c vinuscatalog   # environ 40 routes
 ```

@@ -116,7 +116,7 @@ cat /var/lib/vinuspanel/version /var/lib/vinuspanel/catalog-version
 php8.3 artisan route:list | grep -c vinuscatalog
 ```
 
-Résultat attendu : huit lignes `active`, une réponse `HTTP/1.1 200` ou `302`, Pterodactyl `1.15.1`, la version du thème (`3.2.0`), celle du catalogue (`1.4.0`) et environ 40 routes `vinuscatalog`.
+Résultat attendu : huit lignes `active`, une réponse `HTTP/1.1 200` ou `302`, Pterodactyl `1.15.1`, la version du thème (`3.2.0`), celle du catalogue (`1.4.1`) et environ 40 routes `vinuscatalog`.
 
 Dans le navigateur :
 

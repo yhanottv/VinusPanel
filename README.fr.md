@@ -40,7 +40,7 @@ Les modules absents sont masqués. Le thème ne fournit pas de facturation, de g
 
 ## Compatibilité et installation
 
-Validé avec **Pterodactyl 1.15.1**, **Node 22**, **Yarn 1.x**, **PHP 8.3** et Ubuntu 24.04. Blueprint est optionnel pour le thème ; **beta-2026-06** est requis pour **Vinus Catalog 1.4.0**. D’autres versions ou thèmes ne sont pas automatiquement compatibles.
+Validé avec **Pterodactyl 1.15.1**, **Node 22**, **Yarn 1.x**, **PHP 8.3** et Ubuntu 24.04. Blueprint est optionnel pour le thème ; **beta-2026-06** est requis pour **Vinus Catalog 1.4.1**. D’autres versions ou thèmes ne sont pas automatiquement compatibles.
 
 Sur un **VPS Ubuntu 24.04 vierge**, `install.sh` installe tout : Pterodactyl Panel 1.15.1, MariaDB, Redis, Nginx, le worker, le thème, Docker et Wings. Sur un panel Pterodactyl déjà installé, il applique seulement le thème. Sauvegarder le panel, sa base, ses configurations et les serveurs avant toute installation sur une machine existante.
 

@@ -51,7 +51,7 @@ On a fresh VPS the installer already did this: Blueprint **`beta-2026-06`** (the
 
 ```bash
 cd ~/VinusPanel && sudo bash install.sh --catalog
-cat /var/lib/vinuspanel/catalog-version            # 1.4.0
+cat /var/lib/vinuspanel/catalog-version            # 1.4.1
 php8.3 /var/www/pterodactyl/artisan route:list | grep -c vinuscatalog   # about 40 routes
 ```
 

@@ -139,6 +139,7 @@ Actions non interactives :
   --install [prod|dev]     Installe le panel (si absent) puis le theme
   --update                 git pull + recompilation du theme (+ catalogue si Blueprint)
   --catalog                Installe ou met a jour Vinus Catalog (necessite Blueprint)
+  --textures               Telecharge les textures Minecraft des inventaires (page Joueurs)
   --admin                  Cree ou reinitialise le compte administrateur
   --restart                Redemarre les services du panel
   --uninstall              Desinstalle le theme
@@ -611,6 +612,28 @@ install_catalog() {
     rm -f "$package"
 }
 
+# Item icons of the Players page: built from Mojang's official client (checksums verified by the script).
+# Non fatal: without them unknown items simply show a placeholder icon.
+install_player_textures() {
+    [[ "${VINUS_SKIP_TEXTURES:-0}" == "1" ]] && return 0
+    local target="$PANEL_DIR/public/assets/images/vinus/players"
+    [[ -f "$target/items.svg" && -f "$target/items.json" ]] && return 0
+    command -v python3 >/dev/null 2>&1 || { warn "python3 absent : textures des inventaires ignorees."; return 0; }
+    log "Textures Minecraft des inventaires (client officiel, empreintes verifiees)..."
+    if python3 "$REPO_DIR/scripts/fetch-player-textures.py" "$target"; then
+        chown -R www-data:www-data "$target"
+    else
+        warn "textures indisponibles (reseau ?) : icone de remplacement pour les objets ; relancer avec --textures."
+    fi
+}
+
+action_textures() {
+    require_root
+    panel_present || fail "aucun panel Pterodactyl detecte ; utilise d'abord l'option 1"
+    rm -f "$PANEL_DIR/public/assets/images/vinus/players/items.svg"
+    install_player_textures
+}
+
 USE_BLUEPRINT=0
 MANIFEST="$(mktemp)"
 trap 'rm -f "$MANIFEST"' EXIT
@@ -968,6 +991,7 @@ action_install() {
     # Blueprint goes in before the theme so that one build applies the Blueprint variants.
     if blueprint_wanted; then install_blueprint; fi
     install_theme
+    install_player_textures
     if blueprint_wanted; then install_catalog; fi
     install_guard
     if wings_enabled; then install_wings; fi
@@ -999,6 +1023,7 @@ action_update() {
     BUILD_MODE="production"
     if blueprint_wanted; then install_blueprint; fi
     install_theme
+    install_player_textures
     if blueprint_wanted; then install_catalog; fi
     install_guard
     ok "Mise a jour terminee."
@@ -1129,6 +1154,7 @@ while (($#)); do
             fi ;;
         --update) ACTION="update"; shift ;;
         --catalog) ACTION="catalog"; shift ;;
+        --textures) ACTION="textures"; shift ;;
         --blueprint) WITH_BLUEPRINT="yes"; shift ;;
         --no-blueprint) WITH_BLUEPRINT="no"; shift ;;
         --admin) ACTION="admin"; shift ;;
@@ -1157,6 +1183,7 @@ case "$ACTION" in
     install) action_install "$BUILD_MODE"; exit 0 ;;
     update)  action_update; exit 0 ;;
     catalog) action_catalog; exit 0 ;;
+    textures) action_textures; exit 0 ;;
     admin)   action_admin; exit 0 ;;
     restart) action_restart; exit 0 ;;
     uninstall) action_uninstall; exit 0 ;;

@@ -88,6 +88,8 @@ php artisan route:clear
 php artisan cache:clear
 chown -R www-data:www-data storage bootstrap/cache public/assets
 
+rm -rf "$PANEL_DIR/public/assets/images/vinus/players"
+
 log "Retrait du garde-fou anti-crash…"
 systemctl disable --now vinus-guard.service >/dev/null 2>&1 || true
 rm -f /etc/systemd/system/vinus-guard.service /usr/local/bin/vinus-guard

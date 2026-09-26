@@ -30,6 +30,51 @@ final class PlayerController extends Controller
         }
         uasort($players,fn($a,$b)=>(int)$b['online']<=>(int)$a['online']?:strnatcasecmp($a['name'],$b['name']));return $players;
     }
+
+    private function consoleActions(Server $server): array
+    {
+        try {
+            $offer = app(PlayerCompanion::class)->availability($server);
+            if (($offer['supported'] ?? false) && ($offer['read_only'] ?? false)) {
+                return ['heal','kill','feed','operator','whitelist','ban','gamemode','experience'];
+            }
+        } catch (\Throwable) {
+        }
+
+        return [];
+    }
+
+    private static function consoleCommand(string $action, string $name, mixed $value): string
+    {
+        abort_unless(preg_match('/^[A-Za-z0-9_]{1,16}$/D', $name), 422, 'Nom de joueur invalide.');
+        return match ($action) {
+            'heal' => "effect give {$name} minecraft:instant_health 1 1 true",
+            'feed' => "effect give {$name} minecraft:saturation 2 10 true",
+            'kill' => "kill {$name}",
+            'gamemode' => (function () use ($name, $value) {
+                abort_unless(in_array($value, ['survival','creative','adventure','spectator'], true), 422, 'Mode de jeu invalide.');
+                return "gamemode {$value} {$name}";
+            })(),
+            'experience' => (function () use ($name, $value) {
+                abort_unless(is_int($value) && $value >= 0 && $value <= 10000, 422, 'Le niveau doit être compris entre 0 et 10 000.');
+                return "experience set {$name} {$value} levels";
+            })(),
+            'operator' => (function () use ($name, $value) {
+                abort_unless(is_bool($value), 422, 'Valeur de commande invalide.');
+                return ($value ? 'op ' : 'deop ') . $name;
+            })(),
+            'whitelist' => (function () use ($name, $value) {
+                abort_unless(is_bool($value), 422, 'Valeur de commande invalide.');
+                return ($value ? 'whitelist add ' : 'whitelist remove ') . $name;
+            })(),
+            'ban' => (function () use ($name, $value) {
+                abort_unless(is_bool($value), 422, 'Valeur de commande invalide.');
+                return ($value ? 'ban ' : 'pardon ') . $name;
+            })(),
+            default => abort(422, 'Action inconnue.'),
+        };
+    }
+
     public function index(Request $request,Server $server): array
     {
         $this->access($request,$server);$input=$request->validate(['selected'=>'nullable|uuid']);
@@ -50,8 +95,12 @@ final class PlayerController extends Controller
             }
             $detail=array_merge($detail??(PlayerNbt::profile([])+['source'=>'unavailable','updated_at'=>null]),$players[$uuid]);
         }
-        return ['players'=>array_values($players),'selected'=>$detail,'bridge'=>(bool)$bridge,'actions'=>$bridge?array_values(array_intersect($bridge['actions']??[],['heal','kill','feed','operator','whitelist','ban','gamemode','experience'])):[],
-            'can_control'=>$request->user()->can('control.console',$server),'refreshed_at'=>time()];
+        $canControl = $request->user()->can('control.console', $server);
+        $actions = $bridge ? array_values(array_intersect($bridge['actions'] ?? [], ['heal','kill','feed','operator','whitelist','ban','gamemode','experience'])) : [];
+        if ($bridge && $canControl) $actions = array_values(array_unique(array_merge($actions, $this->consoleActions($server))));
+
+        return ['players'=>array_values($players),'selected'=>$detail,'bridge'=>(bool)$bridge,'actions'=>$actions,
+            'can_control'=>$canControl,'refreshed_at'=>time()];
     }
     public function companion(Request $request, Server $server): array
     {
@@ -91,19 +140,32 @@ final class PlayerController extends Controller
         $this->access($request,$server,true);
         $data=$request->validate(['uuid'=>'required|uuid','action'=>'required|string','request_id'=>'required|regex:/^[a-f0-9]{32}$/D','value'=>'present','confirmed'=>'required|boolean']);
         $data['uuid']=strtolower($data['uuid']);
-        $command=self::command($data['action'],strtolower($data['uuid']),$data['request_id'],$data['value']);
         abort_unless($data['confirmed']||!in_array($data['action'],['kill','operator','ban'],true),422,'Confirmez cette action avant de continuer.');
         $key='vinusplayers:action:'.$server->uuid.':'.$data['request_id'];
         $lock=Cache::lock('vinusplayers:command:'.$server->uuid,10);abort_unless($lock->get(),409,'Une commande est déjà en cours.');
         try{
+            $bridge=$this->files->bridge();
+            $players=$this->roster($server,$bridge);
+            abort_unless(isset($players[$data['uuid']]),404,'Joueur introuvable.');
+            $consoleActions=$bridge?$this->consoleActions($server):[];
+            $consoleMode=in_array($data['action'],$consoleActions,true);
+            $bridgeMode=$bridge&&in_array($data['action'],$bridge['actions']??[],true);
+            abort_unless($consoleMode||$bridgeMode,409,'La liaison joueurs est inactive ou cette action est désactivée.');
+            $command=$consoleMode
+                ? self::consoleCommand($data['action'],(string)$players[$data['uuid']]['name'],$data['value'])
+                : self::command($data['action'],strtolower($data['uuid']),$data['request_id'],$data['value']);
             $saved=Cache::get($key);
             if($saved){abort_unless($saved['user']===$request->user()->id&&$saved['command']===$command,409,'Identifiant de commande déjà utilisé.');return ['request_id'=>$data['request_id']];}
-            $bridge=$this->files->bridge();abort_unless($bridge&&in_array($data['action'],$bridge['actions']??[],true),409,'La liaison joueurs est inactive ou cette action est désactivée.');
-            $players=$this->roster($server,$bridge);abort_unless(isset($players[$data['uuid']]),404,'Joueur introuvable.');
             if(in_array($data['action'],['heal','kill','feed','gamemode','experience'],true))abort_unless($players[$data['uuid']]['online']===true,409,'Cette action nécessite un joueur connecté.');
             abort_unless(($this->daemon->setServer($server)->getDetails()['state']??'')==='running',409,'Le serveur doit être démarré.');
-            Cache::put($key,['user'=>$request->user()->id,'uuid'=>$data['uuid'],'command'=>$command],600);
-            $this->commands->setServer($server)->send($command);
+            Cache::put($key,['user'=>$request->user()->id,'uuid'=>$data['uuid'],'command'=>$command,'console'=>$consoleMode],600);
+            try {
+                $this->commands->setServer($server)->send($command);
+            } catch (\Throwable $error) {
+                Cache::forget($key);
+                throw $error;
+            }
+            if($consoleMode)Cache::forget('vinusplayers:roster:'.$server->uuid);
             return ['request_id'=>$data['request_id']];
         }finally{$lock->release();}
     }
@@ -111,6 +173,7 @@ final class PlayerController extends Controller
     {
         $this->access($request,$server,true);abort_unless(preg_match('/^[a-f0-9]{32}$/D',$id),404);
         $record=Cache::get('vinusplayers:action:'.$server->uuid.':'.$id);abort_unless($record&&$record['user']===$request->user()->id,404);
+        if($record['console']??false)return ['status'=>'success'];
         $result=$this->files->json('/.vinus/players/results/'.$id.'.json',65536);
         if(!$result)return ['status'=>'pending'];
         abort_unless(($result['request_id']??null)===$id&&($result['uuid']??null)===$record['uuid'],409,'Réponse de commande invalide.');

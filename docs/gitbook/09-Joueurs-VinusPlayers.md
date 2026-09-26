@@ -26,7 +26,12 @@ Java 17 est requis pour 1.20.1, Java 21 pour 1.21.1. Une image Java reconnue et 
 
 Inventaire, équipement, coffre de l’Ender, skin, vie, armure, nourriture et expérience apparaissent si disponibles. **Les inventaires ne sont pas modifiables**. Les objets inconnus gardent identifiant/quantité et une icône de remplacement.
 
-Le plugin Bukkit accepte les actions autorisées : heal, kill, feed, opérateur, whitelist, ban, mode de jeu et niveaux. Les actions sensibles demandent confirmation. Le panel attend un accusé de réception ; une expiration ne relance pas automatiquement la commande. Ajouter quelqu’un à la whitelist ne l’active pas globalement. Les mods natifs sont en lecture seule.
+Les actions autorisées sont : soigner, éliminer, nourrir, opérateur, liste blanche, bannir, mode de jeu et niveaux. Les actions sensibles demandent confirmation et la permission `control.console`.
+
+- **Plugin Bukkit** : les actions passent par le compagnon, qui renvoie un accusé de réception ; une expiration ne relance pas automatiquement la commande.
+- **Mods Fabric/Forge/NeoForge** : le compagnon reste en lecture seule pour l'inventaire, mais les actions sont envoyées comme **commandes vanilla dans la console** du serveur (`effect`, `kill`, `gamemode`, `experience`, `op`, `whitelist`, `ban`), sans accusé de réception : vérifier l'état du joueur après l'action. Il faut un joueur connecté pour soigner, nourrir, éliminer, changer le mode de jeu ou le niveau, et le serveur doit être démarré.
+
+Ajouter quelqu’un à la whitelist ne l’active pas globalement.
 
 Aucun port public, clé API ou accès RCON supplémentaire n’est nécessaire. Les mods sont côté serveur uniquement. Les snapshots sont écrits dans `.vinus/players/` et lus par Wings avec les permissions du panel. Ne pas les publier.
 
@@ -36,14 +41,15 @@ Une fiche visible en direct se rafraîchit chaque seconde, sans chevauchement de
 
 50 joueurs ne signifient pas 50 requêtes navigateur par seconde. En revanche, 50 fiches visibles dans différents onglets peuvent approcher ce débit. La collecte des inventaires garde un coût sur Minecraft. Aucun test de charge à 50 joueurs en production ne garantit la capacité de votre machine.
 
-## Images et skins
+## Images des objets et skins
 
-La planche de textures Minecraft est optionnelle et séparée du code :
+L'installeur télécharge automatiquement le **client Minecraft officiel** (empreintes SHA-1 vérifiées) et en extrait les icônes des objets et blocs vers `public/assets/images/vinus/players/`. Sans ces fichiers, les objets s'affichent avec une icône de remplacement (◇). En cas d'échec réseau, ou sur un panel installé avant cette fonction :
 
 ```bash
-python3 scripts/fetch-player-textures.py /var/www/pterodactyl/public/assets/images/vinus/players
+cd ~/VinusPanel
+sudo bash install.sh --textures
 ```
 
-Le script utilise le client officiel et vérifie ses empreintes. Garder les crédits générés. Les modèles ItemsAdder/textures moddés ne sont pas inclus. Les skins passent par les services Mojang et le cache du panel ; les UUID hors ligne peuvent ne pas avoir de skin officiel.
+Ces images appartiennent à Mojang Studios / Microsoft : elles sont générées sur votre machine et ne font pas partie du code du dépôt (un fichier `NOTICE.txt` les accompagne). `VINUS_SKIP_TEXTURES=1` désactive ce téléchargement. Les modèles ItemsAdder et les textures moddées ne sont pas inclus : les objets de mods restent en icône de remplacement. Les skins passent par les services Mojang et le cache du panel ; les UUID hors ligne peuvent ne pas avoir de skin officiel.
 
 [Guide technique détaillé](https://github.com/yhanottv/VinusPanel/blob/main/docs/PLAYERS.md) · [Sommaire](README.md)

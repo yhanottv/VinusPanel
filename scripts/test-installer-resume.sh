@@ -40,6 +40,7 @@ setup_panel_environment() { calls+=(env); if [[ "${FAIL_AT:-}" == env ]]; then e
 
 install_blueprint() { calls+=(blueprint); }
 install_catalog() { calls+=(catalog); }
+install_player_textures() { calls+=(textures); }
 blueprint_installed() { [[ "${BP_PRESENT:-0}" == 1 ]]; }
 WITH_BLUEPRINT=no   # the resume cases below are about the panel bootstrap only
 
@@ -81,6 +82,8 @@ calls=(); FRESH_PANEL=0; WITH_BLUEPRINT=auto; BP_PRESENT=0; fresh_marker
 action_install production
 check "fresh install installs Blueprint before the theme" ordered blueprint theme
 check "fresh install installs the catalogue after the theme" ordered theme catalog
+
+check "item textures are fetched after the theme" ordered theme textures
 
 # 6. Existing panel without Blueprint (auto): left alone.
 calls=(); FRESH_PANEL=0; BP_PRESENT=0
