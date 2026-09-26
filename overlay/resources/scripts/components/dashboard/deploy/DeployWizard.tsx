@@ -3,6 +3,7 @@ import { useStoreState } from 'easy-peasy';
 import { vt } from '@/locales/translate';
 import getServers from '@/api/getServers';
 import { queueCompanion } from '@/components/server/players/companionFollowup';
+import { pickOwnerId } from './owner';
 import styles from './deploy.module.css';
 
 const csrf = () => document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '';
@@ -154,7 +155,7 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
                 setCpu(lastCpu ?? node.cpu_cores * 100);
                 setDisk(Math.min(10240, node.disk));
             }
-            setOwnerId(user?.id || payload.users[0]?.id || 0);
+            setOwnerId(pickOwnerId(payload.users, user?.email));
             const egg = payload.nests[0]?.eggs[0];
             if (egg) applyEgg(egg);
         } catch {

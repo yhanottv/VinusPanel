@@ -19,17 +19,45 @@ class VinusDeployController extends Controller
     {
     }
 
+    /** Whole cores granted by a cgroup v2 "cpu.max" line, or null when the group is unlimited. */
+    public static function coresFromCpuMax(string $line): ?int
+    {
+        $line = trim($line);
+        if ($line === '' || str_starts_with($line, 'max')) {
+            return null;
+        }
+        [$quota, $period] = array_pad(preg_split('/\s+/', $line), 2, '100000');
+        if ((int) $quota <= 0 || (int) $period <= 0) {
+            return null;
+        }
+
+        return max(1, (int) ceil(((int) $quota) / ((int) $period)));
+    }
+
+    private static function hostCores(): int
+    {
+        $disabled = array_map('trim', explode(',', (string) ini_get('disable_functions')));
+        if (function_exists('shell_exec') && !in_array('shell_exec', $disabled, true)) {
+            $cores = (int) trim((string) @shell_exec('nproc 2>/dev/null'));
+            if ($cores > 0) {
+                return $cores;
+            }
+        }
+        if (is_readable('/proc/cpuinfo')) {
+            $cores = (int) preg_match_all('/^processor\s*:/m', (string) file_get_contents('/proc/cpuinfo'));
+            if ($cores > 0) {
+                return $cores;
+            }
+        }
+
+        return 1;
+    }
+
     private function cpuCores(): int
     {
         $quota = null;
         if (is_file('/sys/fs/cgroup/cpu.max')) {
-            $line = trim((string) file_get_contents('/sys/fs/cgroup/cpu.max'));
-            if ($line !== '' && $line !== 'max') {
-                [$quota, $period] = array_pad(explode(' ', $line), 2, '100000');
-                if ((int) $period > 0) {
-                    $quota = max(1, (int) ceil(((int) $quota) / ((int) $period)));
-                }
-            }
+            $quota = self::coresFromCpuMax((string) file_get_contents('/sys/fs/cgroup/cpu.max'));
         }
         if ($quota === null && is_file('/sys/fs/cgroup/cpu/cpu.cfs_quota_us')) {
             $q = (int) file_get_contents('/sys/fs/cgroup/cpu/cpu.cfs_quota_us');
@@ -38,12 +66,8 @@ class VinusDeployController extends Controller
                 $quota = max(1, (int) ceil($q / $p));
             }
         }
-        if ($quota === null) {
-            $cores = (int) shell_exec('nproc 2>/dev/null') ?: (int) (@shell_exec('getconf _NPROCESSORS_ONLN 2>/dev/null') ?: 0);
-            return max(1, $cores);
-        }
 
-        return max(1, (int) $quota);
+        return $quota ?? self::hostCores();
     }
 
     private function memoryPresets(int $nodeMemory): array
@@ -330,14 +354,19 @@ class VinusDeployController extends Controller
             if (str_starts_with($loaderVersion, $minecraftVersion . '-')) {
                 $loaderVersion = substr($loaderVersion, strlen($minecraftVersion) + 1);
             }
-            try {
-                $availableBuilds = app(ServerSoftware::class)->builds('FORGE', $minecraftVersion);
-            } catch (\Throwable) {
-                $availableBuilds = [];
-            }
-            $isValidBuild = collect($availableBuilds)->contains(fn (array $build) => $build['name'] === $loaderVersion);
-            if (!$isValidBuild) {
-                return response()->json(['message' => 'La version Forge choisie ne correspond pas à cette version Minecraft.'], 422);
+            // The build list comes from the optional catalogue extension: without it there is nothing to check against.
+            if (class_exists(ServerSoftware::class)) {
+                try {
+                    $availableBuilds = app(ServerSoftware::class)->builds('FORGE', $minecraftVersion);
+                } catch (\Throwable $exception) {
+                    report($exception);
+
+                    return response()->json(['message' => 'Le catalogue des versions Forge est indisponible. Réessaie dans quelques instants.'], 502);
+                }
+                $isValidBuild = collect($availableBuilds)->contains(fn (array $build) => $build['name'] === $loaderVersion);
+                if (!$isValidBuild) {
+                    return response()->json(['message' => 'La version Forge choisie ne correspond pas à cette version Minecraft.'], 422);
+                }
             }
             $environment['FORGE_VERSION'] = $minecraftVersion . '-' . $loaderVersion;
         }
@@ -360,12 +389,14 @@ class VinusDeployController extends Controller
                 'image' => (string) $image,
                 'environment' => $environment,
                 'skip_scripts' => false,
-                'start_on_completion' => true,
+                'start_on_completion' => (bool) ($data['start_on_completion'] ?? true),
                 'database_limit' => 0,
                 'allocation_limit' => 0,
                 'backup_limit' => 0,
             ]);
         } catch (\Throwable $exception) {
+            report($exception);
+
             return response()->json(['message' => $exception->getMessage()], 422);
         }
 
