@@ -18,7 +18,8 @@ interface NodeInfo {
 }
 interface VariableInfo { env_variable: string; name: string; default_value: string; rules: string }
 interface CatalogVersion { id: string; channel: string; supported: boolean }
-interface EggInfo { id: number; name: string; startup: string; images: string[]; type?: string | null; versions?: CatalogVersion[]; variables: VariableInfo[] }
+interface CatalogBuild { id: string; name: string; experimental: boolean }
+interface EggInfo { id: number; name: string; startup: string; images: string[]; type?: string | null; versions?: CatalogVersion[]; builds?: CatalogBuild[]; variables: VariableInfo[] }
 interface NestInfo { id: number; name: string; eggs: EggInfo[] }
 interface UserInfo { id: number; email: string; username: string }
 interface DeployData { nodes: NodeInfo[]; nests: NestInfo[]; users: UserInfo[] }
@@ -66,6 +67,7 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
     const [eggId, setEggId] = useState(0);
     const [versionEnv, setVersionEnv] = useState<string>('');
     const [versionValue, setVersionValue] = useState<string>('');
+    const [buildValue, setBuildValue] = useState<string>('');
 
     useEffect(() => {
         if (!isAdmin) return;
@@ -149,6 +151,7 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
     const nestOfEgg = useMemo(() => data?.nests.find((nest) => nest.eggs.some((item) => item.id === eggId)), [data, eggId]);
     const versionOptions = useMemo(() => allowValues(egg?.variables.find((variable) => variable.env_variable === versionEnv)?.rules || ''), [egg, versionEnv]);
     const catalogVersions = useMemo(() => egg?.versions || [], [egg]);
+    const catalogBuilds = useMemo(() => egg?.builds || [], [egg]);
     const allocation = useMemo(() => node?.allocations.find((item) => item.id === allocationId), [node, allocationId]);
 
     useEffect(() => {
@@ -169,6 +172,12 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
         const preferred = catalogVersions.find((entry) => entry.supported) || catalogVersions[0];
         setVersionValue(preferred ? preferred.id : '');
     }, [versionEnv, catalogVersions, versionValue]);
+
+    useEffect(() => {
+        if (!catalogBuilds.length) { setBuildValue(''); return; }
+        if (catalogBuilds.some((entry) => entry.id === buildValue)) return;
+        setBuildValue(String(catalogBuilds[0].id));
+    }, [catalogBuilds, buildValue]);
 
     const canNext = (): boolean => {
         if (step === 0) return name.trim().length > 0 && ownerId > 0;
@@ -193,7 +202,12 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
                 cpu,
                 start_on_completion: false,
             };
-            if (versionEnv && versionValue) body.environment = { [versionEnv]: versionValue };
+            if (versionEnv && versionValue) {
+                const environment: Record<string, string> = { [versionEnv]: versionValue };
+                const buildVariable = egg?.variables.find((entry) => /build|loader|forge|fabric/i.test(entry.env_variable) && entry.env_variable !== versionEnv);
+                if (buildVariable && buildValue) environment[buildVariable.env_variable] = buildValue;
+                body.environment = environment;
+            }
             const response = await fetch('/admin/vinus-deploy', {
                 method: 'POST',
                 credentials: 'same-origin',
@@ -354,15 +368,30 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
                                 </div>
                             ))}
                             {versionEnv && catalogVersions.length > 0 && (
-                                <label>{vt('Version')}
-                                    <select value={versionValue} onChange={(event) => setVersionValue(event.target.value)}>
-                                        {catalogVersions.map((entry) => (
-                                            <option key={entry.id} value={entry.id}>
-                                                {entry.id}{entry.channel ? ` · ${entry.channel}` : ''}{entry.supported ? '' : ` · ${vt('non pris en charge')}`}
-                                            </option>
+                                <div className={styles.picker}>
+                                    <p className={styles.pickerLabel}>{vt('Version de Minecraft')}</p>
+                                    <div className={styles.optionScroll}>
+                                        {catalogVersions.map((entry, index) => (
+                                            <button key={entry.id} type="button" style={{ animationDelay: `${Math.min(index, 20) * 25}ms` }} className={styles.optionRow} data-active={versionValue === entry.id} onClick={() => setVersionValue(entry.id)}>
+                                                <strong>{entry.id}</strong>
+                                                <span>{entry.channel && entry.channel !== 'RELEASE' ? entry.channel : vt('Stable')}{entry.supported ? '' : ` · ${vt('non pris en charge')}`}</span>
+                                            </button>
                                         ))}
-                                    </select>
-                                </label>
+                                    </div>
+                                </div>
+                            )}
+                            {versionEnv && catalogBuilds.length > 0 && (
+                                <div className={styles.picker}>
+                                    <p className={styles.pickerLabel}>{vt('Version du loader')}</p>
+                                    <div className={styles.optionScroll}>
+                                        {catalogBuilds.map((entry, index) => (
+                                            <button key={entry.id} type="button" style={{ animationDelay: `${Math.min(index, 20) * 25}ms` }} className={styles.optionRow} data-active={buildValue === entry.id} onClick={() => setBuildValue(String(entry.id))}>
+                                                <strong>{entry.name}</strong>
+                                                <span>{entry.experimental ? vt('Expérimental') : vt('Stable')}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
                             )}
                             {versionEnv && catalogVersions.length === 0 && versionOptions.length > 0 && (
                                 <label>{vt('Version')}
@@ -387,7 +416,7 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
                                 <li style={{ animationDelay: '165ms' }}><span>{vt('Nœud')}</span><strong>{node?.name || '—'}</strong></li>
                                 <li style={{ animationDelay: '220ms' }}><span>{vt('Port')}</span><strong>{allocation?.port || '—'}</strong></li>
                                 <li style={{ animationDelay: '275ms' }}><span>{vt('Logiciel')}</span><strong>{nestOfEgg?.name || '—'} · {egg?.name || '—'}</strong></li>
-                                {versionEnv && versionValue && <li style={{ animationDelay: '330ms' }}><span>{vt('Version')}</span><strong>{versionValue}</strong></li>}
+                                {versionEnv && versionValue && <li style={{ animationDelay: '330ms' }}><span>{vt('Version')}</span><strong>{versionValue}{buildValue ? ` · ${buildValue}` : ''}</strong></li>}
                             </ul>
                             {message && <p className={styles.error}>{message}</p>}
                         </section>

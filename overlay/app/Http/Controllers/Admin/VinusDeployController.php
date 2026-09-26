@@ -154,6 +154,19 @@ class VinusDeployController extends Controller
             }
         }
 
+        $buildsFor = function (ServerSoftware $catalog, string $type, string $version): array {
+            try {
+                return collect($catalog->builds($type, $version))
+                    ->map(fn (array $build) => [
+                        'id' => (string) $build['id'],
+                        'name' => (string) $build['name'],
+                        'experimental' => (bool) $build['experimental'],
+                    ])->values()->all();
+            } catch (\Throwable) {
+                return [];
+            }
+        };
+
         $nodes = Node::query()->orderBy('id')->get()->map(fn (Node $node) => [
             'id' => $node->id,
             'name' => $node->name,
@@ -182,8 +195,13 @@ class VinusDeployController extends Controller
             ->map(fn (Nest $nest) => [
                 'id' => $nest->id,
                 'name' => $nest->name,
-                'eggs' => $nest->eggs->map(function (Egg $egg) use ($catalog, $catalogTypes) {
+                'eggs' => $nest->eggs->map(function (Egg $egg) use ($catalog, $catalogTypes, $buildsFor) {
                     $type = $this->catalogType($egg->name, array_keys($catalogTypes));
+                    $versions = $this->catalogVersions($catalog, $type);
+                    $preferred = collect($versions)->firstWhere('supported', true) ?: collect($versions)->first();
+                    $builds = ($catalog !== null && $type !== null && $preferred !== null)
+                        ? $buildsFor($catalog, $type, $preferred['id'])
+                        : [];
 
                     return [
                         'id' => $egg->id,
@@ -191,7 +209,8 @@ class VinusDeployController extends Controller
                         'startup' => $egg->startup,
                         'images' => array_values($egg->docker_images ?? []),
                         'type' => $type,
-                        'versions' => $this->catalogVersions($catalog, $type),
+                        'versions' => $versions,
+                        'builds' => $builds,
                         'variables' => $egg->variables->map(fn ($variable) => [
                             'env_variable' => $variable->env_variable,
                             'name' => $variable->name,
