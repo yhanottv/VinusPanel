@@ -1,0 +1,99 @@
+name: Frontend and PHP tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  PTERODACTYL_VERSION: "1.15.1"
+
+jobs:
+  frontend:
+    name: TypeScript, Jest and production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download Pterodactyl
+        run: |
+          mkdir panel
+          curl -fsSL -o panel/panel.tar.gz "https://github.com/pterodactyl/panel/releases/download/v${PTERODACTYL_VERSION}/panel.tar.gz"
+          tar -xzf panel/panel.tar.gz -C panel
+          rm panel/panel.tar.gz
+      - name: Install frontend dependencies
+        working-directory: panel
+        run: yarn install --frozen-lockfile
+      - name: Apply the VinusPanel overlay
+        run: |
+          while IFS= read -r file; do
+            [ -n "$file" ] || continue
+            install -D -m 0644 "overlay/$file" "panel/$file"
+          done < overlay-manifest.txt
+      - name: Add the dependencies installed by install.sh
+        working-directory: panel
+        # @babel/core is raised only for the tests: the locked 7.18 cannot load the
+        # current babel-preset-current-node-syntax that jest 28 resolves to.
+        run: |
+          yarn add -D @fontsource-variable/ibm-plex-sans@^5.2.8 jest-environment-jsdom@28.1.3 @babel/core@^7.24.0 --ignore-scripts
+          yarn add xterm-addon-unicode11@^0.6.0 --ignore-scripts
+      - name: TypeScript
+        working-directory: panel
+        run: node_modules/.bin/tsc --noEmit
+      - name: Unit tests
+        working-directory: panel
+        run: node_modules/.bin/jest --ci
+      - name: Production build
+        working-directory: panel
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
+        run: yarn build:production
+
+  php:
+    name: PHP and shell tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Throw-away key: the tests boot Laravel's encrypter but never touch real data.
+      APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: bcmath, curl, gd, mbstring, xml, zip
+          tools: composer
+      - name: Download Pterodactyl and install PHP dependencies
+        run: |
+          mkdir panel
+          curl -fsSL -o panel/panel.tar.gz "https://github.com/pterodactyl/panel/releases/download/v${PTERODACTYL_VERSION}/panel.tar.gz"
+          tar -xzf panel/panel.tar.gz -C panel
+          rm panel/panel.tar.gz
+          composer install --working-dir=panel --no-dev --no-interaction --no-scripts --prefer-dist
+      - name: Install the overlay and the catalogue classes into the panel
+        run: |
+          while IFS= read -r file; do
+            [ -n "$file" ] || continue
+            install -D -m 0644 "overlay/$file" "panel/$file"
+          done < overlay-manifest.txt
+          install -D -m 0644 blueprint-overlay/app/Http/Middleware/VinusMapCors.php panel/app/Http/Middleware/VinusMapCors.php
+          mkdir -p panel/app/BlueprintFramework/Extensions/vinuscatalog
+          cp -r extensions/vinuscatalog/app/. panel/app/BlueprintFramework/Extensions/vinuscatalog/
+          composer dump-autoload --working-dir=panel --no-interaction --no-scripts
+      - name: Catalogue extension tests
+        run: |
+          for test in extensions/vinuscatalog/tests/*.php; do
+            bash scripts/run-php-test.sh "$test" "$PWD/panel"
+          done
+      - name: Panel overlay tests
+        run: |
+          for test in scripts/test-*.php; do
+            bash scripts/run-php-test.sh "$test" "$PWD/panel"
+          done
+      - name: vinus-guard tests
+        run: bash scripts/test-guard.sh

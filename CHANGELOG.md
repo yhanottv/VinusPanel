@@ -2,6 +2,12 @@
 
 ## Unreleased — Live Design Studio
 
+- Fix the administration script (`vinus-admin.js`) being deleted by every `yarn build:production`: Pterodactyl's `clean` step removes each `*.js` under `public/assets`, so the admin search, language switch and navigation marker silently failed. The script now ships in `public/vinus/js/`.
+- Create servers for the signed-in administrator in the deployment wizard. The wizard looked for a numeric user id that the client API never provides, so the owner always defaulted to the first account.
+- Deployment wizard: unlimited cgroup v2 hosts (`cpu.max` = `max 100000`) no longer report a single CPU core, and a disabled `shell_exec` no longer breaks the page. A missing or unreachable Forge catalogue no longer blocks server creation with a misleading version error, and creation failures are now logged.
+- Harden `vinus-guard`: never follow symlinked `mods`, `logs`, `crash-reports` or quarantine directories out of a server volume (the guard runs as root), only process UUID-named volumes, and honour the panel directory chosen at install time. `uninstall.sh` now removes the guard service.
+- Add a ready-to-enable CI workflow (`docs/ci/frontend.yml`) that runs TypeScript, Jest, the production build and every PHP/shell test against a clean Pterodactyl 1.15.1. Repair the stale catalogue rate-limit test and the `ServerRow` spec, and remove unused imports.
+
 - Add emoji landmarks to the GitBook chapters and update the installation guide to use `main`.
 - Synchronize the latest deployed Activity styling and keep Blueprint navigation, feedback notices and console power controls aligned with the standard theme while preserving extension hooks.
 

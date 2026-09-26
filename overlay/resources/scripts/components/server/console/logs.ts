@@ -1,4 +1,5 @@
 export type LogLevel = 'all' | 'warning' | 'error';
+// eslint-disable-next-line no-control-regex
 export const stripAnsi = (text: string) => text.replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, '');
 export function logLevel(line: string): LogLevel {
     const text = stripAnsi(line);

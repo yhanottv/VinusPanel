@@ -1,5 +1,4 @@
 import { formatLocale, panelLanguage } from '@/locales/preferences';
-import { vt } from '@/locales/translate';
 import {
   Chart as ChartJS,
   ChartData,

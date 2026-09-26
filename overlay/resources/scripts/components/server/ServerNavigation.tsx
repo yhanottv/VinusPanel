@@ -11,7 +11,6 @@ import Icon, { DashboardIconName } from '@/components/dashboard/DashboardIcon';
 import dash from '@/components/dashboard/dashboard.module.css';
 import styles from './server.module.css';
 import SoftwareIcon from './SoftwareIcon';
-import { VINUS } from '@/theme';
 import { ip } from '@/lib/formatters';
 import { vt } from '@/locales/translate';
 import useNavigationIndicator from './useNavigationIndicator';

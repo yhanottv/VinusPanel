@@ -2,9 +2,9 @@ import MessageBox from '@/components/MessageBox';
 import React, { useEffect, useRef, useState } from 'react';
 import { Prompt, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faCloudUploadAlt, faImage, faPalette, faRedo, faServer, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faCloudUploadAlt, faImage, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { vt } from '@/locales/translate';
-import { VinusDesignSettings, ServerDesign, vinusDesign } from '@/vinusDesign';
+import { VinusDesignSettings, ServerDesign } from '@/vinusDesign';
 import styles from './style.module.css';
 
 interface StudioServer { uuid: string; name: string }

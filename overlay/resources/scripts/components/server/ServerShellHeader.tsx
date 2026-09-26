@@ -7,7 +7,6 @@ import Can from '@/components/elements/Can';
 import PowerButtons from '@/components/server/console/PowerButtons';
 import SoftwareIcon from './SoftwareIcon';
 import { ip } from '@/lib/formatters';
-import { serverDesign } from '@/vinusDesign';
 import { vt } from '@/locales/translate';
 import styles from './server.module.css';
 export default () => {

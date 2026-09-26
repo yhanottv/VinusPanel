@@ -8,7 +8,7 @@ import { Server } from '@/api/server/getServer';
 
 jest.mock('@/api/server/getServerResourceUsage');
 jest.mock('@/locales/translate', () => ({ vt: (text: string) => text }));
-jest.mock('@/vinusDesign', () => ({ serverDesign: () => ({}), vinusDesign: { server_card: '#101319' } }));
+jest.mock('@/vinusDesign', () => ({ ...jest.requireActual('@/vinusDesign'), serverDesign: () => ({}) }));
 
 const server = { id: 'test', uuid: 'test-uuid', name: 'Test server', node: 'Node', status: null, description: '',
     isNodeUnderMaintenance: false, isTransferring: false, allocations: [], limits: { memory: 1024, disk: 2048, cpu: 100 },
