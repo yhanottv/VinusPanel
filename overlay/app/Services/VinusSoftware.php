@@ -91,6 +91,9 @@ final class VinusSoftware
         };
         foreach ($keys as $key) {
             $value = trim((string) ($variables[$key] ?? ''));
+            if (in_array($profile, ['forge', 'neoforge'], true) && $version !== null && str_starts_with($value, $version.'-')) {
+                $value = substr($value, strlen($version) + 1);
+            }
             if (preg_match('/^\d+(?:\.\d+){1,3}$/D', $value)) { $loaderVersion = $value; break; }
         }
         return ['loader_version' => $loaderVersion, 'software' => $profile, 'categories' => self::PROFILES[$profile] ?? [], 'game_version' => $version];

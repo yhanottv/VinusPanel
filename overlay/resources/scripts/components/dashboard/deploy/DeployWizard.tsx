@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStoreState } from 'easy-peasy';
 import { vt } from '@/locales/translate';
 import getServers from '@/api/getServers';
+import { queueCompanion } from '@/components/server/players/companionFollowup';
 import styles from './deploy.module.css';
 
 const csrf = () => document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '';
@@ -316,6 +317,9 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
                 setMessage(payload?.message || vt('La création a échoué.'));
                 setBusy(false);
                 return;
+            }
+            if (typeof payload.companion_followup === 'string') {
+                queueCompanion(user.uuid, payload.server.uuid, payload.companion_followup);
             }
             window.location.href = `/server/${payload.server.identifier}`;
             try { window.localStorage.removeItem(ABANDONED_KEY); window.localStorage.removeItem(STORE_KEY); window.localStorage.setItem(dismissKey, '1'); } catch { /* noop */ }
