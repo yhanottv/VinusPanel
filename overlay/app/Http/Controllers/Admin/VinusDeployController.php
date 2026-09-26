@@ -138,6 +138,35 @@ class VinusDeployController extends Controller
         }
     }
 
+    public function loaderBuilds(Request $request): JsonResponse
+    {
+        $input = $request->validate([
+            'type' => ['required', 'regex:/^[A-Z][A-Z0-9_]{1,40}$/D'],
+            'version' => ['required', 'string', 'max:81'],
+        ]);
+        if (!class_exists(ServerSoftware::class)) {
+            return response()->json(['builds' => []]);
+        }
+
+        try {
+            $catalog = app(ServerSoftware::class);
+            $known = [];
+            foreach ($catalog->types() as $group) {
+                $known += $group;
+            }
+            abort_unless(isset($known[$input['type']]), 422, 'Logiciel inconnu.');
+            $builds = $catalog->builds($input['type'], $input['version']);
+
+            return response()->json(['builds' => array_map(fn (array $build) => [
+                'id' => (string) $build['id'],
+                'name' => (string) $build['name'],
+                'experimental' => (bool) $build['experimental'],
+            ], $builds)]);
+        } catch (\Throwable) {
+            return response()->json(['builds' => []]);
+        }
+    }
+
     public function data(): JsonResponse
     {
         $cores = $this->cpuCores();
@@ -153,19 +182,6 @@ class VinusDeployController extends Controller
                 $catalog = null;
             }
         }
-
-        $buildsFor = function (ServerSoftware $catalog, string $type, string $version): array {
-            try {
-                return collect($catalog->builds($type, $version))
-                    ->map(fn (array $build) => [
-                        'id' => (string) $build['id'],
-                        'name' => (string) $build['name'],
-                        'experimental' => (bool) $build['experimental'],
-                    ])->values()->all();
-            } catch (\Throwable) {
-                return [];
-            }
-        };
 
         $nodes = Node::query()->orderBy('id')->get()->map(fn (Node $node) => [
             'id' => $node->id,
@@ -195,13 +211,9 @@ class VinusDeployController extends Controller
             ->map(fn (Nest $nest) => [
                 'id' => $nest->id,
                 'name' => $nest->name,
-                'eggs' => $nest->eggs->map(function (Egg $egg) use ($catalog, $catalogTypes, $buildsFor) {
+                'eggs' => $nest->eggs->map(function (Egg $egg) use ($catalog, $catalogTypes) {
                     $type = $this->catalogType($egg->name, array_keys($catalogTypes));
                     $versions = $this->catalogVersions($catalog, $type);
-                    $preferred = collect($versions)->firstWhere('supported', true) ?: collect($versions)->first();
-                    $builds = ($catalog !== null && $type !== null && $preferred !== null)
-                        ? $buildsFor($catalog, $type, $preferred['id'])
-                        : [];
 
                     return [
                         'id' => $egg->id,
@@ -210,7 +222,6 @@ class VinusDeployController extends Controller
                         'images' => array_values($egg->docker_images ?? []),
                         'type' => $type,
                         'versions' => $versions,
-                        'builds' => $builds,
                         'variables' => $egg->variables->map(fn ($variable) => [
                             'env_variable' => $variable->env_variable,
                             'name' => $variable->name,

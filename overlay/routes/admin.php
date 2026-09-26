@@ -233,6 +233,6 @@ Route::group(['prefix' => 'nests'], function () {
     Route::delete('/egg/{egg:id}/variables/{variable:id}', [Admin\Nests\EggVariableController::class, 'destroy']);
 });
 
-// VinusPanel - assistant de creation de serveur (premiere connexion).
 Route::get('/vinus-deploy/data', [Admin\VinusDeployController::class, 'data'])->name('admin.vinus-deploy.data');
+Route::get('/vinus-deploy/builds', [Admin\VinusDeployController::class, 'loaderBuilds'])->name('admin.vinus-deploy.builds');
 Route::post('/vinus-deploy', [Admin\VinusDeployController::class, 'store'])->name('admin.vinus-deploy');
