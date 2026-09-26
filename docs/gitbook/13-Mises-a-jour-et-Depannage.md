@@ -11,7 +11,7 @@ sudo bash install.sh --update      # git pull --ff-only, sauvegarde, recompilati
 
 Équivalent : menu `sudo bash install.sh` puis option **3**. Le panel passe brièvement en maintenance pendant la compilation. Si `git pull` échoue (modifications locales, branche divergente), l'installeur le signale et réinstalle les sources actuelles : conserver ou réconcilier d'abord vos changements.
 
-Le catalogue se met à jour séparément : reconstruire le paquet et relancer `sudo blueprint -install vinuscatalog` ([chapitre 3](03-Blueprint-et-Catalogue.md)). Les compagnons VinusPlayers déjà présents dans les serveurs ne sont pas remplacés automatiquement.
+`--update` met aussi à jour le catalogue lorsque sa version change (`sudo bash install.sh --catalog` pour le faire seul). Les compagnons VinusPlayers déjà présents dans les serveurs ne sont pas remplacés automatiquement.
 
 ## Mettre à jour Pterodactyl et Wings
 

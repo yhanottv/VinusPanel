@@ -54,15 +54,7 @@ sudo bash install.sh --install    # ou sans option : menu interactif, choix [1]
 
 Les identifiants générés sont enregistrés dans `/var/lib/vinuspanel/credentials.txt`. Pour un autre chemin de panel, ajouter `--panel-dir /chemin/du/panel`. Le script sauvegarde les fichiers concernés, place temporairement le panel en maintenance et compile les ressources. Il ne démarre ni n’arrête les serveurs de jeu. Les réglages Design Studio restent sur l’installation. Avant d’ouvrir le panel au public : HTTPS, pare-feu et sauvegardes, voir la [documentation](https://vinuspanel.gitbook.io/vinuspanel-docs/).
 
-Le thème **n’installe pas automatiquement** les outils Minecraft. Sur un VPS vierge : installer le panel et le thème, puis Blueprint `beta-2026-06`, réappliquer le thème (`sudo bash install.sh --update`), puis construire et installer l’extension :
-
-```bash
-cd extensions/vinuscatalog
-zip -r vinuscatalog.blueprint conf.yml admin app components routes config tests README.md
-sudo cp vinuscatalog.blueprint /var/www/pterodactyl/
-cd /var/www/pterodactyl
-sudo blueprint -install vinuscatalog
-```
+Le thème **n’installe pas automatiquement** les outils Minecraft. Sur un VPS vierge, `install.sh` installe aussi **Blueprint `beta-2026-06` et Vinus Catalog** (outils Minecraft) : rien à faire à la main. `--no-blueprint` les désactive, `--catalog` réinstalle ou met à jour le catalogue seul, `--blueprint` les ajoute à un panel existant.
 
 Consulter le [guide VPS détaillé](INSTALLATION.fr.md), la [configuration de l’extension](extensions/vinuscatalog/README.md) et les [notes de mise à jour](docs/server-workspace/UPGRADE.md).
 

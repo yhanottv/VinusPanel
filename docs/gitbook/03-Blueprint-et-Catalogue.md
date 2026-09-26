@@ -1,17 +1,35 @@
 # 🧩 Blueprint et Vinus Catalog
 
-Pterodactyl gère les comptes et les serveurs. Blueprint est le framework d'extensions. **Vinus Catalog 1.4.0** fournit les outils Minecraft utilisés par le thème : logiciels et versions, mods et plugins, modpacks, mondes, BlueMap et joueurs. **Mettre à jour le thème ne met pas à jour le catalogue** : c'est une extension séparée.
+Pterodactyl gère les comptes et les serveurs. Blueprint est le framework d'extensions. **Vinus Catalog 1.4.0** fournit les outils Minecraft utilisés par le thème : logiciels et versions, mods et plugins, modpacks, mondes, BlueMap et joueurs. Le catalogue est une extension séparée de Blueprint ; `install.sh` l'installe et le met à jour avec le thème.
 
-## Ordre d'installation
+## Installation automatique
 
-Blueprint s'installe dans un panel existant. Sur un VPS vierge l'ordre est :
+Sur un VPS vierge, `install.sh` fait tout, dans cet ordre : panel Pterodactyl → Blueprint **`beta-2026-06`** (seule version validée) → thème appliqué **une seule fois** avec les variantes Blueprint → catalogue. Le catalogue n'est pas bloquant : s'il échoue, le reste fonctionne. Options : `--no-blueprint` (ne rien installer), `--blueprint` (forcer sur un panel existant), `--catalog` (installer ou mettre à jour le catalogue seul). Un `--update` met aussi le catalogue à jour quand sa version change.
 
-1. panel + thème + Wings (`install.sh`, [chapitre 2](02-Installation.md)) ;
-2. Blueprint **`beta-2026-06`** (seule version validée) ;
-3. réapplication du thème (`sudo bash install.sh --update`) : l'installeur détecte Blueprint et installe les variantes adaptées ;
-4. construction et installation du paquet du catalogue.
+Vérifier l'installation :
 
-Les commandes exactes sont dans le [chapitre 2, section 6](02-Installation.md). Les voici pour une mise à jour du catalogue :
+```bash
+cat /var/lib/vinuspanel/catalog-version            # 1.4.0
+cd /var/www/pterodactyl
+php8.3 artisan route:list | grep -c vinuscatalog   # environ 40 routes
+```
+
+## Installation manuelle (dépannage)
+
+À n'utiliser que si l'installeur ne peut pas être relancé. Blueprint s'installe dans un panel existant :
+
+```bash
+apt install -y zip unzip wget
+cd /var/www/pterodactyl
+wget "https://github.com/BlueprintFramework/framework/releases/download/beta-2026-06/release.zip" -O release.zip
+unzip -o release.zip
+printf 'WEBUSER="www-data";\nOWNERSHIP="www-data:www-data";\nUSERSHELL="/bin/bash";\n' > .blueprintrc
+chmod +x blueprint.sh
+NODE_OPTIONS=--openssl-legacy-provider bash blueprint.sh <<< "y"
+cd ~/VinusPanel && sudo bash install.sh --update    # applique les variantes Blueprint et le catalogue
+```
+
+Le paquet du catalogue se construit ainsi (l'installeur le fait pour vous) :
 
 ```bash
 cd ~/VinusPanel/extensions/vinuscatalog
@@ -21,12 +39,7 @@ cd /var/www/pterodactyl
 sudo blueprint -install vinuscatalog
 ```
 
-Adapter les chemins. `zip` est installé par `install.sh` (sinon `apt install -y zip`). Le dossier `app/player-artifacts` fait partie du paquet et contient les compagnons vérifiés de VinusPlayers. Vérifier l'installation :
-
-```bash
-cd /var/www/pterodactyl
-php8.3 artisan route:list | grep -c vinuscatalog   # environ 40 routes
-```
+Le dossier `app/player-artifacts` fait partie du paquet et contient les compagnons vérifiés de VinusPlayers.
 
 ## Compatibilité automatique
 

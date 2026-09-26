@@ -4,7 +4,7 @@ This documentation covers the **`main` branch**. The detailed chapters are in Fr
 
 ## What you get
 
-On a **fresh Ubuntu 24.04 VPS**, one script installs Pterodactyl Panel 1.15.1, the VinusPanel theme, MariaDB, Redis, Nginx, the queue worker and cron, Docker and Wings, plus a crash guard service. On a machine that already runs Pterodactyl 1.15.1, it applies (or updates) only the theme. Blueprint and the Vinus Catalog extension (Minecraft tools) are installed as a second step.
+On a **fresh Ubuntu 24.04 VPS**, one script installs everything: Pterodactyl Panel 1.15.1, MariaDB, Redis, Nginx, the queue worker and cron, Blueprint, the VinusPanel theme, the Vinus Catalog extension (Minecraft tools), Docker, Wings and a crash guard service. On a machine that already runs Pterodactyl 1.15.1, it applies (or updates) only the theme (plus the catalog if Blueprint is already there).
 
 ## Requirements
 
@@ -29,11 +29,11 @@ With a domain whose DNS `A` record already points to the VPS:
 sudo bash install.sh --install --url https://panel.example.com --admin-email you@example.com
 ```
 
-The run takes 10–20 minutes. If the panel phase fails, **re-run the same command**: the installer detects the unfinished install (`/var/lib/vinuspanel/bootstrap-incomplete`) and resumes. If the theme phase fails, the installer restores the original files automatically.
+The run is fully automatic and took about 7 minutes on 2 vCPU / 8 GB (up to 20 on slower machines). If the panel phase fails, **re-run the same command**: the installer detects the unfinished install (`/var/lib/vinuspanel/bootstrap-incomplete`) and resumes. If the theme phase fails, the installer restores the original files automatically.
 
 Generated passwords are printed at the end and saved in `/var/lib/vinuspanel/credentials.txt` (mode 600). Avoid `--db-password` and `--admin-password` on the command line (visible in the process list); use `VINUS_DB_PASSWORD` and `VINUS_ADMIN_PASSWORD`. Change the administrator password at first login.
 
-Useful options: `--timezone`, `--admin-user`, `--[no-]wings`, `--node-fqdn`, `--alloc-range A-B`, `--panel-dir`, `--keep-proxy`, `--update`, `--admin`, `--restart`, `--uninstall`.
+Useful options: `--timezone`, `--admin-user`, `--[no-]wings`, `--[no-]blueprint`, `--catalog`, `--node-fqdn`, `--alloc-range A-B`, `--panel-dir`, `--keep-proxy`, `--update`, `--admin`, `--restart`, `--uninstall`.
 
 ## 2. Check
 
@@ -45,29 +45,17 @@ cat /var/lib/vinuspanel/version
 
 Expect eight `active` lines, Pterodactyl `1.15.1` and the theme version. Log in, open **Admin → Nodes** (green heart = Wings connected) and **Design**. An administrator on a panel without servers gets a five-step wizard to create the first one.
 
-## 3. Blueprint and Vinus Catalog (Minecraft tools)
+## 3. Blueprint and Vinus Catalog (automatic)
 
-Requires Blueprint **`beta-2026-06`** exactly. Order on a fresh VPS: panel + theme → Blueprint → theme re-applied → catalog.
+On a fresh VPS the installer already did this: Blueprint **`beta-2026-06`** (the only validated version), then the theme applied once with the Blueprint variants, then Vinus Catalog. The catalog step is non-fatal. Skip it with `--no-blueprint`; force Blueprint on an existing panel with `--blueprint`; retry only the catalog with:
 
 ```bash
-apt install -y zip unzip wget
-cd /var/www/pterodactyl
-wget "https://github.com/BlueprintFramework/framework/releases/download/beta-2026-06/release.zip" -O release.zip
-unzip -o release.zip
-printf 'WEBUSER="www-data";\nOWNERSHIP="www-data:www-data";\nUSERSHELL="/bin/bash";\n' > .blueprintrc
-chmod +x blueprint.sh
-printf 'y\n' | bash blueprint.sh
-
-cd ~/VinusPanel && sudo bash install.sh --update      # detects Blueprint, installs its variants
-
-cd extensions/vinuscatalog
-zip -r vinuscatalog.blueprint conf.yml admin app components routes config tests README.md
-sudo cp vinuscatalog.blueprint /var/www/pterodactyl/
-cd /var/www/pterodactyl && sudo blueprint -install vinuscatalog
-php8.3 artisan route:list | grep -c vinuscatalog     # about 40 routes
+cd ~/VinusPanel && sudo bash install.sh --catalog
+cat /var/lib/vinuspanel/catalog-version            # 1.4.0
+php8.3 /var/www/pterodactyl/artisan route:list | grep -c vinuscatalog   # about 40 routes
 ```
 
-CurseForge needs a private key in `.env` (`VINUS_CURSEFORGE_API_KEY`); Modrinth, SpigotMC and MCJars work without one.
+CurseForge needs a private key in `.env` (`VINUS_CURSEFORGE_API_KEY`); Modrinth, SpigotMC and MCJars work without one. Manual commands for troubleshooting are in chapter 3 (French).
 
 ## 4. Harden before going public
 

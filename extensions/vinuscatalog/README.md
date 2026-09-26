@@ -4,6 +4,8 @@ Outils Minecraft pour **Pterodactyl 1.15.1**, **Blueprint beta-2026-06** et **Vi
 
 ## Installation
 
+**Automatique :** sur un VPS vierge, `install.sh` fait toutes les étapes ci-dessous (Blueprint, thème, catalogue) ; `sudo bash install.sh --catalog` réinstalle ou met à jour le catalogue seul. La procédure manuelle qui suit sert au dépannage ou aux panels déjà installés.
+
 1. Sauvegarder le panel, sa base, sa configuration et les fichiers des serveurs.
 2. Installer la version compatible de [Blueprint](https://blueprint.zip/guides/admin/install) (`beta-2026-06`) dans le panel déjà installé.
 3. Réappliquer le thème avec `sudo bash install.sh --update` depuis le dépôt : les variantes Blueprint sont alors détectées.

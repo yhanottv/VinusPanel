@@ -281,6 +281,8 @@ download_panel() {
         tar -xzf panel.tar.gz
         rm -f panel.tar.gz
         chmod -R 755 storage/* bootstrap/cache 2>/dev/null || true
+        # composer's post-install hook runs artisan, which refuses to start without a key.
+        ensure_app_key
         COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-interaction
     )
 }

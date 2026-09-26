@@ -164,7 +164,7 @@ The catalog tracks its own installed files and lets users check/apply compatible
 
 ### Install the extension
 
-After installing the compatible Blueprint version (`beta-2026-06`) and re-applying the theme (`sudo bash install.sh --update`), run from the repository root (`zip` must be installed; `install.sh` installs it):
+On a fresh VPS `install.sh` installs Blueprint `beta-2026-06` and this extension automatically (`--no-blueprint` skips them, `--catalog` reinstalls or updates only the catalogue, `--blueprint` adds them to an existing panel). The manual equivalent, run from the repository root (`zip` must be installed; `install.sh` installs it), is:
 
 ```bash
 cd extensions/vinuscatalog

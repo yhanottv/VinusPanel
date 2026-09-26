@@ -56,16 +56,17 @@ sudo bash install.sh --install
 sudo bash install.sh --install --url https://panel.exemple.fr --admin-email vous@exemple.fr
 ```
 
-L'opération complète dure de 10 à 20 minutes. Ne pas interrompre la compilation et ne pas lancer deux installations en parallèle. Un terminal multiplexé (`tmux`) protège d'une coupure de la connexion SSH.
+L'opération complète est **entièrement automatique** : Pterodactyl, thème, Blueprint, catalogue Minecraft, garde-fou et Wings. Elle a duré environ 7 minutes sur un VPS de 2 vCPU / 8 Go de RAM (comptez jusqu'à 20 minutes sur une machine plus lente). Ne pas interrompre la compilation et ne pas lancer deux installations en parallèle. Un terminal multiplexé (`tmux`) protège d'une coupure de la connexion SSH.
 
 ### Ce que fait l'installeur sur un VPS vierge
 
 1. Met à jour Ubuntu, ajoute le dépôt PHP `ppa:ondrej/php` et installe PHP 8.3, MariaDB, Nginx, Redis, Composer, Node 22, Yarn 1, `zip`, `unzip`, `wget`, `git` et `openssl`.
 2. Télécharge **Pterodactyl Panel 1.15.1**, génère la clé applicative avant la première commande `artisan`, crée la base MariaDB `panel` et l'utilisateur `pterodactyl`, configure l'environnement (Redis pour le cache, les sessions et la file d'attente, e-mails sur `log`), migre la base et crée le compte administrateur.
 3. Écrit le vhost Nginx (`/etc/nginx/sites-available/pterodactyl.conf`), la tâche cron du planificateur (`/etc/cron.d/pterodactyl`) et le service `pteroq` (worker de file d'attente). Avec une URL `https://`, il demande un certificat Let's Encrypt via Certbot.
-4. Applique la surcouche VinusPanel avec sauvegarde préalable, compile le frontend et vide les caches.
-5. Installe le garde-fou `vinus-guard`, service systemd qui met en quarantaine les mods client-only faisant planter un serveur (voir le [chapitre 8](08-Mods-et-Plugins.md)).
-6. Installe Docker si nécessaire, télécharge **Wings**, crée l'emplacement `fr1`, le nœud (nom = nom d'hôte court, limites = 85 % de la RAM et du disque réels), 20 allocations de ports sur l'IP détectée, écrit `/etc/pterodactyl/config.yml` (mode 600) et démarre `wings`.
+4. Installe **Blueprint `beta-2026-06`** sur le panel neuf, puis applique une seule fois la surcouche VinusPanel avec ses variantes Blueprint (sauvegarde préalable, compilation du frontend, caches vidés).
+5. Construit et installe l'extension **Vinus Catalog** (outils Minecraft : logiciels, mods, modpacks, mondes, BlueMap, joueurs). Cette étape n'est pas bloquante : en cas d'échec, le panel et le thème fonctionnent et un message indique de relancer `sudo bash install.sh --catalog`.
+6. Installe le garde-fou `vinus-guard`, service systemd qui met en quarantaine les mods client-only faisant planter un serveur (voir le [chapitre 8](08-Mods-et-Plugins.md)).
+7. Installe Docker si nécessaire, télécharge **Wings**, crée l'emplacement `fr1`, le nœud (nom = nom d'hôte court, limites = 85 % de la RAM et du disque réels), 20 allocations de ports sur l'IP détectée, écrit `/etc/pterodactyl/config.yml` (mode 600) et démarre `wings`.
 
 Si l'installation échoue pendant la phase « panel », **relancer la même commande** : l'installeur détecte l'installation incomplète (fichier `/var/lib/vinuspanel/bootstrap-incomplete`) et la reprend au lieu de considérer le panel à moitié installé comme terminé. Si l'échec survient pendant la phase « thème », l'installeur restaure automatiquement les fichiers d'origine ; corriger la cause (lire le message et `storage/logs/`) puis relancer.
 
@@ -84,7 +85,7 @@ Les copier dans un gestionnaire de mots de passe, **puis changer le mot de passe
 | Option | Rôle |
 | --- | --- |
 | `--install [prod\|dev]` | Installe le panel (si absent) puis le thème, sans menu |
-| `--update` | `git pull --ff-only` + réinstallation du thème |
+| `--update` | `git pull --ff-only` + réinstallation du thème (et mise à jour du catalogue si Blueprint est présent) |
 | `--admin` | Crée ou réinitialise le compte administrateur |
 | `--restart` | Redémarre PHP-FPM, Nginx, le worker et Wings |
 | `--uninstall` | Désinstalle le thème (via `uninstall.sh`) |
@@ -94,12 +95,14 @@ Les copier dans un gestionnaire de mots de passe, **puis changer le mot de passe
 | `--admin-email EMAIL` | E-mail administrateur (défaut : `admin@<nom-d-hôte>`) |
 | `--admin-user USER` | Identifiant administrateur (défaut : `admin`) |
 | `--[no-]wings` | Installe ou non Wings (défaut : automatique sur VPS vierge) |
+| `--[no-]blueprint` | Installe ou non Blueprint + Vinus Catalog (défaut : automatique sur VPS vierge ou si Blueprint est déjà présent) |
+| `--catalog` | Installe ou met à jour Vinus Catalog seul (Blueprint requis) |
 | `--node-fqdn HOTE` | FQDN ou IP du nœud Wings (défaut : hôte du panel) |
 | `--alloc-range A-B` | Plage de ports des allocations (défaut : `25565-25584`) |
 | `--panel-dir CHEMIN` | Autre emplacement que `/var/www/pterodactyl` |
 | `--keep-proxy` | Ne retire pas un reverse-proxy présent sur 80/443 |
 
-Variables utiles : `VINUS_NODE_MEMORY` et `VINUS_NODE_DISK` (limites du nœud en Mo), `VINUS_PHP_BIN` (binaire PHP, défaut `php8.3`), `VINUS_GUARD_INTERVAL` (période du garde-fou en secondes, défaut 20).
+Variables utiles : `VINUS_NODE_MEMORY` et `VINUS_NODE_DISK` (limites du nœud en Mo), `VINUS_WITH_BLUEPRINT` (`auto`, `yes` ou `no`, équivalent de `--[no-]blueprint`), `VINUS_PHP_BIN` (binaire PHP, défaut `php8.3`), `VINUS_GUARD_INTERVAL` (période du garde-fou en secondes, défaut 20).
 
 Sans domaine, le panel est servi en `http://<ip>` : Let's Encrypt ne délivre pas de certificat pour une adresse IP seule. Ce mode convient à un test, pas à un usage public : voir le [chapitre 12](12-Securite-et-Production.md).
 
@@ -109,10 +112,11 @@ Sans domaine, le panel est servi en `http://<ip>` : Let's Encrypt ne délivre pa
 systemctl is-active nginx php8.3-fpm mariadb redis-server pteroq wings docker vinus-guard
 curl -sI http://127.0.0.1 | head -1
 cd /var/www/pterodactyl && php8.3 artisan p:info
-cat /var/lib/vinuspanel/version
+cat /var/lib/vinuspanel/version /var/lib/vinuspanel/catalog-version
+php8.3 artisan route:list | grep -c vinuscatalog
 ```
 
-Résultat attendu : huit lignes `active`, une réponse `HTTP/1.1 200` ou `302`, Pterodactyl `1.15.1` et la version du thème (`3.2.0`).
+Résultat attendu : huit lignes `active`, une réponse `HTTP/1.1 200` ou `302`, Pterodactyl `1.15.1`, la version du thème (`3.2.0`), celle du catalogue (`1.4.0`) et environ 40 routes `vinuscatalog`.
 
 Dans le navigateur :
 
@@ -121,42 +125,18 @@ Dans le navigateur :
 3. Un administrateur sans serveur voit l'assistant de création de la [première connexion](04-Premiers-pas.md).
 4. Ouvrir **Design** dans la barre latérale et vérifier l'aperçu.
 
-Les onglets **Version**, **Mods**, **Modpacks**, **Mondes** et **BlueMap** n'apparaissent qu'après l'étape suivante.
+Sur un serveur Minecraft, les onglets **Version**, **Mods**, **Modpacks**, **Mondes** et **BlueMap** sont disponibles.
 
-## 6. Blueprint et Vinus Catalog (outils Minecraft)
+## 6. Blueprint et Vinus Catalog (déjà fait par l'installeur)
 
-Ces outils exigent **Blueprint `beta-2026-06`** (version exacte). Blueprint s'installe **dans un panel qui existe déjà** : l'ordre correct sur un VPS vierge est donc *panel + thème → Blueprint → thème réappliqué → catalogue*.
+Sur un VPS vierge, `install.sh` a installé Blueprint `beta-2026-06` (version exacte exigée) puis le catalogue : **rien à faire à la main**. Pour ne pas les installer, ajouter `--no-blueprint`. Si la ligne finale de l'installeur indique « Vinus Catalog : non installé » (échec non bloquant, par exemple réseau), corriger la cause puis relancer :
 
 ```bash
-# 1. Blueprint
-apt install -y zip unzip wget
-cd /var/www/pterodactyl
-wget "https://github.com/BlueprintFramework/framework/releases/download/beta-2026-06/release.zip" -O release.zip
-unzip -o release.zip
-printf 'WEBUSER="www-data";\nOWNERSHIP="www-data:www-data";\nUSERSHELL="/bin/bash";\n' > .blueprintrc
-chmod +x blueprint.sh
-printf 'y\n' | bash blueprint.sh
-
-# 2. Réappliquer le thème : les variantes Blueprint sont détectées automatiquement
 cd ~/VinusPanel
-sudo bash install.sh --update
-
-# 3. Paquet et installation du catalogue
-cd extensions/vinuscatalog
-zip -r vinuscatalog.blueprint conf.yml admin app components routes config tests README.md
-sudo cp vinuscatalog.blueprint /var/www/pterodactyl/
-cd /var/www/pterodactyl
-sudo blueprint -install vinuscatalog
+sudo bash install.sh --catalog
 ```
 
-Adapter `~/VinusPanel` au dossier où le dépôt a été cloné. Ces étapes compilent le frontend : compter quelques minutes chacune. Vérifier ensuite :
-
-```bash
-cd /var/www/pterodactyl
-php8.3 artisan route:list | grep -c vinuscatalog   # environ 40 routes
-```
-
-Recharger le panel (Ctrl+F5) : les onglets Minecraft apparaissent sur un serveur Minecraft. Détails, fournisseurs et clé CurseForge : [chapitre 3](03-Blueprint-et-Catalogue.md).
+Sur un panel existant sans Blueprint, ajouter `--blueprint` à `--install` ou `--update` pour l'installer aussi ; s'il est déjà présent, `--update` installe ou met à jour le catalogue. Les commandes manuelles équivalentes (dépannage) sont dans le [chapitre 3](03-Blueprint-et-Catalogue.md).
 
 ## 7. Après l'installation
 
@@ -170,6 +150,6 @@ Chaque installation du thème sauvegarde les fichiers remplacés dans `/var/back
 
 ## Panel Pterodactyl existant
 
-Sur une machine où Pterodactyl est déjà installé dans `/var/www/pterodactyl`, `install.sh` détecte le panel et applique (ou met à jour) uniquement le thème : mêmes commandes, mêmes vérifications, sans installer Wings. Il exige Pterodactyl **1.15.1** ; une autre version est refusée. Sauvegarder d'abord la base, `.env` et le panel. Prérequis pour le thème seul : Git, Bash, PHP 8.3, Composer, Node 22, Yarn 1 et les sources frontend Pterodactyl.
+Sur une machine où Pterodactyl est déjà installé dans `/var/www/pterodactyl`, `install.sh` détecte le panel et applique (ou met à jour) uniquement le thème : mêmes commandes, mêmes vérifications, sans installer Wings et sans installer Blueprint (sauf avec `--blueprint`). Il exige Pterodactyl **1.15.1** ; une autre version est refusée. Sauvegarder d'abord la base, `.env` et le panel. Prérequis pour le thème seul : Git, Bash, PHP 8.3, Composer, Node 22, Yarn 1 et les sources frontend Pterodactyl.
 
 [Sommaire](README.md) · [Blueprint et catalogue](03-Blueprint-et-Catalogue.md) · [Sécurité et production](12-Securite-et-Production.md)

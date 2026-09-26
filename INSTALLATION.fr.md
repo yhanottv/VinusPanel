@@ -34,15 +34,15 @@ sudo bash install.sh --check      # rapport, aucune modification
 sudo bash install.sh --install    # ou sans option : menu, choix [1]
 ```
 
-Avec un domaine (DNS `A` déjà orienté vers le VPS) : `sudo bash install.sh --install --url https://panel.exemple.fr --admin-email vous@exemple.fr`. L'opération dure de 10 à 20 minutes. En cas d'échec pendant la phase « panel », relancer la même commande : elle reprend. En cas d'échec pendant la phase « thème », les fichiers d'origine sont restaurés automatiquement.
+Avec un domaine (DNS `A` déjà orienté vers le VPS) : `sudo bash install.sh --install --url https://panel.exemple.fr --admin-email vous@exemple.fr`. L'opération est entièrement automatique (environ 7 minutes sur 2 vCPU / 8 Go). En cas d'échec pendant la phase « panel », relancer la même commande : elle reprend. En cas d'échec pendant la phase « thème », les fichiers d'origine sont restaurés automatiquement.
 
 Les mots de passe générés sont affichés à la fin et enregistrés dans `/var/lib/vinuspanel/credentials.txt` (chmod 600). Changer le mot de passe administrateur à la première connexion.
 
 Pour un panel situé ailleurs que `/var/www/pterodactyl` : `--panel-dir /chemin/absolu`. L'installeur est relançable pour une mise à jour (`sudo bash install.sh --update`) ; il conserve les réglages et images Design.
 
-## 4. Blueprint et catalogue Minecraft (optionnel)
+## 4. Blueprint et catalogue Minecraft (automatiques)
 
-Ordre sur un VPS vierge : panel + thème → Blueprint `beta-2026-06` → thème réappliqué (`sudo bash install.sh --update`) → paquet `vinuscatalog`. Commandes exactes : chapitre 2, section 6, de la documentation, et [`extensions/vinuscatalog/README.md`](extensions/vinuscatalog/README.md). Avant d'ouvrir le panel au public : domaine et HTTPS, pare-feu, SSH par clé, e-mails et sauvegardes (chapitre 12).
+Sur un VPS vierge, `install.sh` installe aussi **Blueprint `beta-2026-06`** puis **Vinus Catalog** : panel → Blueprint → thème (une seule application avec les variantes Blueprint) → catalogue. Options : `--no-blueprint` (ne rien installer), `--blueprint` (sur un panel existant), `--catalog` (catalogue seul, installation ou mise à jour). Le catalogue n'est pas bloquant. Commandes manuelles de dépannage : chapitre 3 de la documentation et [`extensions/vinuscatalog/README.md`](extensions/vinuscatalog/README.md). Avant d'ouvrir le panel au public : domaine et HTTPS, pare-feu, SSH par clé, e-mails et sauvegardes (chapitre 12).
 
 ## 5. Configurer le menu Design
 
