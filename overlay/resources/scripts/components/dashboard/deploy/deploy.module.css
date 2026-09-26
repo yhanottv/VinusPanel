@@ -346,6 +346,73 @@
     font-size: 14px;
 }
 
+.picker {
+    margin-bottom: 20px;
+}
+
+.pickerLabel {
+    margin: 0 0 10px;
+    font-size: 13px;
+    color: #cfd0d6;
+}
+
+.optionScroll {
+    max-height: 240px;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 13px;
+    background: #101016;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 122, 26, 0.55) transparent;
+}
+
+.optionRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 11px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    background: #14141a;
+    color: #e9e9ee;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+    animation: vinus-card 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.optionRow:hover {
+    border-color: rgba(255, 122, 26, 0.5);
+    transform: translateY(-1px);
+}
+
+.optionRow[data-active='true'] {
+    border-color: #ff7a1a;
+    background: linear-gradient(180deg, rgba(255, 122, 26, 0.16) 0%, rgba(255, 122, 26, 0.04) 100%);
+    box-shadow: 0 0 0 1px rgba(255, 122, 26, 0.55) inset;
+}
+
+.optionRow strong {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.optionRow span {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8f9199;
+}
+
+.optionRow[data-active='true'] span {
+    color: #ff9b52;
+}
+
 .summary {
     margin: 0;
     padding: 0;
@@ -459,6 +526,7 @@
     .panelIn,
     .memoryCard,
     .engineCard,
+    .optionRow,
     .summary li {
         animation: none !important;
     }
