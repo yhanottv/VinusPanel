@@ -26,6 +26,9 @@ interface DeployData { nodes: NodeInfo[]; nests: NestInfo[]; users: UserInfo[] }
 
 const STEPS = ['IDENTITY', 'RESOURCES', 'ACCESS', 'SOFTWARE', 'REVIEW'] as const;
 
+const STORE_KEY = 'vinus:deploy:state';
+const ABANDONED_KEY = 'vinus:deploy:abandoned';
+
 const isMinecraft = (nest: NestInfo) => /minecraft/i.test(nest.name);
 
 const allowValues = (rules: string): string[] => {
@@ -46,6 +49,7 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
 
     const [promptVisible, setPromptVisible] = useState(false);
     const [promptLeaving, setPromptLeaving] = useState(false);
+    const [promptMessage, setPromptMessage] = useState<string>('');
     const [open, setOpen] = useState(false);
     const [data, setData] = useState<DeployData | null>(null);
     const [dataError, setDataError] = useState<string | null>(null);
@@ -81,6 +85,14 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
 
     useEffect(() => {
         if (!isAdmin || !known || hasServers) return;
+        let abandoned = false;
+        try { abandoned = window.localStorage.getItem(ABANDONED_KEY) === '1'; } catch { /* noop */ }
+        if (abandoned) {
+            try { window.localStorage.removeItem(ABANDONED_KEY); } catch { /* noop */ }
+            setPromptMessage(vt('Oups, vous n\u2019avez pas encore créé votre premier serveur.'));
+            setPromptVisible(true);
+            return;
+        }
         try {
             if (!window.localStorage.getItem(dismissKey)) setPromptVisible(true);
         } catch {
@@ -89,7 +101,10 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
     }, [isAdmin, known, hasServers, dismissKey]);
 
     const dismiss = useCallback(() => {
-        try { window.localStorage.setItem(dismissKey, '1'); } catch { /* noop */ }
+        try {
+            window.localStorage.setItem(dismissKey, '1');
+            window.localStorage.setItem(ABANDONED_KEY, '1');
+        } catch { /* noop */ }
         setPromptLeaving(true);
         window.setTimeout(() => setPromptVisible(false), 260);
     }, [dismissKey]);
@@ -134,6 +149,11 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
     }, [user, applyEgg]);
 
     const openWizard = useCallback(() => {
+        try {
+            window.localStorage.removeItem(ABANDONED_KEY);
+            window.localStorage.removeItem(STORE_KEY);
+        } catch { /* noop */ }
+        setPromptMessage('');
         dismiss();
         setStep(0);
         setOpen(true);
@@ -155,7 +175,27 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
     const allocation = useMemo(() => node?.allocations.find((item) => item.id === allocationId), [node, allocationId]);
 
     useEffect(() => {
-        if (node && !node.memory_presets.some((preset) => preset.value === memory)) {
+        if (!isAdmin || !known || hasServers) {
+            try { window.localStorage.removeItem(ABANDONED_KEY); window.localStorage.removeItem(STORE_KEY); } catch { /* noop */ }
+            return;
+        }
+        const onLeave = () => {
+            try {
+                if (open) { window.localStorage.setItem(STORE_KEY, '1'); return; }
+                if (promptVisible && !promptLeaving) window.localStorage.setItem(ABANDONED_KEY, '1');
+            } catch { /* noop */ }
+        };
+        window.addEventListener('pagehide', onLeave);
+        window.addEventListener('beforeunload', onLeave);
+        return () => {
+            window.removeEventListener('pagehide', onLeave);
+            window.removeEventListener('beforeunload', onLeave);
+        };
+    }, [isAdmin, known, hasServers, open, promptVisible, promptLeaving]);
+
+    useEffect(() => {
+        if (!node) return;
+        if (!node.memory_presets.some((preset) => preset.value === memory)) {
             const lastMem = node.memory_presets[node.memory_presets.length - 1];
             setMemory(lastMem?.value ?? 1024);
         }
@@ -225,6 +265,7 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
                 return;
             }
             window.location.href = `/server/${payload.server.identifier}`;
+            try { window.localStorage.removeItem(ABANDONED_KEY); window.localStorage.removeItem(STORE_KEY); window.localStorage.setItem(dismissKey, '1'); } catch { /* noop */ }
         } catch {
             setMessage(vt('La création a échoué.'));
             setBusy(false);
@@ -237,9 +278,10 @@ export default function DeployWizard({ hasServers: hasServersProp }: { hasServer
         return (
             <div className={`${styles.overlay} ${promptLeaving ? styles.overlayOut : styles.overlayIn}`} role="dialog" aria-modal="true" aria-label={vt('Créer un serveur')}>
                 <div className={`${styles.prompt} ${promptLeaving ? styles.cardOut : styles.cardIn}`}>
-                    <span className={styles.badge}>{vt('Première connexion')}</span>
+                    <span className={styles.badge}>{promptMessage ? vt('Rappel') : vt('Première connexion')}</span>
+                    {promptMessage && <p className={styles.oups}>{promptMessage}</p>}
                     <h2>{vt('Voulez-vous créer un serveur maintenant ?')}</h2>
-                    <p>{vt('Un assistant vous guide en cinq étapes : identité, ressources, accès, logiciel et récapitulatif.')}</p>
+                    {!promptMessage && <p>{vt('Un assistant vous guide en cinq étapes : identité, ressources, accès, logiciel et récapitulatif.')}</p>}
                     <div className={styles.actions}>
                         <button type="button" className={styles.ghost} onClick={dismiss}>{vt('Plus tard')}</button>
                         <button type="button" className={styles.primary} onClick={openWizard}>{vt('Créer un serveur')}</button>

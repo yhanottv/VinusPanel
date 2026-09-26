@@ -512,6 +512,18 @@
     border-color: rgba(255, 255, 255, 0.28);
 }
 
+.oups {
+    display: inline-block;
+    margin: 0 0 4px;
+    padding: 10px 14px;
+    border: 1px solid rgba(255, 122, 26, 0.45);
+    border-radius: 11px;
+    background: rgba(255, 122, 26, 0.1);
+    color: #ffb27a;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
 .actions {
     display: flex;
     justify-content: flex-end;
