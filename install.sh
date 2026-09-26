@@ -585,7 +585,7 @@ catalog_version() {
 # Non fatal: the panel and the theme already work without the Minecraft tools.
 install_catalog() {
     blueprint_installed || { warn "Blueprint absent : Vinus Catalog ignore."; return 0; }
-    local wanted recorded="" present=0 action="-install" package="$PANEL_DIR/vinuscatalog.blueprint"
+    local wanted recorded="" present=0 package="$PANEL_DIR/vinuscatalog.blueprint"
     wanted="$(catalog_version)"
     [[ -d "$PANEL_DIR/app/BlueprintFramework/Extensions/vinuscatalog" ]] && present=1
     [[ -f "$STATE_DIR/catalog-version" ]] && recorded="$(<"$STATE_DIR/catalog-version")"
@@ -593,14 +593,14 @@ install_catalog() {
         log "Vinus Catalog ${wanted} deja installe."
         return 0
     fi
-    ((present)) && action="-upgrade"
-    log "Vinus Catalog ${wanted} : blueprint ${action}..."
+    # "blueprint -install" also updates an extension ("-upgrade" would upgrade Blueprint itself).
+    log "Vinus Catalog ${wanted} : blueprint -install..."
     rm -f "$package"
     if ! (cd "$REPO_DIR/extensions/vinuscatalog" && zip -qr "$package" conf.yml admin app components routes config tests README.md); then
         warn "paquet Vinus Catalog impossible a construire (zip installe ?) : relancer avec --catalog."
         return 0
     fi
-    if (cd "$PANEL_DIR" && enable_legacy_openssl && blueprint_cmd "$action" vinuscatalog); then
+    if (cd "$PANEL_DIR" && enable_legacy_openssl && blueprint_cmd -install vinuscatalog); then
         mkdir -p "$STATE_DIR"
         printf '%s\n' "$wanted" > "$STATE_DIR/catalog-version"
         (cd "$PANEL_DIR" && "$PHP_BIN" artisan config:clear >/dev/null 2>&1) || true
