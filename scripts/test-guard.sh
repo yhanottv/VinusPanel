@@ -11,6 +11,13 @@ export VINUS_GUARD_VOLUMES="$TMP/volumes" VINUS_GUARD_STATE="$TMP/state" VINUS_G
 export VINUS_PANEL_DIR="$TMP/panel"
 mkdir -p "$VINUS_GUARD_VOLUMES" "$TMP/bin"
 
+# Windows shells copy instead of linking: the symlink cases would be meaningless there.
+mkdir "$TMP/probe" && ln -s "$TMP/probe" "$TMP/probe-link" 2>/dev/null
+if [ ! -L "$TMP/probe-link" ]; then
+    echo "vinus-guard: SKIPPED (this shell cannot create symbolic links; run it on Linux)."
+    exit 0
+fi
+
 # The guard only runs when Docker exists; a shim is enough because container_running is replaced below.
 printf '#!/bin/sh\nexit 1\n' > "$TMP/bin/docker"
 chmod +x "$TMP/bin/docker"

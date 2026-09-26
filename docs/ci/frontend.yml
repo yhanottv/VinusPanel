@@ -95,5 +95,7 @@ jobs:
           for test in scripts/test-*.php; do
             bash scripts/run-php-test.sh "$test" "$PWD/panel"
           done
-      - name: vinus-guard tests
-        run: bash scripts/test-guard.sh
+      - name: Shell tests (vinus-guard, installer resume)
+        run: |
+          bash scripts/test-guard.sh
+          bash scripts/test-installer-resume.sh

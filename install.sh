@@ -21,6 +21,8 @@ TRANSACTION_BACKUP=""
 MAINTENANCE_ENABLED=0
 INSTALL_STARTED=0
 CREDENTIALS_FILE="$STATE_DIR/credentials.txt"
+# Present while a fresh panel is being installed: a re-run resumes instead of treating a half-installed panel as complete.
+BOOTSTRAP_MARKER="$STATE_DIR/bootstrap-incomplete"
 
 BUILD_MODE="production"
 ACTION=""
@@ -251,7 +253,7 @@ install_dependencies() {
     apt-get update -y
     apt-get install -y php8.3 php8.3-common php8.3-cli php8.3-gd php8.3-mysql \
         php8.3-mbstring php8.3-bcmath php8.3-xml php8.3-fpm php8.3-curl php8.3-zip \
-        mariadb-server nginx tar unzip git redis-server openssl
+        mariadb-server nginx tar unzip zip wget git redis-server openssl
 
     if ! command -v composer >/dev/null 2>&1; then
         curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -491,6 +493,8 @@ ensure_base_services() {
 bootstrap_panel() {
     require_supported_os
     free_web_ports
+    mkdir -p "$STATE_DIR"
+    : > "$BOOTSTRAP_MARKER"
     install_dependencies
     if command -v update-alternatives >/dev/null 2>&1 && [[ -x /usr/bin/php8.3 ]]; then
         update-alternatives --set php /usr/bin/php8.3 >/dev/null 2>&1 || true
@@ -504,6 +508,7 @@ bootstrap_panel() {
     fix_permissions
     configure_webserver
     configure_services
+    rm -f "$BOOTSTRAP_MARKER"
     ok "Panel Pterodactyl ${PTERODACTYL_VERSION} installe (${PANEL_URL})."
 }
 
@@ -874,9 +879,10 @@ action_install() {
     require_root
     generate_secrets
 
-    if panel_present; then
+    if panel_present && [[ ! -f "$BOOTSTRAP_MARKER" ]]; then
         log "Panel Pterodactyl detecte dans ${PANEL_DIR}."
     else
+        [[ -f "$BOOTSTRAP_MARKER" ]] && warn "une installation precedente du panel est incomplete : reprise."
         FRESH_PANEL=1
         bootstrap_panel
     fi
